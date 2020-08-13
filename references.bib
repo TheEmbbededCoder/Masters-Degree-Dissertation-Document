@@ -1,4 +1,39 @@
 
+@inproceedings{kim_flipping_2014,
+	address = {Minneapolis, MN, USA},
+	title = {Flipping bits in memory without accessing them: {An} experimental study of {DRAM} disturbance errors},
+	isbn = {978-1-4799-4394-4 978-1-4799-4396-8},
+	shorttitle = {Flipping bits in memory without accessing them},
+	url = {http://ieeexplore.ieee.org/document/6853210/},
+	doi = {10.1109/ISCA.2014.6853210},
+	abstract = {Memory isolation is a key property of a reliable and secure computing system — an access to one memory address should not have unintended side eﬀects on data stored in other addresses. However, as DRAM process technology scales down to smaller dimensions, it becomes more diﬃcult to prevent DRAM cells from electrically interacting with each other. In this paper, we expose the vulnerability of commodity DRAM chips to disturbance errors. By reading from the same address in DRAM, we show that it is possible to corrupt data in nearby addresses. More speciﬁcally, activating the same row in DRAM corrupts data in nearby rows. We demonstrate this phenomenon on Intel and AMD systems using a malicious program that generates many DRAM accesses. We induce errors in most DRAM modules (110 out of 129) from three major DRAM manufacturers. From this we conclude that many deployed systems are likely to be at risk. We identify the root cause of disturbance errors as the repeated toggling of a DRAM row’s wordline, which stresses inter-cell coupling eﬀects that accelerate charge leakage from nearby rows. We provide an extensive characterization study of disturbance errors and their behavior using an FPGA-based testing platform. Among our key ﬁndings, we show that (i) it takes as few as 139K accesses to induce an error and (ii) up to one in every 1.7K cells is susceptible to errors. After examining various potential ways of addressing the problem, we propose a low-overhead solution to prevent the errors.},
+	language = {en},
+	urldate = {2020-08-11},
+	booktitle = {2014 {ACM}/{IEEE} 41st {International} {Symposium} on {Computer} {Architecture} ({ISCA})},
+	publisher = {IEEE},
+	author = {Kim, Yoongu and Daly, Ross and Kim, Jeremie and Fallin, Chris and Lee, Ji Hye and Lee, Donghyuk and Wilkerson, Chris and Lai, Konrad and Mutlu, Onur},
+	month = jun,
+	year = {2014},
+	pages = {361--372}
+}
+
+@inproceedings{leng_gpuvolt_2014,
+	address = {La Jolla, California, USA},
+	title = {{GPUVolt}: modeling and characterizing voltage noise in {GPU} architectures},
+	isbn = {978-1-4503-2975-0},
+	shorttitle = {{GPUVolt}},
+	url = {http://dl.acm.org/citation.cfm?doid=2627369.2627605},
+	doi = {10.1145/2627369.2627605},
+	abstract = {Voltage noise is a major obstacle in improving processor energy e ciency because it necessitates large operating voltage guardbands that increase overall power consumption and limit peak performance. Identifying the leading root causes of voltage noise is essential to minimize the unnecessary guardband and maximize the overall energy e ciency. We provide the ﬁrst-ever modeling and characterization of voltage noise in GPUs based on a new simulation infrastructure called GPUVolt. Using it, we identify the key intracore microarchitectural components (e.g., the register ﬁle and special functional units) that signiﬁcantly impact the GPU’s voltage noise. We also demonstrate that intercore-aligned microarchitectural activity detrimentally impacts the chipwide worst-case voltage droops. On the basis of these ﬁndings, we propose a combined register-ﬁle and execution-unit throttling mechanism that smooths GPU voltage noise and reduces the guardband requirement by as much as 29\%.},
+	language = {en},
+	urldate = {2020-08-08},
+	booktitle = {Proceedings of the 2014 international symposium on {Low} power electronics and design - {ISLPED} '14},
+	publisher = {ACM Press},
+	author = {Leng, Jingwen and Zu, Yazhou and Rhu, Minsoo and Gupta, Meeta and Reddi, Vijay Janapa},
+	year = {2014},
+	pages = {141--146}
+}
+
 @article{freijedo_modeling_2012,
 	title = {Modeling the {Effect} of {Process}, {Power}-{Supply} {Voltage} and {Temperature} {Variations} on the {Timing} {Response} of {Nanometer} {Digital} {Circuits}},
 	volume = {28},
@@ -666,7 +701,6 @@ applications.},
 	urldate = {2019-12-25},
 	year = {2010}
 }
-
 @misc{noauthor_pytorch_2016,
 	title = {{PyTorch}},
 	url = {https://pytorch.org/},
@@ -680,6 +714,7 @@ applications.},
 	urldate = {2019-12-25},
 	year = {1999}
 }
+
 @article{he_deep_2015,
 	title = {Deep {Residual} {Learning} for {Image} {Recognition}},
 	url = {http://arxiv.org/abs/1512.03385},
@@ -1163,7 +1198,6 @@ Many of the techniques presented in this dissertation can be used to improve the
 	keywords = {energy-aware computing, optimization, power-aware computing, resource allocation},
 	pages = {13:1--13:5}
 }
-
 @inproceedings{kim_racing_2015,
 	title = {Racing and {Pacing} to {Idle}: {Theoretical} and {Empirical} {Analysis} of {Energy} {Optimization} {Heuristics}},
 	shorttitle = {Racing and {Pacing} to {Idle}},
@@ -1195,6 +1229,7 @@ Many of the techniques presented in this dissertation can be used to improve the
 	keywords = {CUDA, GPU architecture, analytical model, energy, performance, power estimation},
 	pages = {280--289}
 }
+
 @phdthesis{s._hong_modeling_2012,
 	type = {{PhD} thesis},
 	title = {Modeling performance and power for energy-efficient {GPGPU} computing},
@@ -1668,7 +1703,6 @@ Many of the techniques presented in this dissertation can be used to improve the
 	author = {Cameirinha, Diogo},
 	pages = {87}
 }
-
 @inproceedings{chang_learning-directed_2011,
 	title = {Learning-{Directed} {Dynamic} {Voltage} and {Frequency} {Scaling} for {Computation} {Time} {Prediction}},
 	doi = {10.1109/TrustCom.2011.140},
@@ -1681,6 +1715,7 @@ Many of the techniques presented in this dissertation can be used to improve the
 	keywords = {CPN, Classification algorithms, DVFS, Embedded System, Energy consumption, Linux, Linux operating system, Low Power Software Design, PXA270 development board, Prediction algorithms, Radiation detectors, Time frequency analysis, Training, Vectors, computation time prediction, counter propagation networks, electronic engineering computing, learning directed dynamic voltage and frequency scaling, mathematical analysis, mathematical models, microprocessor chips, neural network, power aware computing, power consumption, statistical analysis, statistics information},
 	pages = {1023--1029}
 }
+
 @article{nunez-yanez_energy_2019,
 	title = {Energy {Proportional} {Neural} {Network} {Inference} with {Adaptive} {Voltage} and {Frequency} {Scaling}},
 	volume = {68},

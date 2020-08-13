@@ -172,7 +172,7 @@ In Equation~\ref{eq:tp}, the propagation delay computation is performed consider
   \caption{Voltage guardband ensures reliability by making the transistors switching faster.}
 \end{figure}
 
-The work of Leng \textit{et al.}~\cite{leng_safe_2015} analyzes the voltage guardband of different applications and creates a statistical analysis procedure to predict the $V_{min}$ (the best case voltage level, Figure~\ref{fig:voltage_guardband}) depending on the collected performance counters. For the voltage guardband analysis, Leng \textit{et al.} used 57 representative programs run on four different GPUs of two different architectures. The testing procedure consists of running each program 1000 times. After which a $12mV$ undervoltage is performed on the GPU core if every run is successful, repeating the procedure until a fault occurs. The faults can be of two types: runtime error, such as segmentation fault, silent data corruption or OS crash, and incorrect output (the results of the undervolt run being different from the run with default voltage). The results of Leng's work help us infer the contribution and manifestation of each type of variation on GPUs.
+
 
 
 \subsubsection{Process variation and aging}
@@ -184,10 +184,7 @@ Aging of the CMOS circuits is a reflection of ongoing chip temperature variation
 
 The occurrence of these phenomenons raises the possibility of the circuit stopping to meet its specifications. Hence, a circuit that is dimensioned without any headroom (not sufficiently large voltage guardband) may not be able to cope with the process variation - producing a not working circuit; or stopping to work overtime due to aging.
 
-Leng \textit{et al.}~\cite{leng_safe_2015} tested the influence of process variation by running the set of benchmarks on multiple GPUs of the same model, achieving a maximum variability of 0.07V for the same benchmarks. The measured differences for process variation have a relatively low and uniform impact across all tested programs. This result indicates that this factor does not have a sufficiently high impact to be the leading root cause determining the $V_{min}$ and guardband size.
 
-
-The variability of aging was not possible to measure directly. However, it is plausible to assume that this effect should produce a similar contribution to process and temperature variation \cite{leng_safe_2015}.
 
 \subsubsection{Voltage variation}
 
@@ -217,7 +214,7 @@ Temperature variation occurs both due to changing on the environmental temperatu
 
 The carriers' mobility $ \mu $ describes the drift velocity of a particle in an applied electric field, thus the transistor's capability to drive electric current. MOS transistors carriers mobility presents a very complex temperature dependence; however, in general, the mobility is said to decrease with temperature increase. In the case of threshold voltage, their rate of change also follows the same principle of the carriers mobility, however having a more straightforward dependency of decreasing linearly with temperature increase.
 
-The work of Freijado \textit{et al.}~\cite{freijedo_modeling_2012} created a model that tries to encompass all possible variations and test the impact that temperature has on the propagation delay. The designed model predicts that the propagation delay increases linearly with the temperature increase, which would imply that the size of the voltage guardband reduces with temperature rise. However, Leng \textit{et al.}~\cite{leng_safe_2015} tested the benchmarks mentioned above at two distinct temperatures (40ºC and 70ºC) while measuring the $V_{min}$. The temperature change only caused a voltage guardband size variation of $0.02V$ between the two temperatures, concluding that between these two temperatures, there is no practical effect of temperature variation. 
+The work of Freijado \textit{et al.}~\cite{freijedo_modeling_2012} created a model that tries to encompass all possible variations and test the impact that temperature has on the propagation delay. The designed model predicts that the propagation delay increases linearly with the temperature increase, which would imply that the size of the voltage guardband reduces with temperature rise. 
 
 \subsection{Power Consumption}
 \label{sec:power_consumption}
@@ -262,22 +259,173 @@ The clock frequency is an independently controlled variable, and its change dire
 
 The two major GPU silicon vendors, AMD and NVIDIA, have on their products the concept of performance levels. A performance level is a pair of frequency and voltage that can be applied to the \acrshort{gpu} \acrshort{dvfs} domains. These vary from low power and performance levels to high performance and high power ones. The idea of having multiple performance levels is to be able to always be at the best point of operation.  In the case of the GPU that is going to be used in the experimental phase of the dissertation, the GPU core has eight performance levels, while the memory has only four. Table \ref{tab:gpulevels} shows the reference values for frequency and voltage for each of the core and memory performance levels. The frequency and voltage of increasing performance levels reflect the expected behavior, increasing the voltage to accommodate the frequency boost.
 
+\begin{table}[!htb]
+\renewcommand{\arraystretch}{1.2} % more space between rows
+\centering
+\begin{tabular}{ccclccc}
+\multicolumn{3}{c}{\textbf{Core}}                                         & \multicolumn{1}{c}{\textbf{}} & \multicolumn{3}{c}{\textbf{Memory}}                                             \\
+\textbf{Level} & \textbf{Frequency {[}MHz{]}} & \textbf{Voltage {[}mV{]}} &                               & \textbf{Level}       & \textbf{Frequency {[}MHz{]}} & \textbf{Voltage {[}mV{]}} \\ \cline{1-3} \cline{5-7} 
+0              & 852                          & 800                       &                               & 0                    & 167                          & 800                       \\
+1              & 991                          & 900                       &                               & 1                    & 500                          & 900                       \\
+2              & 1138                         & 950                       &                               & 2                    & 800                          & 950                       \\
+3              & 1269                         & 1000                      &                               & 3                    & 945                          & 1000                      \\ \cline{5-7} 
+4              & 1348                         & 1050                      &                               & \multicolumn{1}{l}{} & \multicolumn{1}{l}{}         & \multicolumn{1}{l}{}      \\
+5              & 1440                         & 1100                      &                               & \multicolumn{1}{l}{} & \multicolumn{1}{l}{}         & \multicolumn{1}{l}{}      \\
+6              & 1528                         & 1150                      &                               & \multicolumn{1}{l}{} & \multicolumn{1}{l}{}         & \multicolumn{1}{l}{}      \\
+7              & 1600                         & 1200                      &                               & \multicolumn{1}{l}{} & \multicolumn{1}{l}{}         & \multicolumn{1}{l}{}      \\ \cline{1-3}
+\end{tabular}
+\caption{GPU Core and Memory Levels of Frequency and Voltage - AMD Vega 10 Frontier Edition}
+\label{tab:gpulevels}
+\end{table}
 
 \subsection{Control Mechanism}
+
+The correct choice of the most appropriate performance level for each \acrshort{gpu} \acrshort{dvfs} domain when executing a given application is one of the topics with more research from both manufacturers and researchers. The correct design of the DVFS controller has a significant impact on the GPU's performance and energy efficiency.
+
+The first implementations of \acrshort{gpu} \acrshort{dvfs} controllers took direct inspiration from the \acrshort{cpu} \acrshort{dvfs} and can be largely classified into interval-based, inter-task, and intra-task \acrshort{dvfs} algorithms \cite{boyer_improving_2013}. 
+
+\subsubsection{Interval-based}
+
+Interval-based algorithms rely on the periodical measurement of the device's utilization, setting the next frequency and voltage based on the average measurement of utilization. The utilization $U_{i}$ reflects the percentage of working time, $w_{i}$, spent by the \acrshort{gpu} over the last time frame $TF_{i}$ and can be formulated using equation \ref{eq:utilization}.
+
+\begin{equation}
+    U_i=\frac{w_i}{TF_i}
+    \label{eq:utilization}
+\end{equation}
+
+By applying arithmetic, geometric, weighted average, or a more complex algorithm, over the last $n$ $U_{i}$ measurements,  the next utilization $U_{i+1}$ is predicted. If the predicted value surpasses pre-determined upper or lower thresholds, the frequency is adjusted up or down accordingly \cite{seongki_gpgpu-perf:_2015}. 
+A \textit{governor} is a set of parameters (such as frequency and voltage tables), thresholds and a utilization prediction algorithm that controls how the interval-based \acrshort{dvfs} works. By choosing a different \textit{governor}, the DVFS system can react differently to the same workload. Figure \ref{fig:DVFSprocedure} schematizes the periodic procedure executed by the DVFS system \cite{seongki_gpgpu-perf:_2015}. 
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{Figures/Background/DVFSprogram.png}
+  \caption{Interval-based DVFS procedure.}
+  \label{fig:DVFSprocedure}
+\end{figure}
+
+\subsubsection{Task-based}
+
+Task-based \acrshort{dvfs} algorithms analyze the program source code, and past runs profiling results to determine the optimal frequency/voltage for each task. This type of algorithm is composed of an intra-task and an inter-task analysis \cite{noauthor_time_nodate}. The intra-task part decomposes the process execution into the on-chip computation and off-chip access latencies. Based on the results,  the optimal GPU core and memory frequencies are determined accordingly to the ratio between the two types of execution. Inter-task mechanisms utilize the intra-task results, assigning a signature to each type of task/process. By analyzing, in run-time, the GPU components' utilization, and using a lookup table that stores the signatures, the optimal frequency/voltage is selected for the sequence of tasks to be executed.
+
+\bigskip
+In general, the challenges of creating a better GPU DVFS relates to three factors. GPU power management is minimal, lack of accurate quantitative GPU DVFS performance and power estimation tools, and the GPU architecture design is still evolving rapidly, which makes the strategies applied to one architecture design have different outcomes on the next iteration of it \cite{mei_survey_2016}. The observed results show that strategies like scaling up the processor frequency, race-to-idle  \cite{hoffmann_racing_2013} or "racing" \cite{kim_racing_2015}, when a task is launched in the pursuit of finishing it as fast as possible and return to an idle state, prof to increase the energy efficiency of CPUs. However, that assumption not always results in the same outcome for GPUs \cite{kim_racing_2015}. 
+
+\subsubsection{AMD/NVIDIA DVFS Mechanism Example}
+
+The \acrshort{gpu} \acrshort{dvfs} control mechanism used nowadays by both AMD and NVIDIA, schematized on figure \ref{fig:DVFSmechanism}, is primarily an interval-based one. The most recent AMD \acrshort{gpu} \acrshort{dvfs} mechanism is called Adaptive Frequency and Voltage Scaling (\acrshort{afvs}) \cite{amd_polaris_2017}. \acrshort{afvs} takes into account the voltage levels across the different parts of the \acrshort{gpu}, the die temperature, the desired frequency and the total power consumption. The controller's objective is to maintain the total power consumption within the required power and temperature envelope. Upon launching a new task and within a set power target, the \acrshort{gpu} tries to achieve the highest possible frequency (highest performance level). For that frequency configuration, it also adjusts the voltage level to the one required to correct functioning. With the highest performance level, power and temperature will increase, when one of these parameters achieves the limit, the \acrshort{gpu} decreases to a lower performance level to maintain itself within the power and temperature target. 
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.8\textwidth]{Figures/Background/DVFS.png}
+  \caption{AMD/NVIDIA DVFS control mechanism.}
+  \label{fig:DVFSmechanism}
+\end{figure}
+
+The major drawback of current \acrshort{gpu} \acrshort{dvfs} implementations is not taking into account the type of task that the \acrshort{gpu} is solving. The dominant control mechanism still considers the \acrshort{gpu} as a black box and controls its \acrshort{dvfs} settings by only looking at outside parameters. Even though such a black-box approach enables significant improvements in current hardware, it lacks the optimization of the frequency/voltage to the type of workload. For instance, a given application can be compute-bound or memory-bound, depending on if the time that it takes to perform the task is limited by the processor performance or the memory bandwidth and latency. This binary classification of applications also depends on the frequency of the core and memory. The same application can be compute-bounded at a low core frequency but be memory-bounded at a higher one \cite{guerreiro_dvfs-aware_2019} (the bottleneck switches from the processing elements to the memory). In the case of a compute-bounded application, the limitation can be imposed by different components of the processor architecture, depending on the type of data (integer or floats) and the intended precision (size of the operands). If one compares the computation with the same type of operands, but with different precision (for instance, 16 vs. 32 bits), even though the GPU uses the same arithmetic unit, the critical path for 32 bits operands is of increased length. That is the maximum delay between the input and the operations output increases with the operands' precision. 
+Since no information about the application is provided to the \acrshort{dvfs} controller, no adaptation of the V-F settings can be employed.
+Considering that the manufacturers do not tune their devices to the minimum voltage level (to accommodate for manufacturing imprecisions and to leave a safe guardband), the operating voltage of the circuits can be significantly reduced, leading to significant power savings. 
+
+Overall, the minimum operating voltage of each performance level is set at a high enough level to ensure the correct functioning of the GPU, independent of the type of computations/workload. Nevertheless, it is possible to fine-tune the voltage and frequency better if the type of task being executed is known at run-time.
+
 \subsection{GPU DVFS Characterization}
 
+Since the GPU is such a widely used computation platform, to improve its performance and energy efficiency, it is significant to characterize and analyze the DVFS effects, mainly in what concerns the impact of the different parameters on different workload scenarios. 
+
+A complete GPU DVFS characterization is explored in the literature using two methodologies. The first refers to experimental studies, where researchers use real GPUs to perform voltage and frequency scaling. Due to past dominance of NVIDIA over AMD \cite{noauthor_jon_2018} \cite{mujtaba_amd_2019} and the fact that this manufacturer only offers limited support for independent voltage scaling tools, the majority of the work act solely on frequency scaling. The second approach uses simulators, like GPGPU-Sim \cite{noauthor_gpgpu-sim/gpgpu-sim_distribution_2019} and GPUWattch \cite{noauthor_gpu_2011} \cite{leng_gpuwattch:_2013},  to simulate various scaling approaches like GPU core number scaling and per-core DVFS \cite{mei_survey_2016}. The benefit of using simulators over real hardware comes on the increased flexibility, enabling the experimentation of scenarios not supported by the frequency/voltage scaling tools provided by the manufacturers. In both methodologies, the studies act on the impact on performance, energy consumption and overall energy efficiency.
+
+The following subsections present a brief overview of some of these works.
+
+
+\subsubsection{Experimental Approach}
+
+Jiao \textit{et al.} \cite{jiao_power_2010} scaled the GPU core and memory frequency of an NVIDIA Tesla GTX 280 using three types of workload: a compute-bounded dense matrix multiplication application; a memory bounded application that performs dense matrix transpose; and a mixed workload, Fast Fourier Transform (FFT) computation. The experimental study showed that for the same core-memory frequency settings, the three applications showed different performance and energy efficiency curves. While a compute bounded application showed to be insensitive to memory scaling, the memory bounded application takes advantage of high memory frequency and low core frequency. At last, the mixed workload FFT application profits from both high core and memory frequency. In general, it was shown that energy efficiency could be determined by the instructions per cycle (IPC) metric and by the global ratio of memory transactions by computation transactions.
+
+Ge \textit{et al.} \cite{ge_effects_2013} explored dense matrix multiplication kernel executions in more detail using an NVIDIA Kepler K20c GPU.  The work revealed that for this type of kernel (compute-bounded), the GPU's power and achievable performance is linear to the GPU core frequency and that the total energy consumption had no relation to frequency scaling. In all the used application tests, the energy efficiency has a linear relation with the GPU frequency, with the highest energy efficiency achieved when the highest clock frequency was employed.
+
+Abe \textit{et al.} \cite{abe_power_2012} introduced a global scaling procedure that combines the GPU core and memory frequency with the CPU frequency to minimize energy consumption. The first experiment tried to optimize the computation of dense matrix multiplication with differing matrix sizes. Using this global scheme on a small matrix leads to a 28\% energy saving while using low GPU memory frequency and high GPU core frequency. The same procedure was then enlarged to a more diverse set of 33 benchmarks where all the possible combinations of a low, medium, and high GPU core and memory frequency were tested to find the optimal working settings. It was found that energy consumption can be reduced as much as 75\% with a performance loss of 30\% when the best settings were used. 
+
+Mei \textit{et al.} \cite{mei_measurement_2013} conducted a more general experimentation using 37 GPU benchmarks. In this work, it was possible to observe that the effect of GPU DVFS depends on application characteristics. In all situations, the fine-tuning of DVFS per application (finding the lowest voltage level for the desired running frequency) conveyed an energy-saving of 20\%, on average, with only a 4\% performance loss. More recently, Mei  \textit{et al.}, expanded the previous work to analyze the relation between energy consumption and dynamic frequency scaling settings \cite{mei_survey_2016}. For the  Rodinia benchmark \cite{che_rodinia:_2009}, it was found that some benchmarks increase the energy consumption linearly with frequency scaling while others are insensitive to the change of this parameter. In the particular case of GPU memory frequency scaling, the work revealed that underclocking this component can result in a 30\% energy decrease if the running application is not memory bounded. For the case of applications whose performance depends on the memory, decreasing its frequency can lead up to 54\% energy increased, due to the increased execution time. The tested set of applications showed that overclocking the memory results in diminishing execution time with reduced overall energy consumption (the memory energy consumption increase overshadows the small reduction in computation time). 
+
+Overall, the relation between the DVFS settings and the energy consumption depends heavily on the application type. A simple linear model (normally used by the GPU manufacturers) for DVFS settings is inadequate to achieve the best performance or energy consumption/efficiency.
+
+\subsubsection{Simulation}
+
+As it was previously referred, the characterization of GPU DVFS with simulation approaches is done by using software tools like GPGPU-Sim \cite{noauthor_gpgpu-sim/gpgpu-sim_distribution_2019} and GPUWattch \cite{noauthor_gpu_2011} \cite{leng_gpuwattch:_2013}. GPGPU-Sim is an architecture simulator of a GPU architecture running CUDA and OpenCL workloads. GPUWattch is an energy model that predicts energy consumption based on the number of computations and memory access that GPGPU-Sim simulates. Together, both programs can be used to model current and novel GPU architectures and DVFS controllers accurately.
+
+Leng \textit{et al.} \cite{leng_gpuwattch:_2013}, the developers of GPUWattch, simulated the execution of compute and memory-bounded kernels in three scenarios: no DVFS and using a custom off-chip and on-chip DVFS. The custom DVFS algorithms monitor the average number of stall cycles caused by memory operations. When the number increases, the controller switches to a slower performance state, whereas the number of stall cycles reduces, the controller places the GPU in a higher performance level. The difference between the on-chip and off-chip DVFS techniques is the time that it takes to respond to the number of stall cycles. While the on-chip can switch the performance level in 500 cycles, the off-chip takes 10000 cycles. The experiments show that using the off-chip DVFS versus no DVFS results in 13.2\% of energy savings (on average) while using the on-chip DVFS yield a 14.4\% energy saving.
+
+Cha \textit{et al.} \cite{cha_core-level_2018} used GPGPU-Sim to create a GPU core space-multitasking simulator, where per-kernel dynamic frequency scaling (acting on the computing unit level) settings can be applied in concurrent kernel execution. They used Rodinia suite \cite{che_rodinia:_2009}, Parboil suite \cite{stratton_parboil:_nodate}, and Polybench suite \cite{noauthor_polybench/c_nodate} of benchmarks and combine the execution of different kernels, creating pairs of two compute-bounded (Com + Com) kernels, one compute-bounded plus one memory-bounded kernel (Com + Mem) and two memory-bounded kernels (Mem + Mem). The work evaluated the performance of the GPU by measuring the number of executed instructions per second. It was shown that for Com + Com concurrent kernel execution, the performance is linear to the per-kernel DVFS setting. An increase of 20\% on the DVFS of both kernels results in a 20.4\% performance increase, while a 20\% decrease results in a 19.3\% decrease in performance. For Mem + Mem concurrent kernel execution, the performance did not change significantly with the changes on the DVFS. The more interesting case is where mixed (Com + Mem) type kernels are concurrently executing. In this case, the per-kernels DVFS can overclock the CU of the Com kernel while underclocking the ones running the Mem kernel. In this setup, the highest performance is achieved for the Com kernel, and the energy (even though it was not the objective of the work) is minimized.
 
 \subsection{DVFS Optimization}
 \label{section:DVFS_opt}
 
-\subsubsection{Coupled V-F - Conventional DVFS optimization}
+As induced by the works presented in the previous section, by correlating the DVFS parameters with the application characteristics, it is possible to improve the performance and reduce the energy consumption of GPU accelerated programs. Under this assumption, the investigation on new DVFS mechanisms currently acts on two fronts: enabling finer-grained DVFS control, with the creation of more clock/voltage domains within each GPU component; and on the creation of novel DVFS control mechanisms, searching how can more sophisticated and aware DVFS systems better control the voltage and frequency depending on the workload type. This section provides an overview of state of the art on both development fronts. However, the second is of increased relevance to the context of the present dissertation.
 
-frequency scaling with tied voltage scaling
+\subsubsection{Increased number of DVFS domains}
 
-\subsubsection{Decoupled V-F - Non-conventional DVFS optimization}
 
-decoupled frequency and voltage scaling
+Sethia \textit{et al.} \cite{sethia_equalizer:_2014} designed \textit{Equalizer}, a low overhead hardware runtime system, able to dynamically perform the monitorization and management of GPU resources and kernel requirements. This mechanism is placed in the instruction decoder pipeline attached to the kernel scheduler (scoreboard control mechanism that indicates which kernel should be run and where). By controlling the on-chip concurrency and core and memory frequency, they can create two running modes based on four counter utilization values (number of active and waiting threads, and number of ALU and memory instructions). In energy mode, it achieves 15\% savings in energy, while in performance mode, it can increase the performance by 22\%.
+
+In the work of Cha \textit{et al.} \cite{cha_core-level_2018} presented earlier, it is discussed how the application of DVFS at the CU level improves the performance and the energy consumption of the GPU. Using the GPGPUSim GPU simulator, they created a multi clock generator able to provide a fast, base and slow clock to each of the CU at demand.  By reserving a register on each CU, the compiler will write with the information regarding the most appropriate clock frequency. Each CU will inform the multi clock generator of which of the three clocks should be active. This approach showed the benefits of creating further specialized clock zones, enabling a finer grain of control over frequency and voltage. In the experimental work conducted by Cha, the finer-grained DVFS system was able to accelerate the compute-bounded kernels while still providing the more energy efficiency frequency for the memory-bounded ones.
+
+\subsubsection{Optimal frequency search and optimization}
+
+Thomas \textit{et al.} \cite{thomas_application_2018} proposed Application-aware Scalable Architecture (\acrshort{apsa}) for GPGPU applications. \acrshort{apsa} is a three-stage runtime hardware profiling and scheduler mechanism able to adjust the working of the GPUs core depending on the application's category under execution. In the first and second stages (profiling and decision-making), ApSA classifies applications as of type-I or type-II. An application is classified as type-I if it requires more processing cores to increase the performance and type-II if it needs more performance of the memory system to run faster. Accordingly to this classification, on stage three (action), the ApSA mechanism will make the application run on all available CU if it is type-I. If it is of type-II, the proposed mechanism only indicates that half of the available threads should run the application. At the same time, the frequency controller scales down the core and scales up the memory frequency, increasing GPU's energy efficiency. By running the ApSA mechanism, a profiling overhead of 1.6\% for type-I applications and 1.15\% for type-II is introduced. Nevertheless, a reduction of 20.08\% of power is achieved by using the ApSA mechanism.
+
+
+
+
+Akiki \textit{et al.} \cite{akiki_energy-aware_2018} proposes a run-time gradient descent (GD) optimal frequency search algorithm. This mechanism relies on multiple executions of the target application. In each iteration, an exploration of the optimal frequency is made. By indicating a given target metric (such as performance or energy-delay product - EDP), it is possible to validate if the new frequency is better than the earlier one. By running this procedure alongside a set of benchmarks, with EDP selected as the target metric, it was achieved a reduction of 15\% on energy consumption.
+
+Huang \textit{et al.} \cite{huang_gpu_2019} introduced an novel proportional-integral-derivative neural network (PIDNN) frequency controller. This controller uses gradient descent to find the most appropriate frequency to be applied to the GPU core, memory and interconnect network to reduce energy consumption. The designed neural network has as input the current frequency of each GPU component, the number of kernels to be dispatched, the interconnect message queue size, and the number of caches misses. The hidden layers of the neural network represent the proportional-integral-derivative controllers, and the output layer corresponds to the new frequency to be set on the core, memory and interconnect. After the model is trained (and depending on the GPU model), the novel DVFS controller can reduce energy consumption between 4.39\% and 18.67\% on the tested benchmarks.
+
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Undervoltage behaviour and imprecision tolerant applications}
-\label{section:und_beh}
+\subsection{Decoupled V-F - Non-conventional DVFS optimization}
+\label{section:decoupled}
+
+The presented state of the art on DVFS exploration and characterization methodologies explored the benefits of using (mainly) frequency scaling to optimize the performance and reduce the power consumption on GPUs. However, the significant frequency and voltage guardbands used by manufacturers to ensure the correct operation of the devices across all possible working conditions, appear to be an extra beneficial space waiting to be explored.  More recent studies have been exploring outside of the default V-F pairs. In this case, instead of just optimizing the frequency and relying on the default voltage values to perform \acrshort{dvfs}, the studies also explore voltage scaling beyond the conventional DVFS limits by trying to optimize both parameters for the running application. 
+
+This approach can enable a more significant energy efficiency degree of optimization by allowing the GPU to be run at higher frequencies with reduced energy consumption. 
+The studies presented in the section show that working in this unexplored space can be profitable when certain conditions are present. Due to the voltage reduction, the voltage guardband will be decreased. This voltage reduction makes the transistors slower, causing the GPU to be more prone to \acrshort{pvt} variations.
+
+\subsubsection{Voltage guardband size estimation}
+
+To beneficially use voltage scaling outside conventional DVFS limits, it is necessary to understand how the size of the voltage guards and the minimum operating voltage - $V_{min}$, relate to the different types of applications.
+The work of Leng \textit{et al.}~\cite{leng_safe_2015} analyzes the voltage guardband of different applications and creates a statistical analysis procedure to predict the $V_{min}$ (the best case voltage level, Figure~\ref{fig:voltage_guardband}) depending on the collected performance counters. For the voltage guardband analysis, Leng \textit{et al.} used 57 representative programs run on four different GPUs of two different architectures. The testing procedure consists of running each program 1000 times. After which a $12mV$ undervoltage is performed on the GPU core if every run is successful, repeating the procedure until a fault occurs. The faults can be of two types: runtime error, such as segmentation fault, silent data corruption or OS crash, and incorrect output (the results of the undervolt run being different from the run with default voltage). 
+
+Leng tested the influence of process variation by running the benchmarks on multiple GPUs of the same model, achieving a maximum variability of 0.07V for the same benchmarks. The measured differences for process variation have a relatively low and uniform impact across all tested programs. This result indicates that this factor does not have a sufficiently high impact to be the leading root cause determining the $V_{min}$ and guardband size.
+
+By running the benchmarks mentioned above at two distinct temperatures (40ºC and 70ºC), Leng tested the influence of temperature on $V_{min}$. The temperature change only caused a voltage guardband size variation of $0.02V$ among the two temperatures, concluding that there is no practical effect of temperature variation between these two temperatures.
+
+The measured differences for process and temperature variation have a relatively low and uniform impact across all tested programs. This result seems to indicate that these two factors do not have a sufficiently high impact to be the leading root cause determining the $V_{min}$ and guardband size.
+The variability of aging was not possible to measure directly. However, it is plausible to assume that this effect should produce a similar contribution to process and temperature variation \cite{leng_safe_2015}.
+
+Overall, since the process and temperature variation and device aging do not have a substantial impact on the variability of $V_{min}$, by themselves, voltage noise appears to be the leading cause of this variation.
+
+Following the work of Leng, Papadimitriou \textit{et. al}~\cite{papadimitriou_exceeding_2020} modeled the GPU voltage guardband in more detail using \textit{GPUVolt}~\cite{leng_gpuvolt_2014}. This modeling framework simulates the voltage noise behavior by calculating the time domain response of the power (voltage) delivery. Using \textit{GPUVolt} in combination with \textit{GPUWattch} to compute the power consumption, the author was able to determine that voltage droops can be originated due to inner and inter-core interference. In the single-core analysis, each component was evaluated to check their contribution to the voltage droop. Results point out that the register file within each \acrshort{sm}/\acrshort{cu} is responsible for up to $70\%$ of the occurrence of droops due to their high power consumption and high access rate. The inter-core interference exists due to the increased silicon area to accommodate the high core count of modern \acrshort{gpu}s. The high core count can induce multiple high power consumption zones separated by inactive cores, inducing both fast-occurring first-order droops localized at small clusters of neighboring cores and the slow-occurring chip-wide second-order droops. Going a step further, Papadimitriou relates the occurrence of these two phenomena with the type of running code. Inner-core voltage droops are mostly related to implicit synchronization mechanisms associated with \acrshort{simt} like cache miss and thread block launch, while inter-core are mostly related to the launch of entirely new kernels.
+
+Works, such as of Leng \textit{et al.} \cite{leng_safe_2015} and Nakhaeea  \textit{et al.} \cite{nakhaee_lifetime_2018} propose methods to determine the $V_{min}$ parameter with different objectives. While Leng aspires to reduce energy consumption, Nakhaeea expects to improve the lifetime of processors. These two examples are only a few of the possible benefits that the exploration of the voltage scaling brings. To model $V_{min}$, Leng used performance counters measurements to train an ANN that predicts the amount of possible undervolt. The root means square error (RMSE) between the model prediction and the measured result is 0.5\%, with the maximum over and underprediction error of 3\% and 2\%, respectively. The trained ANN can correctly model the variation of $V_{min}$ with the type of workload.
+
+In general, a good model of the minimum operating voltage should be able to not only correctly predict  $V_{min}$ across a significant large set of applications, but also minimize the under and overprediction of this value. Overpredicting $V_{min}$ will most likely lead to the occurrence of program faults while underpredicting the voltage may result in not adequately exploring the possible voltage values.
+
+\subsubsection{GPU undervoltage behaviour}
+
+The study of Tan \textit{et al.} \cite{tan_combating_2016} explored the effects of using low supply voltage on the GPU register file. They supported this research by demonstrating that this component is one of the most affected and one of the first provoking program faults when not enough voltage is provided. Under this premise, Tan tested the minimum required voltage that guarantees that a write and a subsequent read of a register produces the same result. Due to process variation, this value can significantly differ from register to register. With this information, the author created an architectural solution that can analyze, for the runtime voltage level, which registers can be used and, by taking advantage of \textit{dead-registers} (registers that contain useless data) the solution can forward the data from a faulty register to a working one.
+
+The presented memory problem that emerges on the register file when decreasing the supply voltage is parallel to the increased probability of a clock cycle ending without the critical path's fulfillment. In such situations, the processing elements of the GPU can misbehave and produce faulty computational results.
+
+
+In general, it is necessary to estimate $V_{min}$ to predict the size of the voltage guardband for the running application, and to understand the degree of computational errors that can emerge to take advantage of non-conventional V-F pairs.
+
+\section{Undervoltage and Imprecision tolerant applications}
+
+A new relevant category of applications named as \textit{Imprecision Tolerant applications} is introduced in this section. For these types of applications, computation errors can be propagated to subsequent logic stages with the expectation that the algorithm itself can recover from it~\cite{nakhaee_lifetime_2018}. Hardware designers can exploit these capabilities to reduce power consumption in two ways: designing hardware with lower precision encoding (reduced number of bits, like Google's TPU), minimizing the amount of combinatorial logic or running traditional hardware (\acrshort{gpu}s) in setups that in the effort of reducing power consumption, may introduce a degree of imprecision.
+
+A typical application that is taking, nowadays, significant advantages of GPU acceleration is Deep Learning (DL). One of the most important characteristics of this type of algorithms is their imprecision tolerance. The computation of a DL application is an iterative and convergence process, and by the natural adaption of the neural networks learning parameters in runtime, the occurrence of small computation errors do not affect the end prediction of the algorithm \cite{jiao_assessment_2017}.
+
+Tang \textit{et al.} \cite{tang_impact_2019} studied the impact of DVFS parameters on the energy and performance of DL applications. Even though the considered DVFS exploration only used the default range of frequency and voltage scaling, it was possible to either improve the performance by up to 33\% or reduce the energy consumption by 23.1\%. However, this work applied the same pair of frequency and voltage throughout the complete training or inference session. Moreover, the authors point out that the different layers that compose a neural network can have different voltage and frequency optimizations points. Furthermore, by using the inherent resilience of neural networks, it is expected that even better working parameters outside of the conventional DVFS range can be found. 
+
+\section{Summary}
