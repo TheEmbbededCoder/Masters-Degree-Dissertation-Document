@@ -68,6 +68,7 @@ To guarantee that no compiler optimizations are performed on the tested variable
 
 
 \subsubsection{DRAM}
+\label{sec:DRAMbench_exp}
 
 The benchmark on Listing~\ref{lst:DRAMbench} was designed (and validated through \acrshort{gpu} counters) to determine the impact of V-F scaling on a user-controlled memory to compute bounded kernel on both \acrshort{gpu} \acrshort{dvfs} domains. 
 
@@ -518,7 +519,9 @@ The experiment shows that for all \texttt{OPS} values ($0$ to $50$), the highest
   \label{fig:DRAM_behaviour}
 \end{figure}
 
-Figure~\ref{fig:DRAM_Corebehaviour} illustrates the normalized performance and energy consumption, again when varying the \texttt{OPS} parameter between 0 and 50 operations (see Listings~\ref{lst:DRAMbench}) when scaling V-F dor the \textit{Core} \acrshort{dvfs} domain. The experiment shows that for memory bounded kernels (\texttt{OPS} values $0$ and $10$), performing frequency scaling does not change the computation time. However, it significantly impacts energy consumption (going from the highest frequency to the lowest yields a $45\%$ reduction on energy consumption). For the case of a kernel that is not memory bounded  (\texttt{OPS} $=25$), the first benefit of exploring non-conventional V-F pairs emerges. For this test, the traditional V-F pairs (connected by the dashed line on Figure~\ref{fig:DRAM_Corebehaviour})  can already yield a $41\%$ energy consumption reduction aggregated with a $15\%$ performance increased. However, by exploring the non-conventional V-F pairs, it is possible to improve both metrics further. Running the \acrshort{gpu} at $1600MHz$ and $1000mV$ yields an $18\%$ performance increase while running \acrshort{gpu} at $1600MHz$ and $1000mV$ allows a $58\%$ energy reduction with a $14\%$ performance increase.
+Figure~\ref{fig:DRAM_Corebehaviour} illustrates the normalized performance and energy consumption, again when varying the \texttt{OPS} parameter between 0 and 50 operations (see Listings~\ref{lst:DRAMbench}) when scaling V-F of the \textit{Core} \acrshort{dvfs} domain. For this benchmark, it is not relevant to determine the minimum usable voltage, since that value will be defined by the type of operations being performed on the Core. The objective is to determine the configuration that offers the best energy efficiency for kernels that are memory bounded.  
+
+The experiment shows that for memory bounded kernels (\texttt{OPS} values $0$ and $10$), performing frequency scaling does not change the computation time. However, it significantly impacts energy consumption (going from the highest frequency to the lowest yields a $54.2\%$ reduction on energy consumption). For the case of a kernel that is not memory bounded  (\texttt{OPS} $=25$), the benefit of exploring non-conventional V-F pairs becomes clear. However, as stated, the optimization of the V-F pairs for compute bounded kernels depends on the type of operations being performed in the \acrshort{alu}, analyzed in the following sections.
 
 \begin{figure}[htb]
   \centering
@@ -530,44 +533,60 @@ Figure~\ref{fig:DRAM_Corebehaviour} illustrates the normalized performance and e
 
 \subsection{Cache and Shared Memory}
 
+Figure~\ref{fig:cache_sm_behaviour} presents the normalized energy consumption and execution time for different V-F setups for the cache and shared memory benchmarks, respectively.  
+
+In what concerns the energy and performance variations, performing voltage scaling at the default frequency (dashed line) reduces energy consumption as high as $46.1\% $. However, this results in a performance degradation of $60.9\%$. The advantage of performing non-conventional DVFS becomes apparent by allowing for energy reduction without any performance degradation. In this case, it is possible to run the GPU Core at $1600$ MHz and $1000$ mV, thus achieving an energy reduction of $35.7\%$ with no performance degradation. The commented results are related to the cache benchmark. However, the results of the shared memory are similar.
+
 \begin{figure}[!htb]
   \begin{subfigmatrix}{2}
-    \subfigure[Cache]{\includegraphics[width=0.5\textwidth]{Figures/GPU_characterization/CacheL2_behaviour_0op.pdf}}
-    \subfigure[Shared Memory]{\includegraphics[width=0.48\textwidth]{Figures/GPU_characterization/SharedMemory_behaviour.pdf}}
+    \subfigure[Cache]{\label{fig:cacheL2_behaviour}\includegraphics[width=0.48\textwidth]{Figures/GPU_characterization/CacheL2_behaviour_0op_no_marks.pdf}}
+    \subfigure[Shared Memory]{\label{fig:sm_behaviour}\includegraphics[width=0.46\textwidth]{Figures/GPU_characterization/SharedMemory_behaviour.pdf}}
   \end{subfigmatrix}
   \caption{Core domain - Normalized energy and performance variations for \texttt{OPS}=0. The  values shown in the left figure represent the applied core voltage and the dashed line connects the default F-V configurations.}
   \label{fig:cache_sm_behaviour}
 \end{figure}
 
 
-% \begin{figure}[htb]
-%   \centering
-%   \includegraphics[width=0.8\textwidth]{Figures/GPU_characterization/CacheL2_behaviour_0op.pdf}
-%   \caption{Core domain - Cache - Normalized energy and performance variations for \texttt{OPS}=0, when applying V-F scaling to the GPU Core. The  values shown in the figure represent the applied core voltage and the dashed line connects the default F-V configurations.}
-%   \label{fig:cacheL2_behaviour}
-% \end{figure}
+Figure~\ref{fig:cache_sm_edp} presents the obtained \acrshort{edp} for the Cache and shared memory benchmark. These components favor the higher frequencies and minimum voltages to achieve the lowest EDP product.
+
+\begin{figure}[!htb]
+  \begin{subfigmatrix}{2}
+    \subfigure[Cache]{\label{fig:cacheL2_behaviour}\includegraphics[width=0.47\textwidth]{Figures/GPU_characterization/CacheL2_EDP_OPS0.pdf}}
+    \subfigure[Shared Memory]{\label{fig:sm_behaviour}\includegraphics[width=0.47\textwidth]{Figures/GPU_characterization/SM_EDP_OPS0.pdf}}
+  \end{subfigmatrix}
+  \caption{Core domain - Obtained Energy-Delay Product (EDP) for \texttt{OPS}=0.}
+  \label{fig:cache_sm_edp}
+\end{figure}
 
 
-% \subsection{Shared Memory}
-
-% \begin{figure}[htb]
-%   \centering
-%   \includegraphics[width=0.8\textwidth]{Figures/GPU_characterization/SharedMemory_behaviour.pdf}
-%   \caption{Core domain - Shared Memory - Normalized energy and performance variations for \texttt{OPS}=0, when applying V-F scaling to the GPU Core. The dashed line connects the default F-V configurations.}
-%   \label{fig:cacheL2_behaviour}
-% \end{figure}
 
 \subsection{MAC}
+
+Figure~\ref{fig:MAC_behaviour} represents the normalized energy consumption and execution time for different V-F pairs for the \acrshort{mac} benchmark. It was chosen to represent the result for single-precision floating-point data-type, due to being the most used. However, the results for the remaining data types are similar.
+
+An interesting phenomenon is observed in the energy-execution time plot for the highest frequencies. Performing undervoltage not only reduces energy consumption (as expected), but it also allows for faster execution time. An explanation can be found by analyzing the power consumption during the benchmark execution. For the default voltage, the power surpasses the power cap, which activates the GPU protection mechanisms, halting the execution until the power is reduced. By applying an undervoltage, the power significantly decreases (as $P_{Static}\propto V$ and $P_{Dynamic}\propto V^2$, see \cite{guerreiro_gpgpu_2018}) and allows sustained maintenance of the desire DVFS configuration. 
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=0.8\textwidth]{Figures/GPU_characterization/MAC_behaviour_d_1_3.pdf}
-  \caption{Core domain - ALU-MAC - Normalized energy and performance chart for the benchmark setup with different values of \texttt{d} (see Listing~\ref{lst:MACbench}). The dashed lines connect the results for default F-V configurations.}
+  \caption{Core domain - ALU-MAC - Normalized energy and performance chart for the benchmark setup with different values of \texttt{d} for single precision floating-point (see Listing~\ref{lst:MACbench}). The dashed lines connect the results for default F-V configurations.}
   \label{fig:MAC_behaviour}
 \end{figure}
 
+Finally, Figure~\ref{fig:MAC_EDP} presents the obtained EDP chart for single-precision floating-point data-type, where the configuration of $1440$MHz and $950$mV achieves the best energy-efficiency, yielding an energy consumption reduction of $39.1\%$ and an execution time improvement of $12.4\%$.
+
+\begin{figure}[htb]
+    \centering
+        \includegraphics[width=0.8\textwidth]{Figures/GPU_characterization/MAC_EDP.pdf}
+        \caption{Core domain - ALU-MAC - Obtained Energy-Delay Product (EDP) for \texttt{d}=${1,3}$.}
+    \label{fig:MAC_EDP}
+\end{figure}
 
 \subsection{Non-linear Operations}
+
+Figure~\ref{fig:SFU_behaviour} showcases the normalized energy consumption and execution time for different V-F pairs for the single-precision floating-point \acrshort{sfu} benchmark. The \acrshort{gpu} behavior displayed in this test is similar to the ones of the cache and shared memory, with the undervoltage not affecting the performance. The degree of energy savings achieved goes in line with the previous results.
+
+
 
 \begin{figure}[htb]
   \centering
@@ -576,7 +595,15 @@ Figure~\ref{fig:DRAM_Corebehaviour} illustrates the normalized performance and e
   \label{fig:SFU_behaviour}
 \end{figure}
 
-\subsection{Reduction}
+Figure~\ref{fig:SFU_EDP} represents the \acrshort{edp} heat-map, displaying that the best energy efficiency is achieved with the highest amount of undervoltage in any of the frequency levels.
+
+\begin{figure}[htb]
+    \centering
+        \includegraphics[width=0.6\textwidth]{Figures/GPU_characterization/SFU_EDP_SP.pdf}
+        \caption{Core domain - ALU-SFU - Obtained Energy-Delay Product (EDP) for single-precision floating-point.}
+    \label{fig:SFU_EDP}
+\end{figure}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

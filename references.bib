@@ -1,4 +1,50 @@
 
+@inproceedings{jain_performance_2019,
+	title = {Performance {Characterization} of {DNN} {Training} using {TensorFlow} and {PyTorch} on {Modern} {Clusters}},
+	doi = {10.1109/CLUSTER.2019.8891042},
+	abstract = {The recent surge of Deep Learning (DL) models and applications can be attributed to the rise in computational resources, availability of large-scale datasets, and accessible DL frameworks such as TensorFlow and PyTorch. Because these frameworks have been heavily optimized for NVIDIA GPUs, several performance characterization studies exist for GPU-based Deep Neural Network (DNN) training. However, there exist very few research studies that focus on CPU-based DNN training. In this paper, we provide an in-depth performance characterization of state-of-the-art DNNs such as ResNet(s) and Inception-v3/v4 on multiple CPU architectures including Intel Xeon Broadwell, three variants of the Intel Xeon Skylake, AMD EPYC, and NVIDIA GPUs like K80, P100, and V100. We provide three key insights: 1) Multi-process (MP) training should be used even for a single-node, because the single-process (SP) approach cannot fully exploit all the cores, 2) Performance of both SP and MP depend on various features such as the number of cores, the processes per node (ppn), and DNN architecture, and 3) There is a non-linear and complex relationship between CPU/system characteristics (core-count, ppn, hyper-threading, etc) and DNN specifications such as inherent parallelism between layers. We further provide a comparative analysis for CPU and GPU-based training and profiling analysis for Horovod. The fastest Skylake we had access to is up to 2.35× better than a K80 GPU but up to 3.32× slower than a V100 GPU. For ResNet-152 training, we observed that MP is up to 1.47× faster than SP and achieves 125× speedup on 128 Skylake nodes.},
+	booktitle = {2019 {IEEE} {International} {Conference} on {Cluster} {Computing} ({CLUSTER})},
+	author = {Jain, Arpan and Awan, Ammar Ahmad and Anthony, Quentin and Subramoni, Hari and Panda, Dhableswar K. DK},
+	month = sep,
+	year = {2019},
+	note = {ISSN: 2168-9253},
+	keywords = {AMD EPYC, CPU-based DNN training, Central Processing Unit, Computational modeling, DNN Training, DNN architecture, GPU-based deep neural network training, Graphics processing units, Horovod, Intel Xeon Broadwell, Intel Xeon Skylake, K80 GPU, MP, MVAPICH2 MPI, Multicore processing, NVIDIA GPU, Parallel processing, Performance Characterization, PyTorch, ResNet-152 training, SP, Skylake nodes, TensorFlow, Training, V100 GPU, computational resources, graphics processing units, hyper-threading, in-depth performance characterization, large-scale datasets, learning (artificial intelligence), modern clusters, multiple CPU architectures, multiprocess training, multiprocessing systems, neural nets, parallel architectures, performance characterization studies, single-node, single-process approach, state-of-the-art DNNs},
+	pages = {1--11}
+}
+
+@misc{lecun_yann_and_cortes_corinna_mnist_1999,
+	title = {{MNIST} handwritten digit database, {Yann} {LeCun}, {Corinna} {Cortes} and {Chris} {Burges}},
+	url = {http://yann.lecun.com/exdb/mnist/},
+	urldate = {2019-12-25},
+	author = {LeCun, Yann {and} Cortes, Corinna},
+	year = {1999}
+}
+
+@article{noauthor_notitle_nodate
+}
+
+@article{krizhevsky_learning_2009,
+	title = {Learning {Multiple} {Layers} of {Features} from {Tiny} {Images}},
+	language = {en},
+	author = {Krizhevsky, Alex},
+	year = {2009},
+	pages = {32--35}
+}
+
+@inproceedings{deng_imagenet_2009,
+	title = {{ImageNet}: {A} large-scale hierarchical image database},
+	shorttitle = {{ImageNet}},
+	doi = {10.1109/CVPR.2009.5206848},
+	abstract = {The explosion of image data on the Internet has the potential to foster more sophisticated and robust models and algorithms to index, retrieve, organize and interact with images and multimedia data. But exactly how such data can be harnessed and organized remains a critical problem. We introduce here a new database called “ImageNet”, a large-scale ontology of images built upon the backbone of the WordNet structure. ImageNet aims to populate the majority of the 80,000 synsets of WordNet with an average of 500-1000 clean and full resolution images. This will result in tens of millions of annotated images organized by the semantic hierarchy of WordNet. This paper offers a detailed analysis of ImageNet in its current state: 12 subtrees with 5247 synsets and 3.2 million images in total. We show that ImageNet is much larger in scale and diversity and much more accurate than the current image datasets. Constructing such a large-scale database is a challenging task. We describe the data collection scheme with Amazon Mechanical Turk. Lastly, we illustrate the usefulness of ImageNet through three simple applications in object recognition, image classification and automatic object clustering. We hope that the scale, accuracy, diversity and hierarchical structure of ImageNet can offer unparalleled opportunities to researchers in the computer vision community and beyond.},
+	booktitle = {2009 {IEEE} {Conference} on {Computer} {Vision} and {Pattern} {Recognition}},
+	author = {Deng, Jia and Dong, Wei and Socher, Richard and Li, Li-Jia and Kai Li and Li Fei-Fei},
+	month = jun,
+	year = {2009},
+	note = {ISSN: 1063-6919},
+	keywords = {Explosions, Image databases, Image retrieval, ImageNet database, Information retrieval, Internet, Large-scale systems, Multimedia databases, Ontologies, Robustness, Spine, computer vision, image resolution, image retrieval, large-scale hierarchical image database, large-scale ontology, multimedia computing, multimedia data, ontologies (artificial intelligence), subtree, trees (mathematics), very large databases, visual databases, wordNet structure},
+	pages = {248--255}
+}
+
 @inproceedings{kim_flipping_2014,
 	address = {Minneapolis, MN, USA},
 	title = {Flipping bits in memory without accessing them: {An} experimental study of {DRAM} disturbance errors},
@@ -582,8 +628,7 @@ Publisher: Multidisciplinary Digital Publishing Institute},
 	year = {2014},
 	pages = {1025 -- 1039}
 }
-
-@article{da-ren_time_2014-1,
+@article{da-ren_time_2014,
 	title = {Time and {Energy} {Efficient} {DVS} {Scheduling} for {Real}-{Time} {Pinwheel} {Tasks}},
 	volume = {12},
 	issn = {1665-6423},
@@ -701,18 +746,12 @@ applications.},
 	urldate = {2019-12-25},
 	year = {2010}
 }
+
 @misc{noauthor_pytorch_2016,
 	title = {{PyTorch}},
 	url = {https://pytorch.org/},
 	urldate = {2019-12-26},
 	year = {2016}
-}
-
-@misc{noauthor_mnist_1999,
-	title = {{MNIST} handwritten digit database, {Yann} {LeCun}, {Corinna} {Cortes} and {Chris} {Burges}},
-	url = {http://yann.lecun.com/exdb/mnist/},
-	urldate = {2019-12-25},
-	year = {1999}
 }
 
 @article{he_deep_2015,
@@ -1154,7 +1193,6 @@ Many of the techniques presented in this dissertation can be used to improve the
 	year = {2019},
 	note = {original-date: 2014-08-09T15:55:39Z}
 }
-
 @misc{mujtaba_amd_2019,
 	title = {{AMD} {Radeon} {Graphics} {Cards} {Gain} {Market} {Share} {Versus} {NVIDIA} {GeForce}},
 	url = {https://wccftech.com/amd-radeon-nvidia-geforce-graphics-card-gpu-market-share-q2-2019/},
@@ -1198,6 +1236,7 @@ Many of the techniques presented in this dissertation can be used to improve the
 	keywords = {energy-aware computing, optimization, power-aware computing, resource allocation},
 	pages = {13:1--13:5}
 }
+
 @inproceedings{kim_racing_2015,
 	title = {Racing and {Pacing} to {Idle}: {Theoretical} and {Empirical} {Analysis} of {Energy} {Optimization} {Heuristics}},
 	shorttitle = {Racing and {Pacing} to {Idle}},
@@ -1673,7 +1712,6 @@ Many of the techniques presented in this dissertation can be used to improve the
 	note = {arXiv: 1610.01784},
 	keywords = {Computer Science - Distributed, Parallel, and Cluster Computing, Dynamic voltage and frequency scaling, Energy efficiency, Graphics processing unit}
 }
-
 @article{vieira_transactional_nodate,
 	title = {Transactional {Memory} for {Heterogeneous} {CPU}-{GPU} {Systems}},
 	language = {en},
@@ -1703,6 +1741,7 @@ Many of the techniques presented in this dissertation can be used to improve the
 	author = {Cameirinha, Diogo},
 	pages = {87}
 }
+
 @inproceedings{chang_learning-directed_2011,
 	title = {Learning-{Directed} {Dynamic} {Voltage} and {Frequency} {Scaling} for {Computation} {Time} {Prediction}},
 	doi = {10.1109/TrustCom.2011.140},
