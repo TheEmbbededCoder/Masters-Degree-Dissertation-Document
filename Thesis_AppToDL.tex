@@ -102,7 +102,7 @@ The inference (or prediction) process corresponds to performing a forward propag
 
 The popularization of \acrshort{gpu}s as the defacto \acrshort{dnn}s execution device comes at the cost of the availability of high-level libraries and frameworks from device manufacturers and other software houses. The available \acrshort{gpu} libraries implement the underlying mathematical operations performed during the \acrshort{dnn}s, while the frameworks operate on the execution of \acrshort{dnn}s by masking the complexity of creating, training and using these models~\cite{jain_performance_2019}.
 
-The most used libraries are cuBLAS and cuDNN, by NVIDIA and rocBLAS and MIOpen, by AMD that implement the most optimize versions of matrix multiplication, convolution, and other kinds of mathematical operations to be used on the \acrshort{dnn} models. For the frameworks, TensorFlow and PyTorch are open-source frameworks developed by Google and Facebook, respectively that allow for easy implementation of the models in \acrshort{gpu}s.
+The most used libraries are cuBLAS\footnote{developer.nvidia.com/cublas} and cuDNN\footnote{developer.nvidia.com/cudnn}, by NVIDIA and rocBLAS\footnote{github.com/ROCmSoftwarePlatform/rocBLAS} and MIOpen\footnote{github.com/ROCmSoftwarePlatform/MIOpen}, by AMD that implement the most optimize versions of matrix multiplication, convolution, and other kinds of mathematical operations to be used on the \acrshort{dnn} models. For the frameworks, TensorFlow\footnote{tensorflow.org/} and PyTorch\footnote{pytorch.org/} are open-source frameworks developed by Google and Facebook, respectively that allow for easy implementation of the models in \acrshort{gpu}s.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{DNN Performance and Energy Efficiency Improvement}
@@ -125,24 +125,169 @@ Supported on the performed \acrshort{gpu} characterization to non-conventional V
 \section{Non-conventional V-F on CNNs}
 \label{section:baseline}
 
-\subsection{CNN Layer Characterization}
+As it was referred in Section~\ref{sec:under_int_app}, Tang~\cite{tang_impact_2019} has recently studied the impact of frequency scaling on the performance and energy consumption of \acrshort{dnn} executed in \acrshort{gpu}. By extending this study with the capability to also apply undervoltage techniques, a broader range of \acrshort{dvfs} configurations are herein envisaged to provide even greater benefits. 
 
-\subsubsection{Convolution Layers}
+Another important characteristic of \acrshort{dnn} is their tolerance to a certain degree of computation errors \cite{zhang_approxann_2015}, without any significant change in the training and inference results. Consequently, it is crucial to complement the characterization performed in the Chapter~\ref{chapter:gpu_char} with the voltage scaling effects in \acrshort{dnn} training and inference phases and, in particular, with its influence on the computation errors that might occur when exploring the existing voltage margins.
 
-\subsubsection{Fully-Connected Layers}
+As discussed, at the particular case of the \acrshort{cnn}, its feature extraction ability is supported by the convolution operator. Nonetheless, \acrshort{cnn} also includes other types of layers, such as fully connected and pooling layers. However, convolution and fully connected layers take up to $97\%$ of the \acrshort{gpu} energy consumption~\cite{li_evaluating_2016}, which makes them particularly suited to exploit energy-saving mechanisms. 
+
+Hence, to assess and apply non-conventional V-F pairs on the execution of \acrshort{cnn}s, the high-level deep learning framework PyTorch and the default mathematical libraries (rocBLAS and MIOpen) provided by the considered \acrshort{gpu} manufacturer (AMD) were extensively evaluated. This section reports the main achieved conclusions for the convolution operator and fully connected layers.
+
+\textcolor{red}{FALAR QUE FOI EXECUTADO EM SP COM NUMEROS ALEATORIOS - seguindo o que foi feito nos testes anteriores}
+
+\subsection{Convolution Layer}
+
+The MIOpen library provides multiple convolution implementations, being the \textit{Direct}, \textit{GEMM} and \textit{Winograd}~\cite{khan_miopen_2019} the ones that are more often used. 
+At the beginning of the execution, this library performs one convolution operation with each of the algorithms that are able to solve the given convolution. Then, the algorithm that takes the shortest execution time is chosen and used to perform the remaining convolutions of the current layer. The convolution layer is defined by the parameters presented in Table~\ref{tab:convparams}. 
+
+\begin{table}[htbp]
+\caption{Convolution Parameters}
+\begin{center}
+\begin{tabular}{cl}
+\hline
+\textbf{Parameter}&\textbf{Description} \\ 
+\hline
+W, H & Input Width, Height\\
+N & Mini-batch Size \\
+C, K & Number of features, kernels \\
+R, S & Kernel Width,Height\\
+Pad\_W, Pad\_H & Padding Width, Height \\
+Str\_W, Str\_H & Stride Width, Height \\
+\hline
+\end{tabular}
+\label{tab:convparams}
+\end{center}
+\end{table}
+
+A valid claim to be made is that if there is a convolution algorithm that is more energy-efficient than the others, and so, of particular interest for the work. One of the input parameters of the convolution \acrshort{api} is the algorithm selection that disables the automatic algorithm selection. 
+The execution time, and energy and power consumption of all algorithms were measured while executing 100 different convolutions layer configurations from the DeepBench benchmark\footnote{github.com/baidu-research/DeepBench}, with each algorithm being executed ten times with the median results being taken. The result showed that the algorithm that achieved the shortest execution time in all cases also achieved the best energy consumption. By looking at the power consumption across the different algorithms, the result showed that it was similar in all cases. Two other important results were that no algorithm proved to be the fastest for all or subset of configurations and that not all convolution layer configurations are able to be mapped on the pre-compiled and optimized kernels, that implement the different algorithms, available in the library. The results show that even though the technique of measuring the execution time at the beginning of the execution appears simplistic and with space to be optimized, in reality, that is not the case. Measuring the execution time at the beginning of the execution for all possible execution ways optimizes both the performance as well as energy consumption. This technique also brings the benefit of optimizing the execution to the current \acrshort{gpu} state and utilization, which is one of the premisses of the presented work.
+
+To conduct the convolution analysis, a set of 20 distinct convolution layer configurations was selected from the DeepBench benchmark to understand how each algorithm is affected by V-F configuration, both in its inference and training phases.
+
+
+
+\subsubsection{Layer Guardband and Characterization}
+
+Figure~\ref{fig:Convolution_guardband} presents the set of valid voltage ranges that were obtained for the inference and training phases of the convolution layer. Comparing these results with those obtained in the individual component characterization, it can be observed that some computation errors (and even some \acrshort{gpu} crashes) were detected at lower frequencies. In fact, since this operation is more complex and requires the utilization of multiple architectural components, the undervoltage limit is more likely to be violated by the voltage drops induced by the activation and deactivation of the \acrshort{gpu}  architectural components \cite{thomas_core_2016}. This phenomenon will make certain parts of the \acrshort{gpu} not to work properly (even momentarily), producing an increased rate of computation errors and an increased crash threshold voltage. 
+
+
+\begin{figure}[htbp]
+    \centering
+        \includegraphics[width=0.75\textwidth]{Figures/Application To Deep Learning/Convolution_Guardband.pdf}
+        \caption{Core Domain - Convolution Layer - Usable voltage range.}
+    \label{fig:Convolution_guardband}
+\end{figure}
+
+When comparing the three convolution algorithms, it is observed that \textit{Direct} allows for the greatest amount of undervoltage, followed by \textit{GEMM} and \textit{Winograd}. The \textit{Direct} algorithm is the simpler of the three, with no data transformation and movement being necessary for its execution. In contrast, \textit{GEMM} and \textit{Winograd} need some data pre-processing before the convolution is performed. This extra step relies on the activation of more \acrshort{gpu} components, making these algorithms more prone to induce voltage drops. 
+
+When comparing the training and inference phases, it is observed that they present similar undervoltage capabilities (for all algorithms), with the crash point diverging only around $10$mV. However, the training algorithm is more prone to the introduction of computation errors, starting to be observed at a lower degree of undervoltage when compared to the inference.
+
+Figures~\ref{fig:Convolution_behaviour} and \ref{fig:Convolution_EDP} illustrates the impact of non-conventional V-F on energy consumption, execution time and \acrshort{edp}. When working with the default voltage level of each frequency (dashed lines), the \textit{Direct} and \textit{GEMM} algorithms exhibit a valley in their performance chart, with the frequency of $1530$~MHz providing the best performance. In contrast, the \textit{Winograd} achieves its best performance with the lowest frequencies. Upon the introduction of independent voltage scaling, it is possible to improve the execution time and energy consumption (in comparison with the default voltage) by $8\%$ and $23\%$, $19\%$ and $8\%$, and $14\%$ and $24\%$ for the \textit{Direct}, \textit{GEMM} and \textit{Winograd} algorithms, respectively. 
+
+\begin{figure}[htb]
+  \begin{subfigmatrix}{2}
+    \subfigure[Inference]{\label{fig:Convolution_Inference_behaviour}\includegraphics[width=0.75\textwidth]{Figures/Application To Deep Learning/Convolution_Inference_Behaviour.pdf}}
+    \subfigure[Training]{\label{fig:Convolution_Backprop_behaviour}\includegraphics[width=0.75\textwidth]{Figures/Application To Deep Learning/Convolution_Backprop_Behaviour.pdf}}
+  \end{subfigmatrix}
+  \caption{Core domain - .}
+  \label{fig:Convolution_behaviour}
+\end{figure}
+
+The \acrshort{edp} charts depicted in Figure~\ref{fig:Convolution_EDP} indicates that the most energy-efficient configuration for the three algorithms is at the lowest frequencies and maximum undervoltage possible. At these configurations, although the execution time is reduced by $16\%$ (for the \textit{Direct} and \textit{GEMM} algorithms), it is still possible to achieve a reduction in energy consumption of up to $46\%$. The use of the most efficient configuration for the \textit{Winograd} algorithm improves both the execution time and the energy by $15\%$ and $32\%$, respectively.
+
+\begin{figure}[htbp]
+    \centering
+        \includegraphics[width=1.0\textwidth]{Figures/Application To Deep Learning/Convolution_EDP.pdf}
+        \caption{Core Domain - Convolution Layer - .}
+    \label{fig:Convolution_EDP}
+\end{figure}
+
+
+
+\subsection{Fully-Connected Layer}
+
+
+The RocBlas library provides a single API for matrix multiplication, the underlying mathematical operation of the fully connected layer. By analyzing the performance counters and the kernels called by the library, it is possible to understand that multiplication is performed in one of two ways depending on the size of the matrices.
+According to to~\cite{dutot_high-performance_2016}, small matrices are first loaded to Cache, and all the operations are performed with the data in this component, making the operation compute bounded. For large matrices, the matrix multiplication is split, performing the multiplication in a tilling fashion. In this way, submatrices are loaded to the local caches, and the submatrices of results are produced. When the submatrix is consumed, another pair is loaded, and the process repeats until the full computation is performed. The threshold size corresponds to the size of the L1 Cache. 
+
+
+\subsubsection{Layer Characterization}
+
+Non-conventional V-F will impact the two implementations of the matrix multiplication in different ways. For small matrices, 
+since before the computations start, all the necessary data is already available on the local caches, 
+it is the ALU that will limit the undervoltage. Consequently, it is expected that a valley-like shape is observable in the performance chart after the application of frequency scaling (see section~\ref{sec:MAC_behaviour}). On the other hand, for large matrix sizes, the Cache will be stressed the most, with constant requests on the DRAM-Cache controller limiting the undervoltage. Consequently, the results will be similar to those that were observed in section~\ref{sec:cache_guardband} and \ref{sec:cache_sm__behaviour}. Figure~\ref{fig:MatrixMult_guardband} illustrates the results of the experiment and confirms the prediction: for small matrix sizes, it is possible to perform a higher degree of undervoltage. 
+
+
+\begin{figure}[htbp]
+    \centering
+        \includegraphics[width=0.75\textwidth]{Figures/Application To Deep Learning/MatrixMul_guardband.pdf}
+        \caption{Core Domain - Convolution Layer - .}
+    \label{fig:MatrixMult_guardband}
+\end{figure}
+
+
+Figures~\ref{fig:MatrixMult_behaviour} and \ref{fig:MatrixMult_EDP} present that it is possible to have an improvement in the execution time and energy consumption for both types of computations. The EDP chart indicates the same energy efficiency configuration for both cases, which results in an average reduction of $52\%$ in energy consumption and $8\%$ of improvement of the execution time.
+
+
+\begin{figure}[htbp]
+    \centering
+        \includegraphics[width=0.75\textwidth]{Figures/Application To Deep Learning/MatrixMul_behaviour.pdf}
+        \caption{Core Domain - Convolution Layer - .}
+    \label{fig:MatrixMult_behaviour}
+\end{figure}
+
+
+
+
+
+\begin{figure}[htbp]
+    \centering
+        \includegraphics[width=0.75\textwidth]{Figures/Application To Deep Learning/MatrixMul_EDP.pdf}
+        \caption{Core Domain - Convolution Layer - .}
+    \label{fig:MatrixMult_EDP}
+\end{figure}
 
 \subsection{Error Analysis}
 
-\subsubsection{Convolution Layers}
+To evaluate the occurrence of computation errors due to the utilization of non-conventional V-F scaling, each benchmark was executed with the default "automatic'' parameterization and the V-F pair under testing with the same input data. A \textit{warmup\_kernel} was also executed before each of these two runs, to fill the cache with random data. 
 
-\subsubsection{Fully-Connected Layers}
+
+For the error analysis of the \acrshort{cnn} layers, a different error metric was adopted due to the utilization of software libraries (versus custom kernels) operating over floating-point numbers (as before, generated from an uniform distribution in the interval $[0.1~;~1]$ to ensure that operations are never applied to numbers with significantly different exponent values). These libraries can launch the kernels in a different order, changing the order of operations, with a possible impact in the final result. In fact, by conducting experiments on the default voltage, it was observed that the order of kernel execution resulted in a relative output difference not greater than $10^{-6}$. In accordance, a computation error was asserted whenever the relative difference in each position of the output vectors was greater than or equal to  $10^{-5}$.
+
+\subsubsection{Convolution Layer}
+
+Figure~\ref{fig:Convolution_errors} depicts the distribution of the output results of the convolution layer for the three considered convolution algorithms (at both inference and training phases) for the minimum usable voltage values (i.e., before \acrshort{gpu} crash) across all considered core frequency values. The obtained results emphasize the little effect of the applied undervoltage on the computed values. Most of the output results are still almost entirely accurate, and only a small portion of the results present deviations. In fact, it should be emphasized that not only is the fraction of non-accurate results very small, but the normalized relative error of those non-accurate results has a shallow magnitude. A particular observation is worth noting about the results of the inference phase with the \textit{GEMM} algorithm. Although the amount of non-accurate results is greater than in the other configurations, the normalized relative error's magnitude is much smaller.
+
+\begin{figure}[htbp]
+    \centering
+        \includegraphics[width=0.75\textwidth]{Figures/Application To Deep Learning/Convolution_Error_Distribution.pdf}
+        \caption{Convolution Layer - Average percentage of accurate results and relative error distribution of non-accurate outputs for the minimum usable core voltage across all considered core frequency values.}
+    \label{fig:Convolution_errors}
+\end{figure}
+
+
+
+\subsubsection{Fully Connected}
+
+Figure~\ref{fig:MatrixMult_errors} represents the same evaluation for the Fully Connected Layer, for both small and large matrices. Even at these extreme configurations, it is observed that most results are still computed with full accuracy (98\% of the cases), with a normalized relative error as low as $1.37\times10^{-3}$ (on the remaining $2$\% of the cases).
+
+\begin{figure}[!t]
+    \centering
+        \includegraphics[width=0.48\textwidth]{Figures/Application To Deep Learning/MatrixMul_Error_Distribution.pdf}
+        \caption{Fully Connected - Average percentage of accurate results and relative error distribution of non-accurate outputs for the minimum usable core voltage across all considered core frequency values.}
+    \label{fig:MatrixMult_errors}
+\end{figure}
+
+Hence, the obtained results demonstrate that the amount of error introduced by these lowest voltages before crash conditions, on the two most important layers, are cooped with both \acrshort{dnn} training and inference, demonstrating the ample viability of this approach.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Complete CNNs training with non-conventional V-F}
 \label{section:enhanced}
 
-\subsection{Experimental Setup}
+falar da granularidade em que e possivel mudar a V-F!!!!!
+
+\subsection{Optimization algorithm adaptation to CNN training}
 
 
 

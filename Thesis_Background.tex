@@ -420,7 +420,7 @@ The presented memory problem that emerges on the register file when decreasing t
 In general, it is necessary to estimate $V_{min}$ to predict the size of the voltage guardband for the running application, and to understand the degree of computational errors that can emerge to take advantage of non-conventional V-F pairs.
 
 \section{Undervoltage and Imprecision tolerant applications}
-
+\label{sec:under_int_app}
 A new relevant category of applications named as \textit{Imprecision Tolerant applications} is introduced in this section. For these types of applications, computation errors can be propagated to subsequent logic stages with the expectation that the algorithm itself can recover from it~\cite{nakhaee_lifetime_2018}. Hardware designers can exploit these capabilities to reduce power consumption in two ways: designing hardware with lower precision encoding (reduced number of bits, like Google's TPU), minimizing the amount of combinatorial logic or running traditional hardware (\acrshort{gpu}s) in setups that in the effort of reducing power consumption, may introduce a degree of imprecision.
 
 A typical application that is taking, nowadays, significant advantages of GPU acceleration is Deep Learning (\acrshort{dl}). One of the most important characteristics of this type of algorithms is their imprecision tolerance. The computation of a \acrshort{dl} application is an iterative and convergence process, and by the natural adaption of the neural networks learning parameters in runtime, the occurrence of small computation errors do not affect the end prediction of the algorithm \cite{jiao_assessment_2017}.

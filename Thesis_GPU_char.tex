@@ -307,7 +307,7 @@ This kernel's objective is to test if the used component contribution can indica
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Experimental Setup}
+\section{Experimental Setup and Methodology}
 
 The devised benchmarks were applied to characterize an AMD Vega 10 Frontier Edition \acrshort{gpu}, whose specifications are presented in Table II~\ref{tab:Vega10specs}. 
 
@@ -418,6 +418,8 @@ Furthermore, an increase in \texttt{OPS} allows for a higher amount of undervolt
 
 
 \subsection{Shared Memory}
+
+\label{sec:cache_guardband}
 
 The voltage guardband results for the Shared Memory are displayed in Figure~\ref{fig:SharedMemory_guardband}. Similarly, with the Cache results, for frequencies bellow $1530MHz$, the output of the benchmark was not affected by the undervoltage, with the \acrshort{gpu} correctly working in the complete voltage range. For the frequencies above and equal to $1530MHz$, both computation errors and crashes occur. With the increase of \texttt{OPS}, from 0 to 10, it is observable that the \acrshort{gpu} starts to allow an increase of $10mV$ of undervoltage. This phenomenon indicates (and was formerly confirmed with \acrshort{gpu} counters) that with the reduction of the shared memory stress, the limiting factor to $V_{min}$ switches from that component to the ALU (result confirmed ahead). The conclusion is further validated for the test at $1600MHz$, where increasing  \texttt{OPS} to 40, makes the \acrshort{gpu} start to crash, meaning that the \acrshort{alu} is now entirely the limiting factor.
 
@@ -533,6 +535,8 @@ The experiment shows that for memory bounded kernels (\texttt{OPS} values $0$ an
 
 \subsection{Cache and Shared Memory}
 
+\label{sec:cache_sm__behaviour}
+
 Figure~\ref{fig:cache_sm_behaviour} presents the normalized energy consumption and execution time for different V-F setups for the cache and shared memory benchmarks, respectively.  
 
 In what concerns the energy and performance variations, performing voltage scaling at the default frequency (dashed line) reduces energy consumption as high as $46.1\% $. However, this results in a performance degradation of $60.9\%$. The advantage of performing non-conventional DVFS becomes apparent by allowing for energy reduction without any performance degradation. In this case, it is possible to run the GPU Core at $1600$ MHz and $1000$ mV, thus achieving an energy reduction of $35.7\%$ with no performance degradation. The commented results are related to the cache benchmark. However, the results of the shared memory are similar.
@@ -562,6 +566,7 @@ Figure~\ref{fig:cache_sm_edp} presents the obtained \acrshort{edp} for the Cache
 
 \subsection{MAC}
 
+\label{sec:MAC_behaviour}
 Figure~\ref{fig:MAC_behaviour} represents the normalized energy consumption and execution time for different V-F pairs for the \acrshort{mac} benchmark. It was chosen to represent the result for single-precision floating-point data-type, due to being the most used. However, the results for the remaining data types are similar.
 
 An interesting phenomenon is observed in the energy-execution time plot for the highest frequencies. Performing undervoltage not only reduces energy consumption (as expected), but it also allows for faster execution time. An explanation can be found by analyzing the power consumption during the benchmark execution. For the default voltage, the power surpasses the power cap, which activates the GPU protection mechanisms, halting the execution until the power is reduced. By applying an undervoltage, the power significantly decreases (as $P_{Static}\propto V$ and $P_{Dynamic}\propto V^2$, see \cite{guerreiro_gpgpu_2018}) and allows sustained maintenance of the desire DVFS configuration. 
