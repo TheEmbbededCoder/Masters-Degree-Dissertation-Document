@@ -64,6 +64,7 @@ The devised set of benchmarks,  presented in Table~\ref{tab:benchmarks} and avai
 On the listed benchmarks, the placeholder \texttt{DATA\_TYPE} is used to represent the different tested data types. The keyword is, following Table~\ref{tab:benchmarks}, equivalent to a standard integer and half, single and double precision data types depending on the benchmark. 
 The objective is to assess the effect of changing the type of operands and computation precision on the critical path.
 
+
 To guarantee that no compiler optimizations are performed on the tested variables, the keyword \texttt{volatile} is used.
 
 
@@ -119,6 +120,8 @@ Listing~\ref{lst:DRAMbitflip} renders a benchmark designed to evaluate the occur
     }
     \end{lstlisting}
 \end{figure}
+
+For the memory tests (\acrshort{dram}, Cache and Shared Memory), only integer data type was used since it was easier to assess if no data corruption had happened and the effects on memory are the same for floating-point operation.
 
 
 \subsubsection{Cache}
@@ -305,7 +308,7 @@ This kernel's objective is to test if the used component contribution can indica
     \end{lstlisting}
 \end{figure}
 
-
+\newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experimental Setup and Methodology}
 
@@ -376,10 +379,10 @@ The default frequencies of the GPU \textit{Core} and \textit{DRAM} domains, pres
 
 All the tests were performed using randomly generated inputs to avoid any bias incurred by the considered data values. Integer values were obtained from a normal distribution across their complete 32-bits range, while floating-point operands were generated using a uniform distribution in the interval $[0.1~;~1]$. The choice for limiting floating-point range to an interval with a maximum value inferior to one ensures that operations are never applied to numbers with a significantly different exponent value, thus avoiding rounding errors that would conduct to the discard of the operator with the lowest absolute value.
 
-While performing the undervoltage, the GPU goes through three distinct stages. At the first stage (\textit{working}), the \ac{gpu} works regularly, and no changes are detected in the application output. Then, by continuing the \ac{gpu} voltage reduction, some \textit{computational errors} are introduced and some application outputs change when compared with the default voltage setup. For integer experimentation, a computational error is considered if the output value differs from the default run, for the floating-point operation, the relative error between the default and non-conventional run is computed for each individual result. When the relative difference between the above is bigger than $10^{-4}$, it is said that the result has \textit{computational errors}.
-By reducing the GPU voltage beyond this stage, the \ac{gpu} enters into the \textit{crash} state, becoming unusable.
+While performing the undervoltage, the GPU goes through three distinct stages. At the first stage (\textit{working}), the \acrshort{gpu} works regularly, and no changes are detected in the application output. Then, by continuing the \acrshort{gpu} voltage reduction, some \textit{computational errors} are introduced and some application outputs change when compared with the default voltage setup. For integer experimentation, a computational error is considered if the output value differs from the default run, for the floating-point operation, the relative error between the default and non-conventional run is computed for each individual result. When the relative difference between the above is bigger than $10^{-4}$, it is said that the result has \textit{computational errors}.
+By reducing the GPU voltage beyond this stage, the \acrshort{gpu} enters into the \textit{crash} state, becoming unusable.
 
-To accurately determine the areas of interest (i.e., when infrequent computation errors occur) and to determine the crash point, the undervoltage step was reduced to $10mV$. Furthermore, when dealing with the \acrshort{DRAM} V-F domain, the \textit{Core} V-F domain was set to default values; for the \textit{Core} V-F domain, the highest frequency and default voltage of the \textit{DRAM} was selected. The GPU power consumption was measured using gpowerSAMPLER\footnote{github.com/hpc-ulisboa/gpowerSAMPLER}~\cite{guerreiro_gpgpu_2018}, at every millisecond. At the end of the execution, the energy is computed as the integral of all the measurements taken. 
+To accurately determine the areas of interest (i.e., when infrequent computation errors occur) and to determine the crash point, the undervoltage step was reduced to $10mV$. Furthermore, when dealing with the \acrshort{dram} V-F domain, the \textit{Core} V-F domain was set to default values; for the \textit{Core} V-F domain, the highest frequency and default voltage of the \textit{DRAM} was selected. The GPU power consumption was measured using gpowerSAMPLER\footnote{github.com/hpc-ulisboa/gpowerSAMPLER}~\cite{guerreiro_gpgpu_2018}, at every millisecond. At the end of the execution, the energy is computed as the integral of all the measurements taken. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Limiting components to the voltage exploration space}
@@ -587,6 +590,7 @@ Finally, Figure~\ref{fig:MAC_EDP} presents the obtained EDP chart for single-pre
     \label{fig:MAC_EDP}
 \end{figure}
 
+\newpage
 \subsection{Non-linear Operations}
 
 Figure~\ref{fig:SFU_behaviour} showcases the normalized energy consumption and execution time for different V-F pairs for the single-precision floating-point \acrshort{sfu} benchmark. The \acrshort{gpu} behavior displayed in this test is similar to the ones of the cache and shared memory, with the undervoltage not affecting the performance. The degree of energy savings achieved goes in line with the previous results.
@@ -609,8 +613,10 @@ Figure~\ref{fig:SFU_EDP} represents the \acrshort{edp} heat-map, displaying that
     \label{fig:SFU_EDP}
 \end{figure}
 
+\section{Temperature Model}
+\label{sec:temp_model}
 
-
+\newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Summary}
 

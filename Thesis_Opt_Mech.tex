@@ -12,26 +12,71 @@
 \label{chapter:mech}
 
 
+The results from the previous chapter display that the energy-efficiency (more specifically, the \acrshort{edp}) of an out-of-the-shelf \acrshort{gpu} can be significantly improved if a specific non-conventional V-F pair is used on the Core \acrshort{dvfs} domain. 
+
+To find the optimal V-F configuration, two approaches can be followed: creating a forecasting model or creating an optimization mechanism.
+
+The forecasting model would predict the V-F pair to use based on the executing code (analysis of the Assembly code) and performance counters (the trace of the application being run on the \acrshort{gpu}). This option has the benefit of allowing the complete execution of the target application under the best possible configuration. However, such a forecasting model would also have to take into consideration the \acrshort{gpu} temperature, utilization (the target application being executed by itself or concurrently with others) and more importantly, it would be very tied to a specific \acrshort{gpu} model. In so, this option would become complicated and not easily scalable between different \acrshort{gpu}s.
+
+On the other hand, the online optimization mechanism can target the native code repetition on \acrshort{gpgpu} applications solving algorithms. For these applications, the best overall configuration is the best V-F pair for each step of the algorithm. With so, in algorithms where the time it takes to perform a step is significantly shorter than the time it takes to compute the total algorithm, it is possible to discover and achieve the optimal V-F configuration quickly. This approach has the added advantage of optimizing the \acrshort{gpu} for their current state: temperature, utilization, aging and all \acrshort{pvt} variation.
+
+Due to the benefits of targeting the current \acrshort{gpu} state, the second approach, the creation of a V-F optimization mechanism, is followed. This chapter provides an overview of the optimization mechanism and an explanation of how it should be adapted to the target application.
+
 
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{V-F Optimiation Mechanism description}
-\label{section:problem}
+\section{V-F Optimization Mechanism description}
+\label{section:opt}
 
-\subsection{Objective}
-\subsection{Requirements}
+The devised V-F optimization mechanism follows the Block Diagram of Figure~\ref{fig:opt_mech}, being constituted of a two-phase process. The following sections provide an in-depth explanation of each step of the mechanism, clarifying its objective, requirements.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.75\textwidth]{Figures/Optimization/full_mech.pdf}
+  \caption{V-F Optimization Mechanism Block Diagram.}
+  \label{fig:opt_mech}
+\end{figure}
+
+\subsection{Objective and Requirements}
+
+This V-F optimization mechanism aims to discover and achieve the optimal V-F configuration to the running \acrshort{gpgpu} application and current \acrshort{gpu} state. This optimal V-F configuration depends on the type of computations being performed, the \acrshort{gpu} temperature, utilization and aging and is selected from an exploration space concluded from the set of experiments covered on chapter~\ref{chapter:gpu_char}. 
+
+The envisioned optimization mechanism is better suited to \acrshort{gpgpu} applications with a native code repetition - iterative algorithms like deep neural networks training. In particular, to applications where each iteration step takes significantly less time to compute than the total computation time of the algorithm. This requirement is not obligatory; however, applications that follow this pattern can more significantly benefit from the mechanism since it can find the most appropriate configuration faster.
+
+
 \subsection{Architecture Overview}
-\subsubsection{Temperature effect model}
-\subsection{Optimization algorithms}
-\subsubsection{Hill Climbing}
 
-\subsubsection{Simulated Annealing}
+The devised mechanism is comprised of a two-phase process, that in order, it tries to find the V-F configuration that achieves the highest energy efficiency for the running application. The evaluated energy efficiency metric is the \acrshort{edp}, computed as 
+\begin{equation}
+	EDP=energy * computation \: time
+	\label{eq:edp}
+\end{equation}
+for the last step run of the algorithm. By changing the applied Core V-F configuration, the \acrshort{edp} value is increased or decreased, allowing for the comparison if the new configuration is better than the old. 
 
-\section{Implementation details}
+Each phase of the optimization mechanism follows the block diagram of Figure~\ref{fig:detail_mech}. Before executing the algorithm step, the energy and computation time calculation is started. After the step is concluded, the energy and computation time are computed, and in addition to specific application status, the results are provided for the optimization mechanism.
 
-\section{Users guide}
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.75\textwidth]{Figures/Optimization/opt_pre_run.pdf}
+  \caption{Pre-Run V-F Optimization Mechanism Block Diagram.}
+  \label{fig:detail_mech}
+\end{figure}
+
+\subsubsection{Pre-run Optimization}
+
+The optimal configuration can vary dramatically due to the complex behavior of the different architectural components when subjects to different workloads. With so, the objective of the first phase, \textit{Pre-run Optimization}, is to be able to find the global minimum of the exploration space, without testing all the possible configurations (as performed on Chapter~\ref{chapter:gpu_char}). To do so, it applies the \textit{Simulated Annealing} algorithm to accept or reject a new V-F configuration based on the computed \acrshort{edp} value. This algorithm excels at finding an approximate global optimum in a fixed amount of time. 
+
+At the beginning of the execution, the \acrshort{gpu} is set to the highest default performance level. The achieved \acrshort{edp} result acts as a baseline to which all following values are normalized to. After each optimization step, a new frequency and voltage configuration are generated. This new configuration explores the neighbors' configuration of the current one, with the new frequency being selected from the default frequency values, and the voltage being discretized in $25mV$ steps, within the given optimization space. 
+For each optimization step, if the new \acrshort{edp} value is smaller than the previous, the configuration is accepted. If the result is worst, the configuration is accepted based on the \textit{Simulated Annealing} algorithm.
+
+If, after $ N $ execution steps no better configuration is found, or the predefined \textit{Pre-Run Steps} is concluded, the \textit{Pre-run Optimization} is ended, with the best V-F configuration being selected for the algorithm execution.
+
+\subsubsection{Online Monitoring Optimization}
+
+After the execution of the \textit{Pre-run Optimization}, a quasi-optimal configuration is found. The objective of the textit{Online Monitoring Optimization} is to achieve the best possible configuration while monitoring the application status to guarantee the correct application output. The overall scheme of this phase is similar to the first one. However, in this case, the \textit{Hill Climbing} algorithm is used instead. This algorithm only accepts a new configuration if it is able to minimize the \acrshort{edp} value further, being specialized in finding the global minimum having the certainty that it is on the neighborhood of the initial V-F configuration. The online monitoring phase cames in action in two forms. First, it applies a temperature undervoltage behavior model, presented in Section~\ref{sec:temp_model},  that minimizes the currently applied undervoltage when the temperature increases, to guarantee correct \acrshort{gpu} operation under all conditions. Second, it monitors the application output. After the execution of each algorithm step, if an invalid application output is found, the undervoltage is decreased, guaranteeing that the V-F configuration does not induce the current invalid output. This policy acts as a fail-safe that should not be necessary if a valid exploration space and temperature model are acquired for the present \acrshort{gpu}.
+
 
 
 \section{Summary}

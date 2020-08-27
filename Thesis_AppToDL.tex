@@ -133,8 +133,6 @@ As discussed, at the particular case of the \acrshort{cnn}, its feature extracti
 
 Hence, to assess and apply non-conventional V-F pairs on the execution of \acrshort{cnn}s, the high-level deep learning framework PyTorch and the default mathematical libraries (rocBLAS and MIOpen) provided by the considered \acrshort{gpu} manufacturer (AMD) were extensively evaluated. This section reports the main achieved conclusions for the convolution operator and fully connected layers.
 
-\textcolor{red}{FALAR QUE FOI EXECUTADO EM SP COM NUMEROS ALEATORIOS - seguindo o que foi feito nos testes anteriores}
-
 \subsection{Convolution Layer}
 
 The MIOpen library provides multiple convolution implementations, being the \textit{Direct}, \textit{GEMM} and \textit{Winograd}~\cite{khan_miopen_2019} the ones that are more often used. 
@@ -198,7 +196,7 @@ The \acrshort{edp} charts depicted in Figure~\ref{fig:Convolution_EDP} indicates
 \begin{figure}[htbp]
     \centering
         \includegraphics[width=1.0\textwidth]{Figures/Application To Deep Learning/Convolution_EDP.pdf}
-        \caption{Core Domain - Convolution Layer - .}
+        \caption{Core Domain - Convolution Layer - EDP heatmap for the three algorithms.}
     \label{fig:Convolution_EDP}
 \end{figure}
 
@@ -221,7 +219,7 @@ it is the ALU that will limit the undervoltage. Consequently, it is expected tha
 \begin{figure}[htbp]
     \centering
         \includegraphics[width=0.75\textwidth]{Figures/Application To Deep Learning/MatrixMul_guardband.pdf}
-        \caption{Core Domain - Convolution Layer - .}
+        \caption{Core Domain - Fully-Connected Layer - Usable GPU core voltage range. Values represent matrix sizes, example $A_{a \times b} \cdot B_{b \times c}$.}
     \label{fig:MatrixMult_guardband}
 \end{figure}
 
@@ -232,7 +230,7 @@ Figures~\ref{fig:MatrixMult_behaviour} and \ref{fig:MatrixMult_EDP} present that
 \begin{figure}[htbp]
     \centering
         \includegraphics[width=0.75\textwidth]{Figures/Application To Deep Learning/MatrixMul_behaviour.pdf}
-        \caption{Core Domain - Convolution Layer - .}
+        \caption{Core Domain - Fully-Connected Layer - Behaviour.}
     \label{fig:MatrixMult_behaviour}
 \end{figure}
 
@@ -260,7 +258,7 @@ Figure~\ref{fig:Convolution_errors} depicts the distribution of the output resul
 
 \begin{figure}[htbp]
     \centering
-        \includegraphics[width=0.75\textwidth]{Figures/Application To Deep Learning/Convolution_Error_Distribution.pdf}
+        \includegraphics[width=0.8\textwidth]{Figures/Application To Deep Learning/Convolution_Error_Distribution.pdf}
         \caption{Convolution Layer - Average percentage of accurate results and relative error distribution of non-accurate outputs for the minimum usable core voltage across all considered core frequency values.}
     \label{fig:Convolution_errors}
 \end{figure}
@@ -271,9 +269,9 @@ Figure~\ref{fig:Convolution_errors} depicts the distribution of the output resul
 
 Figure~\ref{fig:MatrixMult_errors} represents the same evaluation for the Fully Connected Layer, for both small and large matrices. Even at these extreme configurations, it is observed that most results are still computed with full accuracy (98\% of the cases), with a normalized relative error as low as $1.37\times10^{-3}$ (on the remaining $2$\% of the cases).
 
-\begin{figure}[!t]
+\begin{figure}[htbp]
     \centering
-        \includegraphics[width=0.48\textwidth]{Figures/Application To Deep Learning/MatrixMul_Error_Distribution.pdf}
+        \includegraphics[width=0.8\textwidth]{Figures/Application To Deep Learning/MatrixMul_Error_Distribution.pdf}
         \caption{Fully Connected - Average percentage of accurate results and relative error distribution of non-accurate outputs for the minimum usable core voltage across all considered core frequency values.}
     \label{fig:MatrixMult_errors}
 \end{figure}
@@ -282,19 +280,116 @@ Hence, the obtained results demonstrate that the amount of error introduced by t
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Complete CNNs training with non-conventional V-F}
+\section{CNN training and inference with non-conventional V-F}
 \label{section:enhanced}
 
-falar da granularidade em que e possivel mudar a V-F!!!!!
+The preliminary assessment of the \acrshort{cnn} primitives exhibits the same behavior of the primitive operations analyze, performed on the Chapter~\ref{chapter:gpu_char}. It is possible to safely undervolt the \acrshort{gpu} of the two main \acrshort{cnn} primitives without compromising the accuracy and with energy and performance gains. With so, the logical next step is to adapt the optimization mechanism described on Chapter~\ref{chapter:mech} to the training of complete state-of-the-art \acrshort{cnn}s.
+
+
+This section starts by presenting the usability of non-conventional V-F on the complete training of \acrshort{cnn}s, followed by how the optimization mechanism was adapted to achieve the same energy efficiency gains automatically.
+
+\subsection{Feasibility Assessment}
+
+The results that were obtained in the previous section evidence that the small number and relative amount of computation errors introduced by these near threshold conditions is well cooped with the operations that are conducted in \acrshort{dnn} layers. However, the same evaluation urged to be done for the whole network.
+
+
+Following the same methodology as before, an exploration of the frequency and voltage was performed for the training + inference and inference phase of four complete well-know \acrshort{cnn} models. The tested models are LeNet, VGG11, AlexNet and WideResNet, corresponding to increasing model size, complexity, and characteristics. The feasibility assessment will prove that using such configurations is allowed by the algorithms under execution, both with negligent impacts on the models' final training accuracy and with energy-efficiency improvements. To guarantee that the changing V-F is the only source of the observed variation, in all tests, the networks' weights are initialized with the same value.
+
+
+\subsubsection{Training and Inference}
+
+Table~\ref{tab:trainingAcc} presents the median classification accuracy over ten training runs and demonstrates that, when compared with the default setup (i.e., undervolt = 0), the introduced computation errors do not induce any significant change in the network's final training accuracy. 
+In more detail, Figure~\ref{fig:CNN_loss}, presents the behavior of the loss and model accuracy measured on the test set over the training session. It is possible to observe that the two metrics' progress is, within small variations, the same for all tested V-F configurations.
+
+\begin{table}[htb]
+    \centering
+    \caption{Comparing CNN training test set accuracy with the application of different undervoltage levels.}
+    \label{tab:trainingAcc}
+    \begin{tabular}{rcccc}
+        \multicolumn{1}{l}{{\textbf{Amount of undervolt {[}mV{]}}}} &
+          \textbf{AlexNet {[}\%{]}} &
+          \textbf{LeNet {[}\%{]}} &
+          \textbf{VGG11 {[}\%{]}} &
+          \textbf{WideResNet {[}\%{]}} \\ \hline
+        \textbf{0}   & 76.59 & 59.84 & 86.14 & 80.32 \\
+        \textbf{50}  & 76.48 & 60.08 & 86.14 & 80.39 \\
+        \textbf{100} & 76.60 & 59.94 & 86.04 & 80.23 \\
+        \textbf{150} & 76.61 & 60.12 & 86.39 & 80.08 \\ \hline
+        \multicolumn{1}{l}{{\textbf{Number of trained epochs}}} &
+          50 &
+          100 &
+          30 &
+          30
+    \end{tabular}%
+    
+\end{table}
+
+
+\begin{figure}[htb]
+    \centering
+        \includegraphics[width=0.8\textwidth]{Figures/Application To Deep Learning/CNN_loss_acc.pdf}
+        \caption{Core domain - CNN models - superposition of all V-F configuration test set loss and model accuracy.}
+    \label{fig:CNN_loss}
+\end{figure}
+
+\begin{figure}[htb]
+    \centering
+        \includegraphics[width=0.8\textwidth]{Figures/Application To Deep Learning/CNN_behaviour.pdf}
+        \caption{Core domain - CNN models - Normalized energy consumption and execution time for training + inference. The dashed line connects the default V-F pairs, and the diagonal striped pattern indicates the plateau of minimum energy consumption.}
+    \label{fig:CNN_Behaviour_training_inf}
+\end{figure}
+
+\begin{figure}[htb]
+    \centering
+        \includegraphics[width=0.8\textwidth]{Figures/Application To Deep Learning/CNN_EDP.pdf}
+        \caption{Core domain - CNN models - Obtained Energy-Delay Product (EDP) for training + inference.}
+    \label{fig:CNN_EDP_training_inf}
+\end{figure}
+
+\begin{table}[t]
+\centering
+\caption{Evaluation of performance, energy, and EDP when applying non-conventional DVFS in the training of neural networks.}
+\label{tab:trainingMetricsResults}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{llcccc}
+&  &  \multicolumn{4}{c}{\textbf{Improvement {\it vs} default V-F}} \\ 
+\cline{3-6} 
+\bf Metric &  \bf Selected configuration &    \textbf{AlexNet} &  \textbf{LeNet} &  \textbf{VGG11} &  \textbf{WideResNet} \\ \hline
+\textbf{Energy}        & At highest frequency & 24\% & 20\% & 22\% & 23\% \\
+\textbf{}              & At best EDP          & 38\% & 38\% & 33\% & 38\% \\\hline
+\textbf{Training time} & At highest frequency & 1\%  & 2\%  & 0\%  & 6\%  \\
+\textbf{}              & At best EDP          & 3\%  & -3\% & -2\% & 0\% \\\hline
+\textbf{EDP}           & At highest frequency & 21\% & 22\% & 22\% & 23\% \\
+\textbf{}              & At best EDP          & 38\% & 41\% & 32\% & 36\% \\ \hline
+
+&  &\multicolumn{4}{c}{\textbf{Improvement {\it vs} F scaling with default V-F pairs}} \\ \hline
+\textbf{Energy}        &At best EDP&  -2\% & 0\% & -1\% & -2\% \\\hline
+\textbf{Training time} &At best EDP&  8\%  & 0\%  & 6\%  & 10\%  \\\hline
+\textbf{EDP}           &At best EDP&  3\% & 0\% & 3\% & 6\% \\ \hline
+\multicolumn{6}{c}{a positive value indicates an improvement vs the default V-F configuration of the GPU.} \\
+\end{tabular}%
+}
+\end{table}
+
+
+
+\subsubsection{Inference}
+
 
 \subsection{Optimization algorithm adaptation to CNN training}
 
+As described, the optimization mechanism is comprised of two phases. This section presents how each of them was adapted to the training of \acrshort{cnn}s.
 
 
-\subsection{Feasibility Assessment}
-Vou mostrar que treinar com estas settings nao estraga accuracy
+\subsubsection{Pre-run Optimization}
 
-\subsection{Performance and energy optimization}
+\subsubsection{Online Monitoring Optimization}
+
+
+
+\subsection{Energy-efficiency Optimization}
+
+
 
 \section{Summary}
 % % ----------------------------------------------------------------------
