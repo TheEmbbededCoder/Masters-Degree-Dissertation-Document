@@ -328,7 +328,7 @@ The major drawback of current \acrshort{gpu} \acrshort{dvfs} implementations is 
 Since no information about the application is provided to the \acrshort{dvfs} controller, no adaptation of the V-F settings can be employed.
 Considering that the manufacturers do not tune their devices to the minimum voltage level (to accommodate for manufacturing imprecisions and to leave a safe guardband), the operating voltage of the circuits can be significantly reduced, leading to significant power savings. 
 
-Overall, the minimum operating voltage of each performance level is set at a high enough level to ensure the correct functioning of the \acrshort{gpu}, independent of the type of computations/workload. Nevertheless, it is possible to fine-tune the voltage and frequency better if the type of task being executed is known at run-time.
+Overall, the minimum operating voltage of each performance level is set at a high enough level to ensure the correct functioning of the \acrshort{gpu}, independent of the type of computations/workload. Nevertheless, it is possible to fine-tune the voltage and frequency better if the type of task being executed is known at run-time. A significant limitation of the voltage frequency control system is the time it takes to change and stabilize the intended V-F pair. On the case on the AMD Vega 10 Frontier Edition, the mechanism takes approximately 200-500 ms to change between performance levels.
 
 \subsection{GPU DVFS Characterization}
 

@@ -25,7 +25,7 @@ Following Figure~\ref{fig:gpu_char}, the chapter introduces in Section~\ref{sec:
 \begin{figure}[htb]
   \centering
   \includegraphics[width=0.8\textwidth]{Figures/GPU_characterization/gpu_char.pdf}
-  \caption{.}
+  \caption{Overview of the methodology and its objective outputs.}
   \label{fig:gpu_char}
 \end{figure}
 
@@ -599,7 +599,7 @@ Figure~\ref{fig:SFU_behaviour} showcases the normalized energy consumption and e
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=0.8\textwidth]{Figures/GPU_characterization/SFU_behaviour.pdf}
+  \includegraphics[width=0.7\textwidth]{Figures/GPU_characterization/SFU_behaviour.pdf}
   \caption{Core domain - ALU-Non-Linear - Normalized energy and performance for SP. The dashed lines connect the results for default F-V configurations.}
   \label{fig:SFU_behaviour}
 \end{figure}
@@ -608,7 +608,7 @@ Figure~\ref{fig:SFU_EDP} represents the \acrshort{edp} heat-map, displaying that
 
 \begin{figure}[htb]
     \centering
-        \includegraphics[width=0.6\textwidth]{Figures/GPU_characterization/SFU_EDP_SP.pdf}
+        \includegraphics[width=0.55\textwidth]{Figures/GPU_characterization/SFU_EDP_SP.pdf}
         \caption{Core domain - ALU-SFU - Obtained Energy-Delay Product (EDP) for single-precision floating-point.}
     \label{fig:SFU_EDP}
 \end{figure}
@@ -616,7 +616,24 @@ Figure~\ref{fig:SFU_EDP} represents the \acrshort{edp} heat-map, displaying that
 \section{Temperature Model}
 \label{sec:temp_model}
 
-\newpage
+The benchmarks were tested at a set temperature of 45ºC by fixing the \acrshort{gpu} fan to 100\% and waiting for the temperature to stabilize between runs. This temperature was chosen by observing that \acrshort{gpu}'s temperature, while executing short benchmarks, stabilized around that temperature. However, during the execution of more extended applications or changing environmental conditions, the device can become hotter. The described work of Leng \textit{et al.}~\cite{leng_safe_2015} pointed out that only a small variation on $V_{min}$ is observed due to temperature variations. However, the performed experiments only cover temperatures up to 70ºC, easily surpassed by the \acrshort{gpu} underuse. 
+
+To access the undervoltage capabilities in a broader range of temperatures, the Cache and ALU-MAC benchmarks were continuously executed, with varying \acrshort{gpu} fan speed, and the output of the execution was analyzed. Varying the frequency did not change the temperature behavior, so the results of all executions were combined in Figure~\ref{fig:temp_model}. 
+
+\begin{figure}[htb]
+    \centering
+        \includegraphics[width=0.7\textwidth]{Figures/GPU_characterization/UndervoltageWithTemperature.pdf}
+        \caption{Undervoltage capabilties with changing temperature and defined temperature model.}
+    \label{fig:temp_model}
+\end{figure}
+
+Changing the amount of undervolt or fan speed resulted in four different output scenarios. \textit{Working} - the benchmark's output was correct and the same as when running with conventional V-F pairs. \textit{Warning} - the benchmark's output was correct in more than 80\% of the executions. \textit{Computation Errors} - the benchmark's output was not correct. However, the \acrshort{gpu} was still working and responding to the kernel commands. \textit{Crash} - the \acrshort{gpu} stop working and responding to the commands of the application.
+
+Overall, the undervoltage capabilities stay relatively the same until the 70 to 75ºC, with the highest undervoltage capabilities being achieved at the 55ºC mark. After the 75ºC, and following Freijado's work~\cite{freijedo_modeling_2012}, the carriers' mobility decreases and starts to limit the undervolting capabilities of the \acrshort{cmos} circuit. This result leads to the creation of a simple temperature model that limits the undervoltage potential for temperatures above 70ºC, as indicated in Figure~\ref{fig:temp_model}. This model acts as a fail-safe that guarantees that the non-conventional V-F exploration performed at 45ºC can be safely used across the complete temperature spectrum. The final user will have to limit the percentage of undervoltage according to the model, depending on the current \acrshort{gpu} temperature. By doing so, it guarantees that setting a safe non-conventional V-F pair will not cause a \acrshort{gpu} crash with temperature rise.
+
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Summary}
 
