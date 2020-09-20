@@ -11,25 +11,42 @@
 \chapter{Introduction}
 \label{chapter:introduction}
 
-Insert your chapter material here...
+In the last few years, Deep Neural Networks (\acrshort{dnn}s) have had a significant impact in industry and society by allowing for important breakthroughs in many application domains, such as computer vision, speech recognition, natural language processing, drug discovery, genomics, etc \cite{shrestha_review_2019}.
+
+However, \acrshort{dnn}s are usually characterized by significant computational burdens, particularly when considering the training of very deep and complex networks, dealing with high dimensional data, such as images and videos. For such purpose, researchers (and data scientists, in general) often rely on accelerators, such as Graphical Processing Units (\acrshort{gpu}s), to cope with the associated computational burden and reduce the training time. \acrshort{gpu}s differ from conventional processors by including thousands of computing cores (Compute Units - \acrshort{cu}s) and a large bandwidth memory module. As a result, they are able to execute the same instruction over massive amounts of data. Due to their versatility and compute power, \acrshort{gpu}s are now commonly deployed on most supercomputers, data centers, and other computational infrastructures related to artificial intelligence algorithms' development.
 
 
+
+Additionally, several software frameworks, algorithms and techniques have been proposed to manage and optimize the execution of \acrshort{dnn} on \acrshort{gpu} (e.g., the work of Mittal~\cite{mittal_survey_2019}). However, most optimization techniques neglect the training phase's energy impact, usually resulting in considerable costs. 
+
+To overcome this problem, researchers have also explored other solutions that allow mitigating the energy impact of neural network training. One particular and common approach relies on the use of low-precision arithmetic (e.g., demonstrated by Nabavinejad~ \cite{nabavinejad_coordinated_2019}), eventually trading network accuracy with increased processing performance and lower energy consumption.
+
+Researchers have also looked at alternative approaches, such as exploiting Dynamic Voltage and Frequency Scaling (\acrshort{dvfs}) on both the inference and training phases. In fact, by carefully selecting the used voltage-frequency (V-F) levels, significant energy savings can be obtained, although depending on the considered \acrshort{dnn} architecture and computing  device~\cite{tang_impact_2019}. This is achieved through a careful balance between the different GPU components' performance and power consumption (particularly the core and global memory) to minimize stalls in the compute cores. In fact, not only can \acrshort{dvfs} be used to decrease the power consumption, but it can also boost the system performance~\cite{tang_impact_2019}, by increasing the voltage and frequency levels (as long as the GPU total power envelope and thermal limits are not surpassed).
+
+Nevertheless, most state-of-the-art works only consider tightly coupled V-F levels, often predefined by \acrshort{gpu} manufacturers and neglecting the voltage margin that is usually introduced to guarantee fail-safe designs, as well as its variation with the kernel instruction sequence and the corresponding use of specific \acrshort{gpu} components. Supported on this observation, this work tries to increase the energy-efficiency of \acrshort{gpu}s by understanding and characterizing their behavior when subject to non-conventional V-F scaling. 
+It also tries to go one step further by creating an optimization mechanism that automatically selects the V-F pair that better suits the running application as well as the specific characteristics of the computing device.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Objectives}
 \label{section:objectives}
 
+To uncover the use of non-conventional V-F scaling, this thesis focuses on the following objectives:
+
 \begin{itemize}
-\item Access the viability of exploring non-conventional V-F pairs
-\item Characterize the behaviour of the GPU architecture to non-conventional V-F pairs.
-\item Create an automatic V-F controlling and optimization mechanism that improves a target metric while training DNNs
+\item Access the viability of using non-conventional V-F pairs on regular \acrshort{gpu}s.
+\item Characterize the behaviour of the \acrshort{gpu} architecture to non-conventional V-F pairs.
+\item Develop an automatic non-conventional V-F controlling and optimization mechanism that improves the \textit{performance}, \textit{energy consumption} or \textit{energy-efficiency} of \acrshort{gpu}s.
+\item Safely apply non-conventional V-F scaling on Deep Learning applications, characterizing the behaviour of training procedure.
 \end{itemize}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Main Contributions}
 \label{section:main_contri}
+
+
+\textcolor{red}{FALAR DO QUE FOI FEITO}
 
 The scientiﬁc contributions of this work have been published for communication in the following conference:
 
@@ -41,6 +58,13 @@ The scientiﬁc contributions of this work have been published for communication
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Dissertation Outline}
 \label{section:outline}
-
-Briefly explain the contents of the different chapters...
+\textcolor{red}{ACABAR DE DESCREVER CADA CAPITULO}
+This dissertation is organized in 4 chapters with the following outline:
+\begin{itemize}
+    \item Chapter 2 - Background: This chapter presents a summary of the current state-of-the art related with the subject in study.
+    \item Chapter 3 - GPU architectural characterization to decoupled V-F:
+    \item Chapter 4 - V-F Optimization Mechanism:
+    \item Chapter 5 - Application to Deep Learning:
+    \item Chapter 6 - Conclusions:
+\end{itemize}
 

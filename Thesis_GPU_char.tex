@@ -142,7 +142,7 @@ For the Cache benchmark, the number of issued requests to the cache and the DRAM
                 r0= IN[ite];
                 #pragma unroll
                 for(m=0; m<OPS; m++)    
-                    r0 += r0;
+                    asm volatile ("");
                 OUT[ite] = r0;
             }
         }
