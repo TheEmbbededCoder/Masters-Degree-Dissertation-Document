@@ -11,11 +11,11 @@
 \chapter{Background}
 \label{chapter:background}
 
-This chapter provides an overview of modern \acrshort{gpu} architecture and the programming models that allow the extensive use of these devices in current applications, followed by an analysis of techniques to improve the energy efficiency of the same. 
+This chapter provides an overview of modern \acrshort{gpu} architecture and respective programming models that allow the extensive use of these devices to execute more computationally intensive applications, followed by an analysis of techniques to improve the energy efficiency of the same. 
 
-The following sections present a bottom-up sequence of background and related work that supports this thesis — starting by the physical analysis of the digital circuits and the effects of V-F scaling and temperature on them. Continues by presenting the most common procedure to improve \acrshort{gpu}s energy efficiency and finishes by exploring the techniques that will allow for further improvements to these devices. 
+The following sections present a bottom-up sequence of background and related work that supports this thesis — starting by the physical analysis of the digital circuits and the effects of V-F scaling and temperature on them. It continues by presenting the most common procedure to improve \acrshort{gpu}s energy efficiency (\acrshort{dvfs}) and finishes by exploring the techniques that will allow for further improvements to these device based on a complete decoupling between the applied voltage supply and operating frequency. 
 
-The relevance of the current work emerges from the reduced number of studies on the effects of decoupled voltage scaling on \acrshort{gpu}s, one of the objectives of this dissertation. The main reason is probably mainly due to lack of support for controlling these parameters on NVIDIA \acrshort{gpu}s (until recently, the dominant player on the market \cite{noauthor_jon_2018, mujtaba_amd_2019}) that is now allowed by the novel AMD software stack used on this work.
+The relevance of the presented work emerges from the reduced number of studies on the effects of decoupled voltage scaling on \acrshort{gpu}s, one of the objectives of this dissertation. The main reason is probably mainly due to lack of support for independently controlling these parameters on NVIDIA \acrshort{gpu}s (until recently, the dominant player on the market \cite{noauthor_jon_2018, mujtaba_amd_2019}) that is now allowed by the novel AMD software stack used on this work.
 
 
 
@@ -26,7 +26,7 @@ The relevance of the current work emerges from the reduced number of studies on 
 \section{General Purpose Computing on GPUs}
 \label{section:gpp_gpu}
 
-A \acrshort{gpu} is a highly parallel programmable processor, that favours the execution of the same instruction on a set of data, belonging to the category of \textit{Single Instruction Multiple Threads} - \acrshort{simt} processors. When referring to \acrshort{gpu}s, it is still common to be talking about their graphics capabilities. However, more and more programs are taking advantage of their highly parallel architecture to accelerate general purpose applications, commonly referred to as \acrshort{gpgpu} - General Purpose Graphical Processing Unit.
+A \acrshort{gpu} is a highly parallel programmable processor, that favours the execution of the same instruction on multiple data elements, belonging to the category of \textit{Single Instruction Multiple Threads} - \acrshort{simt} processors. When referring to \acrshort{gpu}s, it is still common to be talking about their graphics capabilities. However, more and more programs are taking advantage of their highly parallel architecture to accelerate general purpose applications, leading to the connotation of this device as a \acrshort{gpgpu} - General Purpose Graphical Processing Unit.
 
 The development and deployment of \acrshort{gpgpu} applications are only possible with the creation and adoption of standardized programming models and APIs that allow for hardware abstraction. This section provides a general overview of the \acrshort{gpu} architecture, followed by the presentation of the most common and used software tools available for \acrshort{gpgpu} programming.
 
@@ -34,7 +34,7 @@ The development and deployment of \acrshort{gpgpu} applications are only possibl
 
 
 \subsection{General Overview of a GPU Architecture}
-The architecture of a modern \acrshort{gpu}, figure~\ref{fig:Vega10arch}, can be roughly divided into computation and memory components. The computation part is usually composed of the vertex shader, the rendering engine, and the \acrshort{risc} processors. The vertex shader and rendering engine are included on the graphics pipeline and are not generally used on \acrshort{gpgpu} applications. The \acrshort{risc} processors are responsible for the \acrshort{gpu} programmable calculations and depending on the manufacturer, they are called streaming multiprocessors (\acrshort{sm}) in NVIDIA \acrshort{gpu}s~\cite{nvidia_cuda_2008} or computing units (\acrshort{cu}) in AMD \acrshort{gpu}s~\cite{amd_amd_2008}.  
+The architecture of a modern \acrshort{gpu}, depicted in figure~\ref{fig:Vega10arch}, can be roughly divided into computation and memory components. The computation part is usually composed of the vertex shader, the rendering engine, and the \acrshort{risc} processors. The vertex shader and rendering engine are included on the graphics pipeline and are not generally used on \acrshort{gpgpu} applications. The \acrshort{risc} processors are responsible for the \acrshort{gpu} programmable calculations and depending on the manufacturer, they are denoted as streaming multiprocessors (\acrshort{sm}) in NVIDIA \acrshort{gpu}s~\cite{nvidia_cuda_2008} or computing units (\acrshort{cu}) in AMD \acrshort{gpu}s~\cite{amd_amd_2008}.  
 
 \begin{figure}[htb]
   \begin{subfigmatrix}{2}
@@ -46,29 +46,29 @@ The architecture of a modern \acrshort{gpu}, figure~\ref{fig:Vega10arch}, can be
 \end{figure}
 
 
-One of the significant benefits of \acrshort{gpu}s is, as said, the ability to concurrently execute multiple threads, for that, each \acrshort{sm} or \acrshort{cu} is made up of hundreds of execution units. However, to manipulate a such number of threads, it is necessary to have a significantly large and fast memory system, allowing to save the context of each thread and provide low-overhead context switching between the different sets of threads being executed. In that sense, modern \acrshort{gpu}s architecture compresses a large register file on each \acrshort{sm}/\acrshort{cu}. For reference, in the AMD GNC architecture, each \acrshort{cu} has 49,152 (32-bit) registers~\cite{jing_energy-efficient_2013}.
+As it was referred before, one of the significant benefits of \acrshort{gpu}s is, the ability to concurrently execute multiple threads. To accomplish for that, each \acrshort{sm} or \acrshort{cu} is made up of hundreds of execution units. However, to manipulate such number of threads, it is necessary to have a significantly large and fast memory system, not only to save the context of each thread, but also to provide low-overhead context switching between the different sets of threads being executed. In that sense, modern \acrshort{gpu} architectures include a large register file on each \acrshort{sm}/\acrshort{cu}. For reference, in the AMD GNC architecture, each \acrshort{cu} has 49,152 (32-bit) registers~\cite{jing_energy-efficient_2013}.
 
-In terms of memory, both the AMD and the NVIDIA \acrshort{gpu}s present a 3 level hierarchy system: a global memory, accessible by all \acrshort{sm}/\acrshort{cu} (generally referred as video memory); a shared memory associated with each \acrshort{sm} or \acrshort{cu}, accessible by the threads running on that \acrshort{sm} or \acrshort{cu}; and a set of read-only caches for constants and textures, specific of each execution unit.
+In terms of memory, both the AMD and the NVIDIA \acrshort{gpu}s present a 3 level hierarchy system: a global memory, accessible by all \acrshort{sm}/\acrshort{cu} (generally referred to as video memory); a shared memory associated to each \acrshort{sm} or \acrshort{cu}, accessible by the threads running on that \acrshort{sm} or \acrshort{cu}; and a set of read-only caches for constants and textures, specific to each execution unit.
 
-A \acrshort{gpu} device from AMD will be used to conduct the experimental part of this dissertation. For that reason, the terminology used by AMD will be adopted. However, the presented work is independent of the hardware and terminology itself, and could equally be applied to NVIDIA \acrshort{gpu}s.
+A \acrshort{gpu} device from AMD will be used to conduct the experimental part of this dissertation. For that reason, the terminology used by AMD will be adopted herein. However, the presented work is independent of the hardware and terminology itself, and could equally be applied to NVIDIA \acrshort{gpu}s.
 
 \subsection{GPU programming model}
 
-The development of CUDA~\cite{nvidia_cuda_2017} (by NVIDIA) and OpenCL~\cite{noauthor_opencl_2013} (by Khronos Group) were the driving force to using \acrshort{gpu}s in general programming. CUDA and OpenCL are both parallel computing platforms and application programming interfaces (\acrshort{api}) that allow developers to create \acrshort{gpu}-accelerated applications, splitting the computations between the \acrshort{cpu} and \acrshort{gpu}. The first versions of these frameworks treated the \acrshort{gpu} as an accelerating slave device, providing a set of directives that allow the \acrshort{cpu} (master device) to transfer data, synchronize and control the \acrshort{gpu}.  Though, to take full advantage of the \acrshort{gpu} architecture and create a true heterogeneous system, the \acrshort{cpu} and \acrshort{gpu} have to collaborate more efficiently. The creation of the Heterogeneous System Architecture (\acrshort{hsa}) \cite{hwu_heterogeneous_2015} framework acts on exactly improving this problem by acting as a low-level intermediary \acrshort{api} to provide improved coordination and communication for heterogeneous computing systems.  More recently, AMD introduced the Radeon Open Computing platform (\acrshort{roc}) \cite{noauthor_radeonopencompute/rocm_2019}. Like CUDA and OpenCL, \acrshort{roc} provides a set of tools that allow developers to create heterogeneous applications. Being a newer software stack, already built on the notions and added benefits of \acrshort{hsa} runtime \acrshort{api}, ROC allows for the use of a wider set of programming frameworks like OpenCL, HC++, and HIP.
+The development of CUDA~\cite{nvidia_cuda_2017} (by NVIDIA) and OpenCL~\cite{noauthor_opencl_2013} (by Khronos Group) were the driving force to using \acrshort{gpu}s in general programming. CUDA and OpenCL are both parallel computing platforms and application programming interfaces (\acrshort{api}) that allow developers to create \acrshort{gpu}-accelerated applications, splitting the computations between the \acrshort{cpu} and \acrshort{gpu}. The first versions of these frameworks treated the \acrshort{gpu} as an accelerating slave device, providing a set of directives that allow the \acrshort{cpu} (master device) to transfer data, synchronize and control the \acrshort{gpu}.  Though, to take full advantage of the \acrshort{gpu} architecture and create a true heterogeneous system, the \acrshort{cpu} and \acrshort{gpu} have to collaborate more efficiently. The creation of the Heterogeneous System Architecture (\acrshort{hsa}) \cite{hwu_heterogeneous_2015} framework acts on improving this problem by acting as a low-level intermediary \acrshort{api} to provide improved coordination and communication for heterogeneous computing systems.  More recently, AMD introduced the Radeon Open Computing platform (\acrshort{roc}) \cite{noauthor_radeonopencompute/rocm_2019}. Like CUDA and OpenCL, \acrshort{roc} provides a set of tools that allow developers to create heterogeneous applications. Being a newer software stack, already built on the notions and added benefits of \acrshort{hsa} runtime \acrshort{api}, ROC allows the use of a wider set of programming frameworks like OpenCL, HC++, and HIP.
 
-The programming model is similar across the different platforms, with programmers traditionally programming the \acrshort{gpu}s using low-level languages like C, C++ and Fortran. More recently, the manufacturers are also starting to provide direct access to the \acrshort{gpu} through higher-level languages like Python\footnote{https://developer.nvidia.com/how-to-cuda-python}, allowing for easier development and adoption of \acrshort{gpu}s as accelerating devices.
+This programming model is rather similar across the different platforms, with programmers traditionally programming the \acrshort{gpu}s using low-level languages like C, C++ and Fortran. More recently, the manufacturers are also starting to provide direct access to the \acrshort{gpu} through higher-level languages like Python\footnote{https://developer.nvidia.com/how-to-cuda-python}, allowing for an easier development and adoption of \acrshort{gpu}s as accelerating devices.
 
-Overall, when executing a program on \acrshort{gpu}s, using either of the platforms as mentioned earlier, a Kernel will be invoked, that will execute across several parallel threads. Following this work split, the frameworks expose three levels of abstraction: \textit{threads}, \textit{thread blocks} and  \textit{block grid}. The number of \textit{threads} to be executed can be explicitly made by the programmer, or implicitly set by the compiler. The \textit{threads} are grouped in \textit{thread blocks} containing set amount of \textit{threads} that in turn are arranged in a \textit{block grid}. When the Kernel is executed, the scheduler maps each \textit{thread block} onto a \acrshort{cu}. Due to this mapping, \textit{threads} within a \textit{thread block} are able to communicate over the \acrshort{cu} shared memory and their execution synchronized through programable directives.
+Overall, when executing a program on \acrshort{gpu}s, using either of the previously mentioned platforms, a Kernel is invoked on the \acrshort{gpu}, that will execute across several parallel threads. Following this work split, the frameworks expose three levels of abstraction: \textit{threads}, \textit{thread blocks} and  \textit{block grid}. The number of \textit{threads} to be executed can be explicitly defined by the programmer, or implicitly set by the compiler. The \textit{threads} are grouped in \textit{thread blocks} containing an amount of \textit{threads}, and the \textit{thread blocks} are in turn arranged in a \textit{block grid}. When the Kernel is executed, the scheduler maps each \textit{thread block} onto a \acrshort{cu}. Due to this mapping, \textit{threads} within a \textit{thread block} are able to communicate over the \acrshort{cu} shared memory and their execution is synchronized through programable directives.
 
-During the execution of each \textit{thread}, an identifier presents the location of the running \textit{thread} within the \textit{thread blocks} - \texttt{ThreadIdx} and  \textit{block grid} - \texttt{BlockIdx}, additionally to the \textit{thread block} size - \texttt{BlockSize}. 
+During the execution of each \textit{thread}, an identifier presents the location of the running \textit{thread} within the \textit{thread blocks} - \texttt{ThreadIdx} and within the \textit{block grid} - \texttt{BlockIdx}. The \textit{thread block} size can be obtained with the \texttt{BlockSize} directive. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{CMOS Circuit Characterization}
 \label{section:CMOS}
 
-For the last 40 years, \acrshort{cmos} (Complementary metal-oxide-semiconductor) is the most used technology in the creation of digital circuits and processors in general [REF]. 
+For the last 40 years, \acrshort{cmos} (Complementary metal-oxide-semiconductor) has been the most used technology in the creation of digital circuits and processors in general [REF]. 
 
-There are two defined logic levels in digital circuits: logic level $0$ and $1$, each represented by an analog voltage range. The circuit requires a DC voltage value, $V_{DD}$, to operate and, the logic gates are excited through $V_{i}$ and output, at $V_o$, the logic level correspondent to their logic function, Figure~\ref{fig:cmos}. As stated, the voltage range at the input of the logic gates is, following Figure~\ref{fig:cmos_noise_margin}, correctly interpreted if it falls inside a given range. Logic level $0$, from $GND$ ($0V$) to $V_{IL}$ and logic level $1$ from $V_{IH}$ to $V_{DD}$. In turn, the output is considered $0$ if it goes from $GND$ ($0V$) to $V_{OL}$ and logic level $1$ from $V_{OH}$ to $V_{DD}$. The input and output logic levels' limits depend on the transistors' intrinsic characteristics, such as their dimensions and transconductance values. In addition to the transistors' characteristics and operating voltage, any digital circuit is also characterized by their frequency of operation.
+There are two defined logic levels in digital circuits: logic level $0$ and $1$, each represented by an analog voltage range. To ensure its operations, the circuit requires a DC voltage value $V_{DD}$. The logic gates are excited through an input voltage $V_{i}$ and an output voltage $V_o$, corresponding to the logic level resulting from their logic function (see Figure~\ref{fig:cmos}). As it is illustrated in Figure~\ref{fig:cmos_noise_margin}, the voltage range at the input of the logic gates is correctly interpreted if it falls inside a given range. Logic level $0$ corresponds to the interval between $GND$ ($0V$) to $V_{IL}$, while logic level $1$ corresponds to the interval between $V_{IH}$ to $V_{DD}$. In turn, the output is considered $0$ if it goes from $GND$ ($0V$) to $V_{OL}$ and logic level $1$ from $V_{OH}$ to $V_{DD}$. The limits of the input and output logic levels depend on the intrinsic characteristics of the transistors, such as their dimensions and transconductance values. In addition to the transistors characteristics and operating voltage, any digital circuit is also characterized by their frequency of operation.
 
 \begin{figure}[htb]
     \centering
@@ -84,7 +84,7 @@ There are two defined logic levels in digital circuits: logic level $0$ and $1$,
     \label{fig:cmos_noise_margin}
 \end{figure}
 
-This section provides an introduction to the effects of voltage and frequency scaling on the transistor and circuit level.
+The remaining of this section provides an introduction to the effects of voltage and frequency scaling on the transistor and circuit level operation.
 
 % Moore's law predicted the doubling of the transistors counts roughly every two years. The increase in the number of devices per chip directly translates to the observed performance increase over the last 60 years. However, in the last ten years, the industry is experiencing a slowdown. The shrinking of transistors is harder and harder and the amount of power created by today's chips is limits the transistor count (for the same node size). In this regard, it is indispensable that any digital circuit and, processors in particular, are develop taking into account the underlaying fabrication technology characteristics in order to find new ways of tackling this issues.
 
@@ -92,9 +92,9 @@ This section provides an introduction to the effects of voltage and frequency sc
 
 
 
-\subsection{Propagation delay and Circuit critical path}
+\subsection{Propagation delay and circuit critical path}
 
-The propagation delay of a logic gate (e.g., inverter) corresponds to the difference in time (calculated at $50\%$ of input-output transition) between the output switching after the application of an input, as illustrated in Figure~\ref{fig:tp}. Considering both the transition low to high and high to low, the logic gate $tp$ corresponds to the average value of the two propagation delays, Equation~\ref{eq:tp_avg}.
+The propagation delay of a logic gate (e.g., inverter) corresponds to the time interval (calculated at $50\%$ of low/high transition) between the application of an input signal and corresponding output switching, as illustrated in Figure~\ref{fig:tp}. Considering both transitions low to high and high to low, the logic gate propagation time ($tp$) corresponds to the average value of the two propagation delays, as defined in Equation~\ref{eq:tp_avg}.
 
 \begin{figure}[htb]
     \centering
@@ -108,31 +108,31 @@ The propagation delay of a logic gate (e.g., inverter) corresponds to the differ
     \label{eq:tp_avg}
 \end{equation}
 
-This metric is related to the time that the logic gate takes to switch its output logic level ($t_{Fall}$ for the high to low transition and $t_{Rise}$ for the low to high transition). This transition can be modeled as a first-order RC circuit, Figure~\ref{fig:rc_circuit}, with the transient response following Equation~\ref{eq:firtst_order}, where $\tau$ corresponds to the time constant. This time constant reflects the intrinsic characteristics of the transistors that make up the logic gate, being $\tau=RC$, where $R$ represents the average resistance of the transistor when it is turned 'ON' and $C$ the output capacitance that the logic gate is driving.
+This metric is related to the time that the logic gate takes to switch its output logic level ($t_{Fall}$ for the high to low transition and $t_{Rise}$ for the low to high transition). This transition can be modeled as a first-order RC circuit (see Figure~\ref{fig:rc_circuit}) with the transient response following Equation~\ref{eq:firtst_order}, where $\tau$ corresponds to the time constant. This time constant reflects the intrinsic characteristics of the transistors that make up the logic gate, being $\tau=RC$, where $R$ represents the average output resistance of the transistor when it is turned 'ON' and $C$ the output capacitance that the logic gate is driving.
 
 
 \begin{figure}[htb]
     \centering
     \includegraphics[width=105mm]{Figures/Background/rc_circuit.pdf}
-    \caption{First order RC circuit and temporal response to step input.}
+    \caption{First order RC circuit and its corresponding temporal response to step input.}
     \label{fig:rc_circuit}
 \end{figure}
 
 \begin{equation}
-    V_o=V_{DD} \cdot (1-e^{t/\tau})
+    V_o=V_{DD} \cdot (1-e^{-t/\tau})
     \label{eq:firtst_order}
 \end{equation}
 
-Solving Equation~\ref{eq:firtst_order} for $V_o=\frac{V_{DD}}{2}$, the propagation delay is a function of the supplied voltage, of $R$ and $C$, Equation~\ref{eq:tp}.
+By solving Equation~\ref{eq:firtst_order} for $V_o=\frac{V_{DD}}{2}$, it is observed that the propagation delay is a function of the supplied voltage, of $R$ and $C$, as depicted in Equation~\ref{eq:tp}.
 
 
 \begin{equation}
-    t_p=ln(1-\frac{V_{DD}}{2 \cdot V_{DD}})\cdot\tau=ln(2)\cdot\tau
+    t_p=-ln\left(1-\frac{V_{DD}}{2 \cdot V_{DD}}\right)\cdot\tau=-ln(0.5)\cdot\tau=ln(2)\cdot\tau
     \label{eq:tp}
 \end{equation}
 
 
-From all the logic paths (sequence of logic gates) that connect two registers, the one which presents the largest sum of the propagation delay limits the overall maximum frequency that the \acrshort{cmos} circuit can operate, establishing itself as the critical path of the circuit, Figure~\ref{fig:critical_path}. However, in a microprocessor, depending on the operation being performed (and so, of the used architectural component), the circuit's critical path can change.
+From all the logic paths (sequence of logic gates) that connect any two registers, the one which presents the largest sum of the propagation delay limits the overall maximum frequency that the \acrshort{cmos} circuit can operate, establishing itself as the critical path of the circuit (see Figure~\ref{fig:critical_path}). However, in the particular case of a microprocessor circuit, depending on the operation (instruction) being performed (and so, of the used architectural component), the circuit's critical path can change.
 
 \begin{figure}[htb]
     \centering
@@ -149,15 +149,15 @@ In this way, when scaling the circuit's operating frequency, it is only possible
 
 \subsection{Voltage guardband, PVT Variation and Aging}
 
-After the release of the digital circuit, silicon vendors deal with variations of their devices' specifications. On the design stage of the circuit, these variations need to be predicted and accounted for, guaranteeing the correct operation of the circuit throughout time and range of conditions that the circuit will be exposed to.
+After the release of the digital circuit, silicon vendors often deal with variations of their devices' specifications. On the design stage of the circuit, these variations need to be correctly predicted and accounted for, guaranteeing the correct operation of the circuit throughout time and range of conditions that the circuit will be exposed to.
 
-Process, voltage and temperature (\acrshort{pvt}) variation and aging impact the circuit in different manners and the solution for all is to put in place a voltage guardband, Figure~\ref{fig:voltage_guardband}. This voltage guardband increases the circuit nominal voltage from the best-case operating voltage selected from the transistors and gates' intrinsic characteristics.
-In Equation~\ref{eq:tp}, the propagation delay computation is performed considering the best-case operating voltage. However, when the silicon vendor opts to put in place a voltage guardband, increasing the supplied voltage (overvoltage), the propagation delay will follow Equation~\ref{eq:tp_v_scaling}, where $V_{Threshold}$ depends on the transistors (and so, it does not depend on the supply voltage value) and $V_{Supply \: Voltage}$ is the supplier controlled parameter. Figure~\ref{fig:voltage_scaling} illustrates the logic gate step response for over and undervoltage. Increasing the supply voltage will make the transistors switch faster, while decreasing it, reduces the switching pace.
+Process, voltage and temperature (\acrshort{pvt}) variation and aging impact the circuit in different manners and the solution for all is to put in place a voltage guardband, as defined in Figure~\ref{fig:voltage_guardband}. This voltage guardband increases the circuit nominal voltage from the best-case operating voltage selected from the transistors and gates' intrinsic characteristics.
+In Equation~\ref{eq:tp}, the propagation delay is now obtained by considering the ratio between the best-case operating voltage\footnote{(Threshold voltage) and the considered supply voltage}. Hence, when the silicon vendor opts to put in place a voltage guardband, increasing the supplied voltage (overvoltage), the propagation delay will follow Equation~\ref{eq:tp_v_scaling}, where $V_{Threshold}$ depends on the transistors (and so, it does not depend on the supply voltage value) and $V_{Supply \: Voltage}$ is the supplier controlled parameter. Figure~\ref{fig:voltage_scaling} illustrates the logic gate step response for over and undervoltage. Increasing the supply voltage will make the transistors switch faster, while decreasing it, reduces the switching pace.
 
 
 
 \begin{equation}
-    t_p=ln(1-\frac{V_{Threshold}}{V_{Supply \: Voltage}})\cdot\tau
+    t_p=-ln \left( 1-\frac{V_{Threshold}}{V_{Supply \: Voltage}}\right)\cdot\tau=ln\left(\frac{2V_{Supply \: Voltage}}{2V_{Supply \: Voltage}-V_{Threshold}}\right)\cdot\tau
     \label{eq:tp_v_scaling}
 \end{equation}
 
@@ -168,7 +168,7 @@ In Equation~\ref{eq:tp}, the propagation delay computation is performed consider
     \centering
     \includegraphics[height=4cm]{Figures/Background/voltage_guardband_bar.pdf}
     \label{fig:voltage_guardband}}
-    \subfigure[First order circuit step response with changing supply voltage ($V_{sv}$).]{
+    \subfigure[First order circuit step response when changing the supply voltage ($V_{sv}$).]{
     \centering\includegraphics[height=7cm]{Figures/Background/v_scaling.pdf}
     
     \label{fig:voltage_scaling}}
@@ -181,43 +181,45 @@ In Equation~\ref{eq:tp}, the propagation delay computation is performed consider
 
 \subsubsection{Process variation and aging}
 
-Process variation and aging impact the circuit in different ways. Process variation is related to the modern fabrication process of silicon. It results from imperfections in the lithography and dopant diffusion, affecting the transistors' dimensions (for example, length and oxide thickness). This dimensionality change between the transistors can occur either intra-die, when devices from the same die present different features depending on their locations and inter-die, meaning that devices from one die can present different traits from devices from another batch of dies. The process variation affects the speed of transistors and the overall circuit characteristics by varying the device voltage threshold and speed \cite{schemmert_threshold-voltage_1974, thomas_core_2016}. Such variations are inherent to the fabrication process. Even though silicon manufacturers try to reduce this impact, such variation will always occur as a \textit{static} variation after the release of the chip to the market.
+Process variation and aging impact the circuit in different ways. Process variation is related to the modern fabrication process of silicon. It results from imperfections in the lithography and dopant diffusion, affecting the transistors' dimensions (for example, length and oxide thickness). This dimensionality change between the transistors can occur either intra-die, when devices from the same die present different features depending on their locations, and inter-die, meaning that devices from one die can present different traits from devices from another batch of dies. The process variation affects the speed of transistors and the overall circuit characteristics, by varying the device voltage threshold and speed \cite{schemmert_threshold-voltage_1974, thomas_core_2016}. Such variations are inherent to the fabrication process. Even though silicon manufacturers try to reduce this impact, such variation will always occur as a \textit{static} variation after the release of the chip to the market.
 
-Aging of the \acrshort{cmos} circuits is a reflection of ongoing chip temperature variation and supply voltage change. The continuous variation of these two factors induces \textit{Bias Temperature Instability} (\acrshort{bti}) and  \textit{Hot Carrier Injection} (\acrshort{hci}). \acrshort{bti} causes threshold voltage shifts over long periods due to the presence of voltage stress at the transistors' gate. On the other side, \acrshort{hci} is caused by the acceleration of carriers (electrons/holes) under lateral electric fields in the channel of MOS devices. The acceleration can get up to the point where the carriers gain enough energy and momentum to cause damage, degrading mobilities and again, changing the threshold voltages~\cite{sapatnekar_what_nodate}.
+Aging of the \acrshort{cmos} circuits is a result of ongoing chip temperature variation and supply voltage change. The continuous variation of these two factors induces \textit{Bias Temperature Instability} (\acrshort{bti}) and  \textit{Hot Carrier Injection} (\acrshort{hci}). \acrshort{bti} causes threshold voltage shifts over long periods due to the presence of voltage stress at the transistors' gate. On the other side, \acrshort{hci} is caused by the acceleration of carriers (electrons/holes) under lateral electric fields in the channel of MOS devices. The acceleration can get up to the point where the carriers gain enough energy and momentum to cause damage, degrading mobilities and again, changing the threshold voltages~\cite{sapatnekar_what_nodate}.
 
-The occurrence of these phenomenons raises the possibility of the circuit stopping to meet its specifications. Hence, a circuit that is dimensioned without any headroom (not sufficiently large voltage guardband) may not be able to cope with the process variation - producing a not working circuit; or stopping to work overtime due to aging.
+The occurrence of these phenomenons raises the possibility of the circuit diverge from its original specifications. Hence, a circuit that is dimensioned without any headroom (not sufficiently large voltage guardband) may not be able to cope with such a process variation - producing a not working circuit; or stopping to work overtime due to aging.
 
 
 
 \subsubsection{Voltage variation}
 
-Running the circuit at an increased voltage compared to the required at target frequency for typical workloads results in a faster circuit. This increment in performance allows for inserting an extra timing margin in each clock cycle, Figure~\ref{fig:timming_guardband}. 
+As it was previously observed, running the circuit at an increased voltage compared to the required voltage at the target frequency for typical workloads results in a faster circuit. This increment in performance allows for inserting an extra timing margin in each clock cycle, as described in Figure~\ref{fig:timming_guardband}. 
 
 \begin{figure}[!htb]
   \begin{subfigmatrix}{2}
     \subfigure[Static Margin]{\includegraphics[height=4.5cm]{Figures/Background/static_margin.pdf}}
     \subfigure[Reduced Voltage Margin]{\includegraphics[height=4.5cm]{Figures/Background/reduced_voltage_margin.pdf}}
   \end{subfigmatrix}
-  \caption{Voltage guardband ensures reliability by effectively inserting extra timing margin.}
+  \caption{Voltage guardband ensures operation reliability by effectively inserting some extra timing margin.}
   \label{fig:timming_guardband}
 \end{figure}
 
-This timing margin is of extreme importance to cope with voltage noise, the leading cause of voltage variation during the circuit execution. Voltage noise is mainly induced by $di/dt$ droop. This phenomenon makes the actual measured voltage applied to the circuit components, as formulated in Equation \ref{eq:Vactual}, depend on the rate of change of the current being drawn. 
+This timing margin is of extreme importance to cope with voltage noise, the leading cause of voltage variation during the circuit execution. Voltage noise is mainly induced by $di/dt$ droop. This phenomenon makes the actual measured voltage that is  applied to the circuit components (as formulated in Equation \ref{eq:Vactual}), depend on the rate of change of the current being drawn. 
 
 \begin{equation}
     \label{eq:Vactual}
     V_{actual} = V_{DD}-L*\frac{di}{dt}
 \end{equation}
 
-The runtime workload intensity variation induces the $di/dt$ droop due to the rapid and significant change in current demand from the various circuit functional blocks~\cite{thomas_core_2016}. Thus, in the case of processors, the workload type can directly impact voltage noise. A program that induces a bigger $di/dt$ droop will need to have a bigger voltage guardband.
+The runtime workload intensity variation induces the $di/dt$ droop due to the rapid and significant change in current demand from the various circuit functional blocks~\cite{thomas_core_2016}. Thus, in the case of processors, the workload type can directly impact voltage noise. As a result, a program that induces a bigger $di/dt$ droop will need to have a bigger voltage guardband.
 
 \subsubsection{Temperature variation}
 
-Temperature variation occurs both due to changing on the environmental temperature as well, due to the temperature dissipated as heat by the transistors on the circuit. The temperature affects the transistors by changing the carriers' mobility ($ \mu [\frac{cm^2}{V\cdot s}]$), and threshold voltage \cite{wolpert_temperature_2012}.
+Temperature variation occurs both due to changes on the environmental temperature, and due to changes in the temperature that is dissipated as heat by the transistors on the circuit. The temperature affects the transistors by changing the carriers' mobility ($ \mu [\frac{cm^2}{V\cdot s}]$), and threshold voltage ($V_t$)\cite{wolpert_temperature_2012}.
 
-The carriers' mobility $ \mu $ describes the drift velocity of a particle in an applied electric field, thus the transistor's capability to drive electric current. MOS transistors carriers mobility presents a very complex temperature dependence; however, in general, the mobility is said to decrease with temperature increase. In the case of threshold voltage, their rate of change also follows the same principle of the carriers mobility, however having a more straightforward dependency of decreasing linearly with temperature increase.
+The carriers' mobility $ \mu $ describes the drift velocity of a particle in an applied electric field, thus the transistor's capability to drive electric current. Usually, the carrier mobility of MOS transistors presents a very complex temperature dependence. However, in general, the mobility is said to decrease with temperature increase. 
 
-The work of Freijado \textit{et al.}~\cite{freijedo_modeling_2012} created a model that tries to encompass all possible variations and test the impact that temperature has on the propagation delay. The designed model predicts that the propagation delay increases linearly with the temperature increase, which would imply that the size of the voltage guardband reduces with temperature rise. 
+In the case of threshold voltage, its rate of change also follows the same principle of the carriers mobility. However, it usually has a more straightforward dependency of decreasing linearly with temperature increase.
+
+The work of Freijado \textit{et al.}~\cite{freijedo_modeling_2012} presents a model that tries to encompass all these variations and test the impact that temperature has on the propagation delay. The designed model predicts that the propagation delay increases linearly with the temperature increase, which would imply that the size of the voltage guardband reduces when the temperature increases. 
 
 \subsection{Power Consumption}
 \label{sec:power_consumption}
@@ -228,21 +230,21 @@ On a \acrshort{cmos} circuit, the total consumed power is decomposed into the dy
     \label{eq:power}
 \end{equation}
 
-The dynamic power relates to the power consumed by the transistors flipping stages (inverting the logic values), and correspond to the power of charging and discharging the internal net capacitances. This value is proportional to the frequency that this change occurs. Equation~\ref{eq:dynpower} represents the general formulation of the dynamic power, where $a$ represents the device utilization factor, $C$ the total capacitance of the circuit, $V$ the circuit supplied voltage, and $f$ the frequency of operation~\cite{gonzalez_supply_1997}.
+The dynamic power relates to the power that is consumed by the transistors flipping stages (inverting the logic values), and corresponds to the power of charging and discharging the internal net capacitances. This value is proportional to the frequency that this change occurs. Equation~\ref{eq:dynpower} represents the general formulation of the dynamic power, where $a$ represents the device utilization factor, $C$ the total capacitance of the circuit, $V$ the circuit supply voltage, and $f$ the frequency of operation~\cite{gonzalez_supply_1997}.
 
 \begin{equation}
     P_{dynamic} = aCV^2f
     \label{eq:dynpower}
 \end{equation}
 
-On the other hand, the static part of the power consumption comprehends three components: $P_{leakage}$, $P_{short-circuit}$ and $P_{DC}$~\cite{mei_survey_2016}. The leakage power is independent of the transistors flip, and it represents the flow of electrons between the transistors' source, drain, and gate, known as leakage current. The short-circuit power comes from the instantaneous short-circuit connection between the supply voltage and the ground when the transistor flips. Finally, the Direct Current (DC) power corresponds to the power needed for powering the circuit. Equation \ref{eq:cmosstatic} represents the total power consumption sources.
+On the other hand, the static part of the power consumption comprehends three components: $P_{leakage}$, $P_{short-circuit}$ and $P_{DC}$~\cite{mei_survey_2016}. The leakage power is independent of the transistors flip, and it represents the flow of electrons between the transistors' source, drain, and gate, known as leakage current. The short-circuit power comes from the instantaneous short-circuit connection between the supply voltage and the ground when the transistor flips. Finally, the Direct Current (DC) power corresponds to the power needed for powering the circuit. Equation \ref{eq:cmosstatic} represents the expression with all static power consumption components.
 
 \begin{equation}
     P_{static} = P_{leakage} + P_{short-circuit} + P_{DC}
     \label{eq:cmosstatic}
 \end{equation}
 
-Usually, the dynamic power dominates the total power consumption of a circuit. However, with the current reduction of the transistors manufacturing size, the static power is becoming more of a significant part \cite{s._hong_modeling_2012,hong_integrated_2010}. Nevertheless, as a common reference, and due to the usually higher weight of the dynamic power on the total power consumption, the power used by a \acrshort{cmos} circuit usually changes linearly with the clock frequency and quadratically with the supplied voltage.
+Usually, the dynamic power dominates the total power consumption of a circuit. However, with the current tendency to reduce the manufacturing size of transistors, the static power is becoming a more significant part \cite{s._hong_modeling_2012,hong_integrated_2010}. Nevertheless, as a common reference, and due to the usually dominant weight of the dynamic power on the total power consumption, the power used by a \acrshort{cmos} circuit usually changes linearly with the clock frequency and quadratically with the supplied voltage.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
