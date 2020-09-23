@@ -10,7 +10,7 @@
 
 \chapter{GPU architectural characterization to decoupled V-F}
 \label{chapter:gpu_char}
-The objective of this thesis is to provide a methodology to uncover the use of non-conventional V~-~F pairs on regularly deployed \acrshort{gpu}s to improve their energy efficiency.
+The objective of this thesis is to provide a methodology to uncover the use of non-conventional V-F pairs on regularly deployed \acrshort{gpu}s to improve their energy efficiency.
 This chapter introduces the methodology used to assess non-default voltage values' usability and benefits on top of the traditional device frequency scaling. 
 
 The developed methodology allows for:
@@ -20,7 +20,7 @@ The developed methodology allows for:
     \item The determination of which and how performing non-conventional V-F scaling on both \acrshort{dvfs} domains affects the performance, power and energy consumption, and energy efficiency of \acrshort{gpu}s;
 \end{itemize}
 
-Following Figure~\ref{fig:gpu_char}, the chapter introduces in Section~\ref{sec:char_meth}, a set of benchmarks that stress each individual \acrshort{gpu} \acrshort{dvfs} domain and component to find $V_{min}$, the frequency-dependent minimum operating voltage that (still) leads to correct GPU operation. Section~\ref{sec:ex_setup} presents the experimental setup and testing procedure on an AMD Vega 10 Frontier Edition \acrshort{gpu}. The establishment of a usable voltage range across the frequency spectrum, Section~\ref{sec:limiting_components}, allows for creating a voltage frequency exploration and usable space (top right chart of Figure~\ref{fig:gpu_char}). The chapter finishes with Section~\ref{sec:gpu_behaviour} (bottom right chart of Figure~\ref{fig:gpu_char}),  evaluating the performance, energy consumption and Energy Delay Product (\acrshort{edp}), a figure of merit correlated with the digital circuit energy efficiency for the given benchmarks when subject to non-conventional V-F scaling.
+Following Figure~\ref{fig:gpu_char}, the chapter introduces in Section~\ref{sec:char_meth}, a set of benchmarks that stress each individual \acrshort{gpu} \acrshort{dvfs} domain and component to find $V_{min}$, the frequency-dependent minimum operating voltage that (still) leads to correct GPU operation. Section~\ref{sec:ex_setup} presents the experimental setup and testing procedure on the AMD Vega 10 Frontier Edition and AMD Radeon 5700 XT \acrshort{gpu}s. The establishment of a usable voltage range across the frequency spectrum, Section~\ref{sec:limiting_components}, allows for creating a voltage frequency exploration and usable space (top right chart of Figure~\ref{fig:gpu_char}). The chapter finishes with Section~\ref{sec:gpu_behaviour} (bottom right chart of Figure~\ref{fig:gpu_char}),  evaluating the performance, energy consumption and Energy Delay Product (\acrshort{edp}), a figure of merit correlated with the digital circuit energy efficiency for the given benchmarks when subject to non-conventional V-F scaling.
 
 \begin{figure}[htb]
   \centering
@@ -91,7 +91,7 @@ The \acrshort{dram} \acrshort{dvfs} domain is responsible for controlling the vo
             r0= IN0[i * C + ite] + IN1[i * C + ite];
             #pragma unroll
             for(int j = 0; j < OPS; j++)  
-                r0 += r0 * r0;
+                asm volatile ("");
             OUT[threadId] = r0;
         }
     }
@@ -114,7 +114,7 @@ Listing~\ref{lst:DRAMbitflip} renders a benchmark designed to evaluate the occur
             r0 = IN[ite];
             #pragma unroll
             for(int j = 0; j < OPS; j++)  
-                r0 += r0;
+                asm volatile ("");
             OUT[ite] = r0;
         }
     }
@@ -170,7 +170,7 @@ The benchmark that tests the Shared Memory is presented on the Listing~\ref{lst:
                 shared[t] = r0;
                 __syncthreads();
                 for(int k = 0; k < OPS; k++) 
-                    r0 += r0;
+                    asm volatile ("");
                 r0 = shared[tr];
                 __syncthreads();
         }
@@ -312,35 +312,37 @@ This kernel's objective is to test if the used component contribution can indica
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experimental Setup and Methodology}
 
-The devised benchmarks were applied to characterize an AMD Vega 10 Frontier Edition \acrshort{gpu}, whose specifications are presented in Table II~\ref{tab:Vega10specs}. 
+The devised benchmarks were applied to characterize the AMD Vega 10 Frontier Edition and AMD Radeon 5700 XT \acrshort{gpu}s, whose specifications are presented in Table II~\ref{tab:Vega10specs}. 
 
 \begin{table}[htbp]
-    \caption{AMD Vega 10 Frontier Edition Specifications.}
+    \caption{\acrshort{gpu}s under test specifications.}
     \begin{center}
-        % \resizebox{0.48\textwidth}{!}{%
-            \begin{tabular}{lr}
+         \resizebox{\textwidth}{!}{%
+            \begin{tabular}{llcc}
+                \textbf{Model} &\textbf{Unit} & \textbf{Vega 10} & \textbf{Radeon 5700 XT} \\
                 \hline
-                {Architecture} & GNC5\\
-                {CUs} & 64\\
-                {DRAM size} & 16 GB\\
-                {Core frequency range [MHz]} & [852 - 1980]\\
-                {Core voltage range [mV]} & [900 - 1200]\\
-                {DRAM  frequency range [MHz]} & [500 - 1200] \\ 
-                {DRAM  voltage range [mV]} & [800 - 1200] \\
+                \textbf{Architecture} & & GNC5 & RDNA\\
+                \textbf{CUs} & & 64 & 40\\
+                \textbf{DRAM size} & [GB] & 16 & 8\\
+                \textbf{Default Power Cap} & [W] & 220 & 190\\
+                \textbf{Core frequency range} &  [MHz] & [852 - 1980] & [800 - 2050]\\
+                \textbf{Core voltage range} &  [mV] & [900 - 1200] & [750 - 1200]\\
+                \textbf{DRAM  frequency range} &  [MHz] & [500 - 1200] & Fixed at 1000\\ 
+                \textbf{DRAM  voltage range} &  [mV] & [800 - 1200] & Fixed at 1000\\
                 \hline
-                \multicolumn{2}{c}{\textbf{Default Frequency-Voltage (F-V) setups}}\\
+                \multicolumn{4}{c}{\textbf{Default Frequency-Voltage (F-V) setups}}\\
                 \hline
-                {\textit{Core} F-V [MHz ; mV]} & [995;900, 1140;950, 1350;1050, \\
-                \multicolumn{2}{r}{ 1440;1100, 1530;1150, 1600;1200{]}} \\
-                {\textit{DRAM} F-V [MHz ; mV]} & [500;900, 800;950, 950;1000] \\
+                \textbf{\textit{Core} F-V} &  [MHz ; mV] & [995;900, 1140;950, 1350;1050, &  [1200;950, 1400;1000, 1600;1050,\\
+                & & 1440;1100, 1530;1150, 1600;1200{]} &           1800;1100, 2000;1200]\\
+                \textbf{\textit{DRAM} F-V} &  [MHz ; mV] & [500;900, 800;950, 950;1000] &  [1000;1000]\\
                 \hline
             \end{tabular}%
-        % }
+         }
     \end{center}
     \label{tab:Vega10specs}
 \end{table}
 
-By default, the GPU driver establishes the two sets of Frequency-Voltage (F-V) setups presented in Table~\ref{tab:gpulevels}. However, the \acrshort{gpu} vendor rocm-smi\footnote{github.com/RadeonOpenCompute/ROC-smi} tool allows for independent control over frequency and voltage. The following section presents the capabilities of the software tool and Annex A shows a more comprehensive description and user manual of rocm-smi. Finally, to allow a greater evaluation range, the GPU power cap was changed from the default 220W to 300W (matching the GPU thermal design). This GPU was installed on a machine equipped with an Intel i7 4770K CPU, with 32 GB of main memory. 
+By default, the GPU driver establishes the two sets of Frequency-Voltage (F-V) setups presented in Table~\ref{tab:gpulevels}. However, the \acrshort{gpu} vendor rocm-smi\footnote{github.com/RadeonOpenCompute/ROC-smi} tool allows for independent control over frequency and voltage. The following section presents the capabilities of the software tool and testing methodology. Annex A provides a more comprehensive description of how rocm-smi is used to set the target voltage frequency pair. Finally, to allow a greater evaluation range, the GPU power cap was changed from the default 220W to 300W for the Vega 10 and 190W to 285W (matching the \acrshort{gpu}s thermal design). This GPU was installed on a machine equipped with an Intel i7 4770K CPU, with 32 GB of main memory. 
 
 
 
@@ -353,16 +355,16 @@ The ROCm System Management Interface (rocm-smi) \cite{noauthor_radeonopencompute
 
 \item \textbf{GPU power}: Retrieves the average power used by the device. Similarly to the utilization rate, the average power is computed over a defined time interval, during which a number of power samples are taken.
 
-\item \textbf{Clock rate and voltage level:} Retrieves both the clock frequency and device voltage level. Of significant importance is that the voltage retrieved corresponds to the maximum measured value between the \acrshort{gpu} core and the main device memory voltage. Current versions of AMD \acrshort{gpu}s do not allow for querying the specific voltage value of the different \acrshort{dvfs} domains.
+\item \textbf{Clock rate and voltage level:} Retrieves both the current clock frequency and device voltage level. Of significant importance is that the voltage retrieved corresponds to the maximum measured value between the \acrshort{gpu} core and the main device memory voltage. Current versions of AMD \acrshort{gpu}s do not allow for querying the specific voltage value of the different \acrshort{dvfs} domains.
 
-The tool also displays two tables: the first, showing the eight pairs of clock frequency/voltage level of the GPU core and the second, showing four pairs of the same parameters related to the device memory. These two tables correspond to the 8 and 4 performance levels that the device kernel can apply to the GPU core and memory, correspondingly.
+The tool also displays the performance level tables for the Core and DRAM DVFS domains.
 \end{itemize}
 
 The rocm-smi interface also allows querying the device temperature, the current fan speed, and the selected performance level.
 
 rocm-smi also provides a mechanism to control and change some of the device parameters:
 \begin{itemize}
-\item \textbf{Set performance level:} Allows the user to select the desired performance level of the GPU core and device memory, disabling the driver's automatic performance level management system.
+\item \textbf{Set performance profile:} Allows the user enable/disable the automatic DVFS system. When disable the GPU respects the user-defined voltage and frequency.
 \item \textbf{Set clock rate and voltage level:} Set the clock frequency and the voltage level of any of the performance levels of both the GPU core and memory. 
 \item \textbf{Reset clock rate and voltage level:} Resets the clock rates and voltage level to the default values.
 \end{itemize}
@@ -382,13 +384,18 @@ All the tests were performed using randomly generated inputs to avoid any bias i
 While performing the undervoltage, the GPU goes through three distinct stages. At the first stage (\textit{working}), the \acrshort{gpu} works regularly, and no changes are detected in the application output. Then, by continuing the \acrshort{gpu} voltage reduction, some \textit{computational errors} are introduced and some application outputs change when compared with the default voltage setup. For integer experimentation, a computational error is considered if the output value differs from the default run, for the floating-point operation, the relative error between the default and non-conventional run is computed for each individual result. When the relative difference between the above is bigger than $10^{-4}$, it is said that the result has \textit{computational errors}.
 By reducing the GPU voltage beyond this stage, the \acrshort{gpu} enters into the \textit{crash} state, becoming unusable.
 
-To accurately determine the areas of interest (i.e., when infrequent computation errors occur) and to determine the crash point, the undervoltage step was reduced to $10mV$. Furthermore, when dealing with the \acrshort{dram} V-F domain, the \textit{Core} V-F domain was set to default values; for the \textit{Core} V-F domain, the highest frequency and default voltage of the \textit{DRAM} was selected. The GPU power consumption was measured using gpowerSAMPLER\footnote{github.com/hpc-ulisboa/gpowerSAMPLER}~\cite{guerreiro_gpgpu_2018}, at every millisecond. At the end of the execution, the energy is computed as the integral of all the measurements taken. 
+To accurately determine the areas of interest (i.e., when infrequent computation errors occur) and to determine the crash point, the undervoltage step was reduced to $10mV$. Furthermore, when dealing with the \acrshort{dram} V-F domain, the \textit{Core} V-F domain was set to default values; for the \textit{Core} V-F domain, the highest frequency and default voltage of the \textit{DRAM} was selected. 
+
+The GPU power consumption was measured using gpowerSAMPLER\footnote{github.com/hpc-ulisboa/gpowerSAMPLER}~\cite{guerreiro_gpgpu_2018}, at every millisecond. At the end of the execution, the energy is computed as the integral of all the measurements taken. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Limiting components to the voltage exploration space}
 \label{sec:limiting_components}
 
 The execution of the different benchmarks while controlling the V-F values allowed us to study how much voltage guardband each component has. More specifically, to explore and quantify how far it is possible to decrease the operating voltage from each default frequency level while measuring the impact on the application output and working capabilities of the \acrshort{gpu} device. 
+
+
+The present section presents the results of the voltage margin for every architectural component of the Vega 10 \acrshort{gpu}. For the Radeon 5700 XT \acrshort{gpu}, only the results of the \acrhosrt{mac} (see Section~\ref{sec:cache_guardband}) and Cache (see Section~\ref{sec:cmac_guardband}) are shown in complete detail. However, at the end of the section, a complete overview chart with all the architectural components is presented for the two \acrshort{gpu}s under test.
 
 
 \subsection{DRAM}
@@ -400,23 +407,45 @@ The conducted experiment shows that no computation error or crashes happen for t
 \begin{figure}[htb]
   \centering
   \includegraphics[width=0.35\textwidth]{Figures/GPU_characterization/DRAM_Guardband.pdf}
-  \caption{DRAM domain - Usable DRAM voltage for each frequency configuration.}
+  \caption{Vega 10 - DRAM domain - DRAM - Usable voltage for each frequency configuration.}
   \label{fig:DRAM_guardband}
 \end{figure}
 
 The result and strong conclusion derived from the previous experience was further verified with the use of the kernel of Listing~\ref{lst:DRAMbitflip}. It is of extreme importance to validate if the use of lower voltage values induces data corruption on two edge cases: extreme use of part of \acrshort{dram} and prolonged data storage. That said, the kernel was executed, and after periods of 1, 2, 5, 10, 30 minutes and 1, 2, 4 and 8 hours, the output data was retrieved and compared to the original set. Again, no perceptible change in the output was detected, further validating the previous result and assessing that the \acrshort{dram} can be successfully used with lower voltage levels. 
 
 \subsection{Cache}
+\label{sec:cache_guardband}
 
-Figure~\ref{fig:CacheL2_guardband} presents the usable voltage interval for different frequency setups. For frequencies below $1530$MHz, no computation errors or crashes were observed, with the \acrshort{gpu} correctly working at the lowest voltage across all the tested frequencies. Only for frequencies as high as $1530$ and $1600$ MHz performing undervoltage resulted in the program crashing. A critical observation is that no computation errors occur, meaning that this architectural component either works normally or makes the GPU immediately to crash. This phenomenon is of significant importance to determine the root cause of failures, since if it is observed \acrshort{gpu} crash without prior computation errors, this may be the preeminent component causing it.
-Furthermore, an increase in \texttt{OPS} allows for a higher amount of undervolt. Since this change only affects the stress over the DRAM-Cache controller (the number of cache accesses and hit-rate maintains the same), it can be concluded that it is the Cache-DRAM controller that limits the undervoltage range and not the memory elements of the cache.
+Figure~\ref{fig:CacheL2_guardband} presents the usable voltage interval for different frequency setups for both \acrshort{gpu}s. 
+For the Vega 10 \acrshort{gpu}, at frequencies below $1530$~MHz, no computation errors or crashes were observed, with the \acrshort{gpu} correctly working at the lowest voltage across all the tested frequencies. 
+Only for frequencies as high as $1530$ and $1600$ MHz performing undervoltage resulted in the program crashing. A critical observation is that no computation errors occur, meaning that this architectural component either works normally or makes the GPU immediately to crash. This phenomenon is of significant importance to determine the root cause of failures, since if it is observed \acrshort{gpu} crash without prior computation errors, this may be the preeminent component causing it.
+Furthermore, an increase in \texttt{OPS} allows for a higher amount of undervolt. Since this change only affects the stress over the DRAM-Cache controller (the number of cache accesses and hit-rate maintains the same), it can be concluded that it is the Cache-DRAM controller that limits the undervoltage range and not the memory elements of the cache. 
+
+For the Radeon 5700 XT a similar behaviour is observed. For frequencies below $1600$~MHz, it is possible to use the \acrshort{gpu} at the lowest voltage without any computation errors or crashes being observed. For higher frequencies, when the voltage is reduced the most, the \acrshort{gpu} can crash. Increasing the value of \texttt{OPS} (decreasing Cache stress) increases the undervoltage capabilities. 
 
 
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width=0.5\textwidth]{Figures/GPU_characterization/CacheL2_guardband.pdf}
-  \caption{Core domain - Usable CacheL2 voltage for each frequency configuration with varying cache stress ($OPS$ value).}
-  \label{fig:CacheL2_guardband}
+% \begin{figure}[htb]
+%   \centering
+%   \includegraphics[width=0.5\textwidth]{Figures/GPU_characterization/CacheL2_guardband.pdf}
+%   \caption{Core domain - Usable CacheL2 voltage for each frequency configuration with varying cache stress ($OPS$ value).}
+%   \label{fig:CacheL2_guardband}
+% \end{figure}
+
+\begin{figure}[!htb]
+    \centering
+    \begin{subfigmatrix}{2}
+      \label{fig:CacheL2_guardband}
+      \subfigure[Vega 10.]{
+        \centering
+        \includegraphics[width=0.49\textwidth]{Figures/GPU_characterization/CacheL2_guardband.pdf}
+        \label{fig:Vega10-CacheL2_guardband}
+      }
+      \subfigure[Radeon 5700 XT.]{
+        \centering\includegraphics[width=0.42\textwidth]{Figures/GPU_characterization/5700XT-CacheL2_Guardband.pdf}
+        \label{fig:5700XT-CacheL2_guardband}
+      }
+    \end{subfigmatrix}
+    \caption{Core domain - Cache L2 - Usable voltage for each frequency configuration with varying cache stress ($OPS$ value).}
 \end{figure}
 
 
@@ -429,36 +458,69 @@ The voltage guardband results for the Shared Memory are displayed in Figure~\ref
 \begin{figure}[htb]
   \centering
   \includegraphics[width=0.5\textwidth]{Figures/GPU_characterization/SharedMemory_guardband.pdf}
-  \caption{Core domain - Usable Shared voltage for each frequency configuration with varying shared memory stress ($OPS$ value).}
+  \caption{Vega 10 - Core domain - Shared Memory - Usable voltage for each frequency configuration with varying shared memory stress ($OPS$ value).}
   \label{fig:SharedMemory_guardband}
 \end{figure}
 
 \subsection{MAC}
 
-Figure~\ref{fig:MAC_guardband} represents the usable undervoltage range for the \acrshort{alu} benchmark. The presented benchmark was performed for integer and floating-point data types and with different float precision. In all tests, for frequencies below $1440$~MHz, the benchmark successfully runs for all voltage values. For higher frequencies, it is observed that after a certain amount of undervoltage, computation errors start appearing. The \acrshort{gpu} crashes if a further undervoltage level is applied. 
-It is also observable that the voltage margin increases with the operating frequency, from around $170$mV for $1440$MHz to around $210$mV for $1600$MHz (values for single-precision floating-point).
+\label{sec:cmac_guardband}
+
+Figure~\ref{fig:MAC_guardband} represents the usable undervoltage range for the \acrshort{alu} benchmark. The presented benchmark was performed for integer and floating-point data types and with different float precision available on each \acrshort{gpu}. 
+
+On the Vega 10 \acrshort{gpu}, In all scenarios, for frequencies below $1440$~MHz, the benchmark successfully runs for all voltage values. For higher frequencies, it is observed that after a certain amount of undervoltage, computation errors start appearing. The \acrshort{gpu} crashes if a further undervoltage level is applied. 
+It is also observable that the voltage margin increases with the operating frequency, from around $170$mV for $1440$~MHz to around $210$mV for $1600$~MHz (values for single-precision floating-point). For the Radeon 5700 XT \acrshort{gpu}, for frequencies below $1600$~MHz the \acrshort{alu} correctly works independently of the applied voltage. At higher frequencies, similarly to the other \acrhosrt{gpu}, it exists a computation error margin when undervolting, before the occurrence of crashes.
 
 In general, the operands that are "easier" to compute, integer and half-precision, allow the highest amount of undervoltage, not being the computation of those the limiting factor of the \acrshort{alu}. 
 It was expected that comparing floating-point single precision with double precision, the second would have a worse undervolting capabilities, due to having the double amount of bits to compute. However, the way double-precision allows for an extra $10$ to $20mV$ of undervoltage. This leads us to conclude that the way that single and double floating-points are computed is not the same. The \acrshort{risc} microprocessors are pipelined, and the way the pipeline stages are divided is not non. It is reasonable to expect that the double-precision computation is split among more clock cycles that the single precision, allowing for an extra relaxation of the timing constraints on that data path.
 
 The dependencies effect varied from integer to floating-point operation. In the first case, the dependencies on the code do not affect the size of the voltage margin. In the second case, the existence of dependencies in the code reduces the size of the voltage margin. In general, when compared with the setup with no dependencies (\texttt{d=0}), the undervoltage range of the benchmark configuration that represent the general case (\texttt{d=3} - see Listings~\ref{lst:MACbench}) is reduced by $10$mV. 
 
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width=1\textwidth]{Figures/GPU_characterization/MAC_Guardband.pdf}
-  \caption{Core domain - Usable ALU-MAC voltage for the different data types and operand's precision.}
-  \label{fig:MAC_guardband}
+% \begin{figure}[htb]
+%   \centering
+%   \includegraphics[width=1\textwidth]{Figures/GPU_characterization/MAC_Guardband.pdf}
+%   \caption{Core domain - Usable ALU-MAC voltage for the different data types and operand's precision.}
+%   \label{fig:MAC_guardband}
+% \end{figure}
+
+\begin{figure}[!htb]
+    \centering
+    \begin{subfigmatrix}{2}
+      \label{fig:MAC_guardband}
+      \subfigure[Vega 10.]{
+        \centering
+        \includegraphics[width=0.95\textwidth]{Figures/GPU_characterization/MAC_Guardband.pdf}
+        \label{fig:Vega10-MAC_guardband}
+      }
+      \subfigure[Radeon 5700 XT.]{
+        \centering\includegraphics[width=0.95\textwidth]{Figures/GPU_characterization/5700XT-MAC_Guardband.pdf}
+        \label{fig:5700XT-MAC_guardband}
+      }
+    \end{subfigmatrix}
+    \caption{Core domain - ALU-MAC - Usable voltage for the different data types and operand's precision.}
 \end{figure}
 
 \subsection{Non-linear Operations}
 
 The special function unit (\acrshort{sfu}) was tested for floating-point of single and double precision, Figure~\ref{fig:SFU_guardband}. In order with the results of the \acrshort{mac} operation, double precision allows a further $10$ to $20mV$ of valid undervoltage compared to single precision. Overall the voltage guardband of this unit is similar to the one of the \acrshort{alu} on the \acrshort{mac} operation. 
 
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width=0.6\textwidth]{Figures/GPU_characterization/SFU_guardband.pdf}
-  \caption{Core domain - Usable Special Function Unit voltage for each frequency configuration with varying operand type: SP - Single Precision Floating-Point, DP - Double Precision Floating-Point.}
-  \label{fig:SFU_guardband}
+
+
+\begin{figure}[!htb]
+    \centering
+    \begin{subfigmatrix}{2}
+      \label{fig:SFU_guardband}
+      \subfigure[Vega 10.]{
+        \centering
+        \includegraphics[width=0.44\textwidth]{Figures/GPU_characterization/SFU_guardband.pdf}
+        \label{fig:Vega10-SFU_guardband}
+      }
+      \subfigure[Radeon 5700 XT.]{
+        \centering\includegraphics[width=0.46\textwidth]{Figures/GPU_characterization/5700XT-SFU_Guardband.pdf}
+        \label{fig:5700XT-SFU_guardband}
+      }
+    \end{subfigmatrix}
+    \caption{Core domain - Special Function Unit - Usable voltage for each frequency configuration with varying operand type: SP - Single Precision Floating-Point, DP - Double Precision Floating-Point.}
 \end{figure}
 
 \subsection{Branches}
@@ -467,11 +529,28 @@ The special function unit (\acrshort{sfu}) was tested for floating-point of sing
 Figure~\ref{fig:Branches_guardband} presents the results of the branches test. The number of branches on the kernel did not affect the size of the voltage guardband, with all configurations allowing the same degree of undervoltage.
 The result allowed the conclusion that branch miss-prediction does not negatively impact the minimum voltage.
 
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width=0.67\textwidth]{Figures/GPU_characterization/Branches_guardband.pdf}
-  \caption{Core domain - Usable Branches voltage for each frequency configuration with varying number of branches per iteration.}
-  \label{fig:Branches_guardband}
+% \begin{figure}[htb]
+%   \centering
+%   \includegraphics[width=0.67\textwidth]{Figures/GPU_characterization/Branches_guardband_3.pdf}
+%   \caption{Vega 10 - Core domain - Usable Branches voltage for each frequency configuration with varying number of branches per iteration.}
+%   \label{fig:Branches_guardband}
+% \end{figure}
+
+\begin{figure}[!htb]
+    \centering
+    \begin{subfigmatrix}{2}
+      \label{fig:Branches_guardband}
+      \subfigure[Vega 10.]{
+        \centering
+        \includegraphics[width=0.46\textwidth]{Figures/GPU_characterization/Branches_guardband_3.pdf}
+        \label{fig:Vega10-Branches_guardband}
+      }
+      \subfigure[Radeon 5700 XT.]{
+        \centering\includegraphics[width=0.44\textwidth]{Figures/GPU_characterization/5700XT-Branches_guardband.pdf}
+        \label{fig:5700XT-Branches_guardband}
+      }
+    \end{subfigmatrix}
+    \caption{Core domain - Branches - Usable voltage for each frequency configuration with varying number of branches per iteration.}
 \end{figure}
 
 \subsection{Reduction}
@@ -481,7 +560,7 @@ Figure~\ref{fig:Reduction_guardband} present the usable voltage range for the \t
 \begin{figure}[htb]
   \centering
   \includegraphics[width=0.59\textwidth]{Figures/GPU_characterization/Reduction_guardband.pdf}
-  \caption{Core domain - Usable voltage for Reduction benchmark for each frequency configuration with varying operand type: Int - 32-bit Integer, SP - Single Precision Floating-Point, DP - Double Precision Floating-Point.}
+  \caption{Vega 10 - Core domain - Reduction benchmark - Usable voltage for each frequency configuration with varying operand type: Int - 32-bit Integer, SP - Single Precision Floating-Point, DP - Double Precision Floating-Point.}
   \label{fig:Reduction_guardband}
 \end{figure}
 
@@ -489,26 +568,49 @@ Figure~\ref{fig:Reduction_guardband} present the usable voltage range for the \t
 \subsection{General Comments and Remarks}
 
 
-Figure~\ref{fig:Guardband_comparison} presents a comprehensive comparison of the valid voltage ranges for all the considered architectural components of the GPU. The general motive is that the CacheL2 and the \acrshort{alu} are the two components that compromise the undervoltage capabilities. CacheL2 affects kernels that are more memory intensive, while the \acrshort{alu} limits those that are more compute-intensive. 
+Figure~\ref{fig:Guardband_comparison} presents a comprehensive comparison of the valid voltage ranges for all the considered architectural components of both \acrhosrt{gpu}s. The general motive is that the CacheL2 and the \acrshort{alu} are the two components that compromise the undervoltage capabilities. CacheL2 affects kernels that are more memory intensive, while the \acrshort{alu} limits those that are more compute-intensive. 
 
 In more detail, the results of both benchmarks that test the \acrshort{alu} are similar. Meaning one of two things, or there are two similar critical paths (in terms of timing constraints) on both the linear and non-linear data paths, or the critical path is at the beginning of the  \acrshort{alu} where the operands are forward to the appropriate computational unit. Although it is not possible to assess which preposition is the correct one, we tend to agree more with the second explanation.
 
+In general, even though two completely different \acrhosrt{gpu} architectures are under test, the general behaviour of the both is similar. At the lower frequencies available, the minimum voltage can be safely applied without the existence of computation errors or crashes. The utilization of undervoltage for higher frequencies will depend on which components the application being executed stresses the most. Across all frequencies, both \acrhosrt{gpu}s allow for more than $20\%$ of save undervoltage, being a considerable amount to be explored on the following section.
 
-\begin{figure}[h]
+
+% \begin{figure}[h]
+%     \centering
+%         \includegraphics[width=1\textwidth]{Figures/GPU_characterization/Comparison_Guardband.pdf}
+%         \caption{Comparison of usable GPU core voltage ranges for all the considered architectural components of the GPU.}
+%     \label{fig:Guardband_comparison}
+% \end{figure}
+
+\begin{figure}[!htb]
     \centering
-        \includegraphics[width=1\textwidth]{Figures/GPU_characterization/Comparison_Guardband.pdf}
-        \caption{Comparison of usable GPU core voltage ranges for all the considered architectural components of the GPU.}
-    \label{fig:Guardband_comparison}
+    \begin{subfigmatrix}{2}
+      \label{fig:Guardband_comparison}
+      \subfigure[Vega 10.]{
+        \centering
+        \includegraphics[width=0.95\textwidth]{Figures/GPU_characterization/Comparison_Guardband.pdf}
+        \label{fig:Vega10-Comparison_Guardband}
+      }
+      \subfigure[Radeon 5700 XT.]{
+        \centering\includegraphics[width=0.95\textwidth]{Figures/GPU_characterization/5700XT-Comparison_Guardband.pdf}
+        \label{fig:5700XT-Comparison_Guardband}
+      }
+    \end{subfigmatrix}
+    \caption{Comparison of usable GPU core voltage ranges for all the considered architectural components of the GPU.}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{V-F decoupled scaling GPU behaviour}
 \label{sec:gpu_behaviour}
 
-The \acrshort{gpu} behavior to V-F scaling varies depending on the stressed components. Having explored and established the usable voltage V-F  pairs, this section presents the energy-performance charts and the \acrshort{edp} heat-maps. The results of this section indicate the maximum available improvement possible to achieve on each component and acts as a target optimization for subsequent analysis using complete applications.
+The \acrshort{gpu} behavior to V-F scaling varies depending on the stressed components. Having explored and established the usable voltage V-F  pairs, this section presents the energy-performance charts and the \acrshort{edp} heat-maps for each of the tested benchmarks. The results of this section indicate the maximum available improvement possible to achieve on each component and acts as a target optimization for subsequent analysis using complete applications. As indicated in the previous subsection, for the Vega 10 \acrshort{gpu}, all the charts are provided, where for the Radeon 5700 XT, we choose only to present the Cache (see Section~\ref{sec:cache_sm__behaviour}) and  MAC-ALU results (see Section~\ref{sec:MAC_behaviour}) , due to being the most important for the use of our methodology.
+
+
 
 For an easier understanding of the obtained results, the following charts only represent the data-points that correspond to voltages equal-to and lower-than the default voltage of each frequency level (no interesting data is found at higher voltage levels), with each data point representing a $50mV$ undervoltage in relation to the previous one.
-Furthermore, the performance, energy consumption, and energy-delay product charts were normalized to the results achieved with the highest core frequency and default voltage ($1600$MHz and $1200$mV), so a smaller number indicates an improvement in relation to that configuration. 
+Furthermore, the performance, energy consumption, and energy-delay product charts were normalized to the results achieved with the highest core frequency and default voltage ( Vega 10 - \{$1600$~MHz; $1.2$V\} and Radeon 5700 XT - \{$2000$~MHz; $1.2$V\}), so a smaller number indicates an improvement in relation to that configuration. 
+
+As on
 
 \subsection{DRAM}
 
@@ -520,7 +622,7 @@ The experiment shows that for all \texttt{OPS} values ($0$ to $50$), the highest
 \begin{figure}[htb]
   \centering
   \includegraphics[width=0.75\textwidth]{Figures/GPU_characterization/DRAM_behaviour.pdf}
-  \caption{DRAM domain - DRAM benchmark normalized energy consumption and execution time. Each connected data point represents a $50mV$ undervoltage in relation to the previous one.}
+  \caption{Vega 10 - DRAM domain - DRAM benchmark - Normalized energy consumption and execution time. Each connected data point represents a $50mV$ undervoltage in relation to the previous one.}
   \label{fig:DRAM_behaviour}
 \end{figure}
 
@@ -531,7 +633,7 @@ The experiment shows that for memory bounded kernels (\texttt{OPS} values $0$ an
 \begin{figure}[htb]
   \centering
   \includegraphics[width=0.75\textwidth]{Figures/GPU_characterization/DRAM_Core_domain_behaviour.pdf}
-  \caption{Core domain - DRAM benchmark normalized energy consumption and execution time. The dashed line connects the default F-V configurations and each connected data point represents a $50mV$ undervoltage in relation to the previous one.}
+  \caption{Vega 10 - Core domain - DRAM - Normalized energy consumption and execution time. The dashed line connects the default F-V configurations and each connected data point represents a $50mV$ undervoltage in relation to the previous one.}
   \label{fig:DRAM_Corebehaviour}
 \end{figure}
 
@@ -540,29 +642,77 @@ The experiment shows that for memory bounded kernels (\texttt{OPS} values $0$ an
 
 \label{sec:cache_sm__behaviour}
 
-Figure~\ref{fig:cache_sm_behaviour} presents the normalized energy consumption and execution time for different V-F setups for the cache and shared memory benchmarks, respectively.  
+Figure~\ref{fig:cache_behaviour} and \ref{fig:sm_behaviour} presents the normalized energy consumption and execution time for different V-F setups for the cache and shared memory benchmarks, respectively.  
 
 In what concerns the energy and performance variations, performing voltage scaling at the default frequency (dashed line) reduces energy consumption as high as $46.1\% $. However, this results in a performance degradation of $60.9\%$. The advantage of performing non-conventional DVFS becomes apparent by allowing for energy reduction without any performance degradation. In this case, it is possible to run the GPU Core at $1600$ MHz and $1000$ mV, thus achieving an energy reduction of $35.7\%$ with no performance degradation. The commented results are related to the cache benchmark. However, the results of the shared memory are similar.
 
 \begin{figure}[!htb]
-  \begin{subfigmatrix}{2}
-    \subfigure[Cache]{\label{fig:cacheL2_behaviour}\includegraphics[width=0.48\textwidth]{Figures/GPU_characterization/CacheL2_behaviour_0op_no_marks.pdf}}
-    \subfigure[Shared Memory]{\label{fig:sm_behaviour}\includegraphics[width=0.46\textwidth]{Figures/GPU_characterization/SharedMemory_behaviour.pdf}}
-  \end{subfigmatrix}
-  \caption{Core domain - Normalized energy and performance variations for \texttt{OPS}=0. The  values shown in the left figure represent the applied core voltage and the dashed line connects the default F-V configurations.}
-  \label{fig:cache_sm_behaviour}
+    \centering
+    \begin{subfigmatrix}{2}
+      \label{fig:cache_behaviour}
+      \subfigure[Vega 10.]{
+        \centering
+        \includegraphics[width=0.45\textwidth]{Figures/GPU_characterization/CacheL2_behaviour_0op_no_marks.pdf}
+        \label{fig:Vega10-cache_behaviour}
+      }
+      \subfigure[Radeon 5700 XT.]{
+        \centering\includegraphics[width=0.45\textwidth]{Figures/GPU_characterization/5700XT-CacheL2_behaviour_0op.pdf}
+        \label{fig:5700XT-cache_behaviour}
+      }
+    \end{subfigmatrix}
+    \caption{Core domain - Cache L2 - Normalized energy and performance variations with \texttt{OPS}=0. The dashed line connects the default F-V configurations.}
 \end{figure}
 
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.5\textwidth]{Figures/GPU_characterization/SharedMemory_behaviour.pdf}
+  \caption{Vega 10 - Core domain - Shared Memory - Normalized energy consumption and execution time. The dashed line connects the default F-V configurations and each connected data point represents a $50mV$ undervoltage in relation to the previous one.}
+  \label{fig:sm_behaviour}
+\end{figure}
 
-Figure~\ref{fig:cache_sm_edp} presents the obtained \acrshort{edp} for the Cache and shared memory benchmark. These components favor the higher frequencies and minimum voltages to achieve the lowest EDP product.
+% \begin{figure}[!htb]
+%   \begin{subfigmatrix}{2}
+%     \subfigure[Cache]{\label{fig:cacheL2_behaviour}\includegraphics[width=0.48\textwidth]{}}
+%     \subfigure[Shared Memory]{\label{fig:sm_behaviour}\includegraphics[width=0.46\textwidth]{Figures/GPU_characterization/SharedMemory_behaviour.pdf}}
+%   \end{subfigmatrix}
+%   \caption{Core domain - Normalized energy and performance variations for \texttt{OPS}=0. The  values shown in the left figure represent the applied core voltage and the dashed line connects the default F-V configurations.}
+%   \label{fig:cache_sm_behaviour}
+% \end{figure}
+
+
+Figure~\ref{fig:cache_edp} and \ref{fig:sm_edp} presents the obtained \acrshort{edp} for the Cache and shared memory benchmark. These components favor the higher frequencies and minimum voltages to achieve the lowest EDP product.
 
 \begin{figure}[!htb]
-  \begin{subfigmatrix}{2}
-    \subfigure[Cache]{\label{fig:cacheL2_behaviour}\includegraphics[width=0.47\textwidth]{Figures/GPU_characterization/CacheL2_EDP_OPS0.pdf}}
-    \subfigure[Shared Memory]{\label{fig:sm_behaviour}\includegraphics[width=0.47\textwidth]{Figures/GPU_characterization/SM_EDP_OPS0.pdf}}
-  \end{subfigmatrix}
-  \caption{Core domain - Obtained Energy-Delay Product (EDP) for \texttt{OPS}=0.}
-  \label{fig:cache_sm_edp}
+    \centering
+    \begin{subfigmatrix}{2}
+      \label{fig:cache_edp}
+      \subfigure[Vega 10.]{
+        \centering
+        \includegraphics[width=0.53\textwidth]{Figures/GPU_characterization/CacheL2_EDP_OPS0.pdf}
+        \label{fig:Vega10-cache_edp}
+      }
+      \subfigure[Radeon 5700 XT.]{
+        \centering\includegraphics[width=0.37\textwidth]{Figures/GPU_characterization/5700XT-CacheL2_EDP_OPS0.pdf}
+        \label{fig:5700XT-cache_edp}
+      }
+    \end{subfigmatrix}
+    \caption{Core domain - Cache L2 - Obtained Energy-Delay Product (EDP) with \texttt{OPS}=0.}
+\end{figure}
+
+% \begin{figure}[!htb]
+%   \begin{subfigmatrix}{2}
+%     \subfigure[Cache]{\label{fig:cacheL2_behaviour}\includegraphics[width=0.47\textwidth]{Figures/GPU_characterization/CacheL2_EDP_OPS0.pdf}}
+%     \subfigure[Shared Memory]{\label{fig:sm_behaviour}\includegraphics[width=0.47\textwidth]{Figures/GPU_characterization/SM_EDP_OPS0.pdf}}
+%   \end{subfigmatrix}
+%   \caption{Core domain - Obtained Energy-Delay Product (EDP) for \texttt{OPS}=0.}
+%   \label{fig:cache_sm_edp}
+% \end{figure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.5\textwidth]{Figures/GPU_characterization/SM_EDP_OPS0.pdf}
+  \caption{Vega 10 - Core domain - Shared Memory - Obtained Energy-Delay Product (EDP) with \texttt{OPS}=0.}
+  \label{fig:sm_edp}
 \end{figure}
 
 
@@ -577,17 +727,34 @@ An interesting phenomenon is observed in the energy-execution time plot for the 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=0.8\textwidth]{Figures/GPU_characterization/MAC_behaviour_d_1_3.pdf}
-  \caption{Core domain - ALU-MAC - Normalized energy and performance chart for the benchmark setup with different values of \texttt{d} for single precision floating-point (see Listing~\ref{lst:MACbench}). The dashed lines connect the results for default F-V configurations.}
+  \caption{Vega 10 - Core domain - ALU-MAC - Normalized energy and performance chart for the benchmark setup with different values of \texttt{d} for single precision floating-point (see Listing~\ref{lst:MACbench}). The dashed lines connect the results for default F-V configurations.}
   \label{fig:MAC_behaviour}
 \end{figure}
 
-Finally, Figure~\ref{fig:MAC_EDP} presents the obtained EDP chart for single-precision floating-point data-type, where the configuration of $1440$MHz and $950$mV achieves the best energy-efficiency, yielding an energy consumption reduction of $39.1\%$ and an execution time improvement of $12.4\%$.
+Finally, Figure~\ref{fig:MAC_EDP} presents the obtained EDP chart for single-precision floating-point data-type, where the configuration of $1440$~MHz and $950$mV achieves the best energy-efficiency, yielding an energy consumption reduction of $39.1\%$ and an execution time improvement of $12.4\%$.
 
-\begin{figure}[htb]
+% \begin{figure}[htb]
+%     \centering
+%         \includegraphics[width=0.8\textwidth]{Figures/GPU_characterization/MAC_EDP.pdf}
+%         \caption{Core domain - ALU-MAC - Obtained Energy-Delay Product (EDP) for \texttt{d}=${1,3}$.}
+%     \label{fig:MAC_EDP}
+% \end{figure}
+
+\begin{figure}[!htb]
     \centering
+    \begin{subfigmatrix}{2}
+      \label{fig:MAC_EDP}
+      \subfigure[Vega 10.]{
+        \centering
         \includegraphics[width=0.8\textwidth]{Figures/GPU_characterization/MAC_EDP.pdf}
-        \caption{Core domain - ALU-MAC - Obtained Energy-Delay Product (EDP) for \texttt{d}=${1,3}$.}
-    \label{fig:MAC_EDP}
+        \label{fig:Vega10-MAC_EDP}
+      }
+      \subfigure[Radeon 5700 XT.]{
+        \centering\includegraphics[width=0.75\textwidth]{Figures/GPU_characterization/5700XT-MAC_EDP.pdf}
+        \label{fig:5700XT-MAC_EDP}
+      }
+    \end{subfigmatrix}
+    \caption{Core domain - ALU-MAC - Obtained Energy-Delay Product (EDP) for \texttt{d}=${1,3}$.}
 \end{figure}
 
 \newpage
@@ -600,7 +767,7 @@ Figure~\ref{fig:SFU_behaviour} showcases the normalized energy consumption and e
 \begin{figure}[htb]
   \centering
   \includegraphics[width=0.7\textwidth]{Figures/GPU_characterization/SFU_behaviour.pdf}
-  \caption{Core domain - ALU-Non-Linear - Normalized energy and performance for SP. The dashed lines connect the results for default F-V configurations.}
+  \caption{Core domain - Special Function Unit - Normalized energy and performance for single-precision floating-point data type. The dashed lines connect the results for default F-V configurations.}
   \label{fig:SFU_behaviour}
 \end{figure}
 
@@ -609,7 +776,7 @@ Figure~\ref{fig:SFU_EDP} represents the \acrshort{edp} heat-map, displaying that
 \begin{figure}[htb]
     \centering
         \includegraphics[width=0.55\textwidth]{Figures/GPU_characterization/SFU_EDP_SP.pdf}
-        \caption{Core domain - ALU-SFU - Obtained Energy-Delay Product (EDP) for single-precision floating-point.}
+        \caption{Core domain - Special Function Unit - Obtained Energy-Delay Product (EDP) for single-precision floating-point data type.}
     \label{fig:SFU_EDP}
 \end{figure}
 

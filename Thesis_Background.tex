@@ -56,7 +56,7 @@ A \acrshort{gpu} device from AMD will be used to conduct the experimental part o
 
 The development of CUDA~\cite{nvidia_cuda_2017} (by NVIDIA) and OpenCL~\cite{noauthor_opencl_2013} (by Khronos Group) were the driving force to using \acrshort{gpu}s in general programming. CUDA and OpenCL are both parallel computing platforms and application programming interfaces (\acrshort{api}) that allow developers to create \acrshort{gpu}-accelerated applications, splitting the computations between the \acrshort{cpu} and \acrshort{gpu}. The first versions of these frameworks treated the \acrshort{gpu} as an accelerating slave device, providing a set of directives that allow the \acrshort{cpu} (master device) to transfer data, synchronize and control the \acrshort{gpu}.  Though, to take full advantage of the \acrshort{gpu} architecture and create a true heterogeneous system, the \acrshort{cpu} and \acrshort{gpu} have to collaborate more efficiently. The creation of the Heterogeneous System Architecture (\acrshort{hsa}) \cite{hwu_heterogeneous_2015} framework acts on improving this problem by acting as a low-level intermediary \acrshort{api} to provide improved coordination and communication for heterogeneous computing systems.  More recently, AMD introduced the Radeon Open Computing platform (\acrshort{roc}) \cite{noauthor_radeonopencompute/rocm_2019}. Like CUDA and OpenCL, \acrshort{roc} provides a set of tools that allow developers to create heterogeneous applications. Being a newer software stack, already built on the notions and added benefits of \acrshort{hsa} runtime \acrshort{api}, ROC allows the use of a wider set of programming frameworks like OpenCL, HC++, and HIP.
 
-This programming model is rather similar across the different platforms, with programmers traditionally programming the \acrshort{gpu}s using low-level languages like C, C++ and Fortran. More recently, the manufacturers are also starting to provide direct access to the \acrshort{gpu} through higher-level languages like Python\footnote{https://developer.nvidia.com/how-to-cuda-python}, allowing for an easier development and adoption of \acrshort{gpu}s as accelerating devices.
+This programming model is rather similar across the different platforms, with developers traditionally programming the \acrshort{gpu}s using general-purpose languages like C, C++ and Fortran. More recently, the manufacturers are also starting to provide direct access to the \acrshort{gpu} through higher-level languages like Python\footnote{https://developer.nvidia.com/how-to-cuda-python}, allowing for an easier development and adoption of \acrshort{gpu}s as accelerating devices.
 
 Overall, when executing a program on \acrshort{gpu}s, using either of the previously mentioned platforms, a Kernel is invoked on the \acrshort{gpu}, that will execute across several parallel threads. Following this work split, the frameworks expose three levels of abstraction: \textit{threads}, \textit{thread blocks} and  \textit{block grid}. The number of \textit{threads} to be executed can be explicitly defined by the programmer, or implicitly set by the compiler. The \textit{threads} are grouped in \textit{thread blocks} containing an amount of \textit{threads}, and the \textit{thread blocks} are in turn arranged in a \textit{block grid}. When the Kernel is executed, the scheduler maps each \textit{thread block} onto a \acrshort{cu}. Due to this mapping, \textit{threads} within a \textit{thread block} are able to communicate over the \acrshort{cu} shared memory and their execution is synchronized through programable directives.
 
@@ -164,7 +164,7 @@ In Equation~\ref{eq:tp}, the propagation delay is now obtained by considering th
 \begin{figure}[!htb]
     \centering
   \begin{subfigmatrix}{2}
-    \subfigure[Voltage Guardband]{
+    \subfigure[Voltage guardband definition.]{
     \centering
     \includegraphics[height=4cm]{Figures/Background/voltage_guardband_bar.pdf}
     \label{fig:voltage_guardband}}
@@ -262,7 +262,9 @@ In general, modern \acrshort{gpu} boards have independent control over two pairs
 
 The clock frequency is an independently controlled variable, and its change directly reflects on the performed achieved by the \acrshort{gpu}. An increase in the clock frequency of the core results in an improvement of the \acrshort{sm}/\acrshort{cu} execution speed, while the same change in the memory frequency will increase the \acrshort{dram} I/O throughput \cite{mei_survey_2016}. The voltage level of each domain is dependent on the clock frequency being computed based on tests performed by the manufacturer to ensure the correct operation of the circuit, independently of the workload.
 
-The two major \acrshort{gpu} silicon vendors, AMD and NVIDIA, have on their products the concept of performance levels. A performance level is a pair of frequency and voltage that can be applied to the \acrshort{gpu} \acrshort{dvfs} domains. These vary from low power and performance levels to high performance and high power ones. The idea of having multiple performance levels is to be able to always be at the best point of operation.  In the case of the \acrshort{gpu} that is going to be used in the experimental phase of the dissertation, the \acrshort{gpu} core has eight performance levels, while the memory has only four. Table \ref{tab:gpulevels} shows the reference values for frequency and voltage for each of the core and memory performance levels. The frequency and voltage of increasing performance levels reflect the expected behavior, increasing the voltage to accommodate the frequency boost.
+The two major \acrshort{gpu} silicon vendors, AMD and NVIDIA, have on their products the concept of performance levels. A performance level is a pair of frequency and voltage that can be applied to the \acrshort{gpu} \acrshort{dvfs} domains. These vary from low power and performance levels to high performance and high power ones. The idea of having multiple performance levels is to be able to always be at the best point of operation. In the case of the first \acrshort{gpu} (AMD Vega 10 Frontier Edition) that is going to be used in the experimental phase of the dissertation, the \acrshort{gpu} core has eight performance levels, while the memory has only four. Table \ref{tab:gpulevels} shows the reference values for frequency and voltage for each of the core and memory performance levels. 
+The increase of frequency observed at the higher performance levels is, as expected, accompanied by the increased voltage to accommodate the frequency boost.
+
 
 \begin{table}[!htb]
 \renewcommand{\arraystretch}{1.2} % more space between rows
@@ -282,6 +284,16 @@ The two major \acrshort{gpu} silicon vendors, AMD and NVIDIA, have on their prod
 \caption{GPU Core and Memory Levels of Frequency and Voltage - AMD Vega 10 Frontier Edition}
 \label{tab:gpulevels}
 \end{table}
+
+
+Newer \acrshort{gpu} \acrshort{dvfs} systems, like the one used on the second \acrshort{gpu} under test (AMD Radeon 5700 XT) improve the number of performance levels by allowing for a continuous used of all frequency values within the valid range (versus discretizing the domain into a set number of performance levels). In this case, there are three user-defined frequency-voltage pairs on which a quadratic regression is computed  (see Figure~\ref{fig:voltage_curve}), creating a $f(V)$ function that for every frequency, gives the correspondent voltage value.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.75\textwidth]{Figures/Background/voltage_frequency_curve.pdf}
+  \caption{GPU Core voltage frequency curve, red dots indicate the default user-defined voltage frequency pair - AMD Radeon 5700 XT.}
+  \label{fig:voltage_curve}
+\end{figure}
 
 \subsection{Control Mechanism}
 
