@@ -12,52 +12,50 @@
 \label{chapter:mech}
 
 
-The results from the previous chapter display that the energy-efficiency (more specifically, the \acrshort{edp}) of an out-of-the-shelf \acrshort{gpu} can be significantly improved if a specific non-conventional V-F pair is used on the Core \acrshort{dvfs} domain. 
+The results from the previous chapter display that the energy-efficiency (through the \acrshort{edp}) of an out-of-the-shelf \acrshort{gpu} can be significantly improved if a specific non-conventional V-F pair is applied on the Core \acrshort{dvfs} domain. 
 
-To find the optimal V-F configuration, two approaches can be followed: creating a forecasting model or creating an optimization mechanism.
+However, in the previous chapter, one does not perform the frequency and voltage scaling dynamically, being one of the dissertation's objectives.
+To address this dynamic tunning of frequency and voltage while using the increased exploration space (and taking into account that it is necessary to guarantee safe \acrshort{gpu} operation), two approaches can be followed: creating a forecasting model or creating an online optimization mechanism.
 
-The forecasting model would predict the V-F pair to use based on the executing code (analysis of the Assembly code) and performance counters (the trace of the application being run on the \acrshort{gpu}). This option has the benefit of allowing the complete execution of the target application under the best possible configuration. However, such a forecasting model would also have to take into consideration the \acrshort{gpu} temperature, utilization (the target application being executed by itself or concurrently with others) and more importantly, it would be very tied to a specific \acrshort{gpu} model. In so, this option would become complicated and not easily scalable between different \acrshort{gpu}s.
+The forecasting model would predict the V-F pair to use based on the executing code (analysis of the Assembly code) and performance counters (the trace of the application being executed). This option has the benefit of allowing the complete execution of the target application under the best possible configuration. However, such a forecasting model would also have to take into consideration the \acrshort{gpu} temperature, utilization (the target application being executed by itself or concurrently with others) and more importantly, it would be very tied to a specific \acrshort{gpu} model. In so, this option would become complicated and not easily scalable between different \acrshort{gpu}s.
 
-On the other hand, the online optimization mechanism can target the native code repetition on \acrshort{gpgpu} applications solving algorithms. For these applications, the best overall configuration is the best V-F pair for each step of the algorithm. With so, in algorithms where the time it takes to perform a step is significantly shorter than the time it takes to compute the total algorithm, it is possible to discover and achieve the optimal V-F configuration quickly. This approach has the added advantage of optimizing the \acrshort{gpu} for their current state: temperature, utilization, aging and all \acrshort{pvt} variation.
+On the other hand, the online optimization mechanism can target the native code repetition on \acrshort{gpgpu} applications solving algorithms. For these applications, the best overall configuration is the best V-F pair for each algorithm's step. In algorithms where the time it takes to perform a step is significantly shorter than the time it takes to compute the total algorithm, it is possible to discover and achieve the optimal V-F configuration quickly. This approach has the added advantage of optimizing the \acrshort{gpu} for their current state: temperature, utilization, aging and all \acrshort{pvt} variation.
 
-Due to the benefits of targeting the current \acrshort{gpu} state, the second approach, the creation of a V-F optimization mechanism, is followed. This chapter provides an overview of the optimization mechanism and an explanation of how it should be adapted to the target application.
-
-
-
+Due to the benefits of targeting the current \acrshort{gpu} state, the second approach, the creation of an online V-F optimization mechanism, is followed. This chapter provides an overview of the optimization mechanism and explains how it should be adapted to the target application.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{V-F Optimization Mechanism description}
 \label{section:opt}
 
-The devised V-F optimization mechanism follows the Block Diagram of Figure~\ref{fig:opt_mech}, being constituted of a two-phase process. The following sections provide an in-depth explanation of each step of the mechanism, clarifying its objective, requirements.
+The devised V-F optimization mechanism follows the block diagram of Figure~\ref{fig:opt_mech}, consisting of a two-phase process. The following sections provide an in-depth explanation of each step of the mechanism, clarifying its objectives and requirements.
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=0.75\textwidth]{Figures/Optimization/full_mech.pdf}
+  \includegraphics[width=0.75\textwidth]{Figures/Optimization/full_mech_2.pdf}
   \caption{V-F Optimization Mechanism Block Diagram.}
   \label{fig:opt_mech}
 \end{figure}
 
 \subsection{Objective and Requirements}
 
-This V-F optimization mechanism aims to discover and achieve the optimal V-F configuration to the running \acrshort{gpgpu} application and current \acrshort{gpu} state, optimizing for \textit{performance}, \textit{performance} or \textit{energy-efficiency}-\acrshort{edo}. This optimal V-F configuration depends on the type of computations being performed, the \acrshort{gpu} temperature, utilization and aging and is selected from an exploration space concluded from the set of experiments covered on chapter~\ref{chapter:gpu_char}. 
+The V-F optimization mechanism aims to discover and achieve the optimal V-F configuration to the running \acrshort{gpgpu} application and current \acrshort{gpu} state, optimizing for \textit{performance}, \textit{energy consumption} or \textit{energy-efficiency} (\acrshort{edp}). This optimal V-F configuration depends on the type of computations being performed, the \acrshort{gpu} temperature, utilization and aging and is selected from an exploration space concluded from the set of experiments covered on chapter~\ref{chapter:gpu_char}. 
 
-The envisioned optimization mechanism is better suited to \acrshort{gpgpu} applications with a native code repetition - iterative algorithms like deep neural networks training. In particular, to applications where each iteration step takes significantly less time to compute than the algorithm's total computation time. This requirement is not obligatory; however, applications that follow this pattern can more significantly benefit from the mechanism since it can find the most appropriate configuration faster.
+The envisioned optimization mechanism is better suited to \acrshort{gpgpu} applications with a native code repetition - iterative algorithms like the training of deep neural networks. In particular, to applications where each iteration step takes significantly less time to compute than the algorithm's total computation time. This requirement is not mandatory; however, applications that follow this pattern can more significantly benefit from the mechanism since it can find the most appropriate configuration faster.
 
-Another important characteristic of the optimization mechanism is that it takes into account the time that the voltage frequency controllers of regular \acrshort{gpu}s take to change these parameters. It is better and safer to allow a portion of time between V-F changes, guaranteeing that the control mechanism has time to effect the change.
+Another important characteristic of the optimization mechanism is that it takes into account the time that the voltage frequency controllers of regular \acrshort{gpu}s take to change these parameters. It is better and safer to allow a portion of time between V-F changes, guaranteeing that the control mechanism has time to perform the change and stabilize both the frequency as well as the voltage before continuing to execute the computation.
 
 
 \subsection{Architecture Overview}
 
-The devised mechanism is comprised of a two-phase process, that in order, it tries to find the V-F configuration that achieves the highest energy efficiency for the running application. The evaluated energy efficiency metric is the \acrshort{edp}, computed as 
+The devised mechanism is comprised of a two-phase process, that in order, tries to find the V-F configuration that achieves the highest \textit{performance}, lowest \textit{energy consumption}, or best \textit{energy efficiency} for the running application. Targeting the dissertation objective, the chosen and exemplified metric from now on is \textit{energy efficiency} through the \acrshort{edp}, computed as 
 \begin{equation}
-	EDP=energy * computation \: time
+	EDP=energy * computation \: time.
 	\label{eq:edp}
 \end{equation}
-for the last step run of the algorithm. By changing the applied Core V-F configuration, the \acrshort{edp} value is increased or decreased, allowing for the comparison if the new configuration is better than the old. 
+By changing the applied Core V-F configuration, the \acrshort{edp} value is increased or decreased, allowing for comparing if the new configuration is better than the old. 
 
-Each phase of the optimization mechanism follows the block diagram of Figure~\ref{fig:detail_mech}. Before executing the algorithm step, the energy and computation time calculation is started. After the step is concluded, the energy and computation time are computed, and in addition to specific application status, the results are provided for the optimization mechanism.
+Each phase of the optimization mechanism follows the block diagram of Figure~\ref{fig:detail_mech}. Before executing the algorithm step, the energy and computation time calculation is started. After the step is concluded, the energy and computation time are computed, and in addition to specific application status, the results are provided for the optimization mechanism. The optimization mechanism is responsible for comparing the last \acrshort{edp} result with the best available, accept or reject the new configuration, and generate a new one for the next application epoch. It also analyses the application output to guarantee if the current volta-frequency pair allows correct \acrshort{gpu} computations.
 
 \begin{figure}[htb]
   \centering
