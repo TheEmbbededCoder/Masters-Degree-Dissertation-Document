@@ -661,22 +661,22 @@ In general, even though two completely different \acrshort{gpu} architectures ar
 \clearpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{V-F decoupled scaling GPU behaviour}
+\section{Effect of a decoupled V-F scaling on performance and energy consumption}
 \label{sec:gpu_behaviour}
 
 
-The \acrshort{gpu} behavior to V-F scaling varies depending on the stressed components. Having explored and established the usable voltage V-F  pairs, this section presents the energy-performance charts and the \acrshort{edp} heat-maps for each of the tested benchmarks. This section's results indicate the maximum available improvement possible to achieve on each component and acts as a target optimization for subsequent analysis using complete applications. 
+As it was observed in the previous section, the \acrshort{gpu} behavior to V-F scaling depends on the stressed components. Having explored and established the usable V-F  pairs, this section presents the energy-performance charts and the \acrshort{edp} heat-maps for each of the tested benchmarks. In particular, this section's results indicate the maximum attainable improvement on each component and acts as a target optimization for subsequent analysis using complete applications. 
 
 
 
 For an easier understanding of the obtained results, the following charts only represent the data-points that correspond to voltages equal-to and lower-than the default voltage of each frequency level (no interesting data is found at higher voltage levels), with each data point representing a $50mV$ undervoltage in relation to the previous one.
-Furthermore, the performance, energy consumption, and energy-delay product charts are normalized to the results achieved with the highest core frequency and default voltage ( Vega 10 - \{$1600$~MHz; $1.2$V\} and Radeon 5700 XT - \{$2000$~MHz; $1.2$V\}), so a smaller number indicates an improvement in relation to that configuration. 
+Furthermore, the presented performance, energy consumption, and energy-delay product charts are normalized to the results achieved with the highest core frequency and default voltage ( Vega 10 - \{$1600$~MHz; $1.2$V\} and Radeon 5700 XT - \{$2000$~MHz; $1.2$V\}). As such, a smaller number indicates an improvement in relation to that configuration. 
 
 \subsection{DRAM}
 
-Figure~\ref{fig:DRAM_behaviour} illustrates the normalized performance and energy consumption when varying the \texttt{OPS} parameter between 0 and 50 operations (see Listings~\ref{lst:DRAMbench}) for the \acrshort{dram} \acrshort{dvfs} domain.
+Figure~\ref{fig:DRAM_behaviour} illustrates the normalized performance and energy consumption of the conceived \acrshort{dram} benchmark (see Listings~\ref{lst:DRAMbench}) when varying the \texttt{OPS} parameter between 0 and 50 operations for the \acrshort{dram} \acrshort{dvfs} domain, normalized to the highest \acrshort{dram} \acrshort{dvfs} V-F configuration - \{950MHz, 1V\}.
 
-The experiment shows that for all \texttt{OPS} values ($0$ to $50$), the highest DRAM frequency delivers not only the best performance but also the lowest energy consumption. Moreover, undervolting the DRAM at that frequency did not result in a relevant reduction in the total GPU energy consumption, leading us to conclude that the weight of \acrshort{dram} in the GPU energy consumption is not significant in relation to the \textit{Core} energy consumption. In accordance, the highest \acrshort{dram} frequency will be hence-forwardly considered, guaranteeing the maximum performance, and leaving the voltage control for the automatic DVFS system.
+This experiment shows that, for all \texttt{OPS} values ($0$ to $50$), the highest DRAM frequency delivers not only the best performance but also the lowest energy consumption. Moreover, undervolting the DRAM at that frequency did not result in a relevant reduction in the total GPU energy consumption, leading to the conclusion that the weight of \acrshort{dram} in the GPU energy consumption is not significant in relation to the \textit{Core} energy consumption. In accordance, the highest \acrshort{dram} frequency will be hence-forwardly considered, guaranteeing the maximum performance and leaving the voltage control for the automatic DVFS system.
 
 
 \begin{figure}[htb]
@@ -686,14 +686,14 @@ The experiment shows that for all \texttt{OPS} values ($0$ to $50$), the highest
   \label{fig:DRAM_behaviour}
 \end{figure}
 
-Figure~\ref{fig:DRAM_Corebehaviour} illustrates the normalized performance and energy consumption, again when varying the \texttt{OPS} parameter between 0 and 50 operations (see Listings~\ref{lst:DRAMbench}) when scaling V-F of the \textit{Core} \acrshort{dvfs} domain. For this benchmark, it is not relevant to determine the minimum usable voltage, since that value will be defined by the type of operations being performed on the Core. The objective is to determine the configuration that offers the best energy efficiency for kernels that are memory bounded.  
+A collateral experiment was also conducted to evaluate any possible cross-relation between the applied V-F setup at the Core domain when executing the \acrshort{dram} benchmark with a variable amount of stress in memory bounded kernels. Figure~\ref{fig:DRAM_Corebehaviour} illustrates the normalized performance and energy consumption, with varying \texttt{OPS} parameter between 0 and 50 operations (see Listings~\ref{lst:DRAMbench}). For this benchmark, it is not relevant to determine the minimum usable voltage, since that value will be defined by the type of operations being performed on the Core. The objective is to determine the configuration that offers the best energy efficiency for kernels that are memory bounded.  
 
-The experiment shows that for memory bounded kernels (\texttt{OPS} values $0$ and $10$), performing frequency scaling does not change the computation time. However, it significantly impacts energy consumption (going from the highest frequency to the lowest yields a $54.2\%$ reduction on energy consumption). For the case of a kernel that is not memory bounded  (\texttt{OPS} $=25$), the benefit of exploring non-conventional V-F pairs becomes clear. However, as stated, the optimization of the V-F pairs for compute bounded kernels depends on the type of operations being performed in the \acrshort{alu}, analyzed in the following sections.
+The experiment shows that for memory bounded kernels (\texttt{OPS} values $0$ and $10$), performing frequency scaling at the core domain does not change the computation time. However, it significantly impacts the energy consumption (going from the highest frequency to the lowest yields a $54.2\%$ reduction on energy consumption). For the case of a kernel that is not memory bounded  (\texttt{OPS} $=25$), the benefit of exploring non-conventional V-F pairs becomes clear. However, as stated, the optimization of the V-F pairs for compute bounded kernels depends on the type of operations being performed in the \acrshort{alu}, analyzed in the following sections.
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=0.75\textwidth]{Figures/GPU_characterization/DRAM_Core_domain_behaviour.pdf}
-  \caption{Vega 10 - Core domain - DRAM - Normalized energy consumption and execution time. The dashed line connects the default F-V configurations and each connected data point represents a $50mV$ undervoltage in relation to the previous one.}
+  \caption{Vega 10 - Core domain - DRAM - Normalized energy consumption and execution time. The dashed line connects the default V-F configurations and each connected data point represents a $50mV$ undervoltage in relation to the previous one.}
   \label{fig:DRAM_Corebehaviour}
 \end{figure}
 
@@ -702,12 +702,14 @@ The experiment shows that for memory bounded kernels (\texttt{OPS} values $0$ an
 
 \label{sec:cache_sm__behaviour}
 
-Figure~\ref{fig:cache_behaviour} and \ref{fig:sm_behaviour} presents the normalized energy consumption and execution time for different V-F setups for the cache and shared memory benchmarks, respectively.  
+Figure~\ref{fig:cache_behaviour} and \ref{fig:sm_behaviour} presents the normalized energy consumption and execution time for different V-F setups for the cache and shared memory benchmarks, respectively. Acting on core domain, the normalization of the present and all subsequent benchmark is done to the highest V-F configuration available:Vega 10 - \{$1600$~MHz; $1.2$V\} and Radeon 5700 XT - \{$2000$~MHz; $1.2$V\}.
 
-In what concerns the energy and performance variations, performing voltage scaling at the default frequency (dashed line) reduces energy consumption as high as $46\% $ for Vega 10 \acrshort{gpu} and $30\% $ for Radeon 5700 XT \acrshort{gpu}. However, this results in a performance degradation of $61\%$ on both \acrshort{gpu}s. The advantage of performing non-conventional DVFS becomes apparent by allowing for energy reduction without any performance degradation. 
-In the Radeon 5700 XT case, the use of non-conventional V-F pairs yields a minimum energy consumption that is even lower than the most energy-saving default V-F configuration.
+In what concerns the energy and performance variations, it was observed that performing voltage the conventional scaling (using the default frequency - dashed line) provides an energy consumption as high as $46\% $ for Vega 10 \acrshort{gpu} and $30\% $ for Radeon 5700 XT \acrshort{gpu}. However, this also introduces a performance degradation of $61\%$ on both \acrshort{gpu}s. 
+
+As it was refered before, the advantage of performing non-conventional DVFS becomes apparent by allowing for energy reduction without any performance degradation. For example, the Vega 10 running at \{1600MHz ; 1V\} allows an energy reduction of $36\%$ while still being a peak performance.
+In the Radeon 5700 XT case, the use of non-conventional V-F pairs yields a minimum energy consumption that is even lower than the most energy-saving default V-F configuration, with the configuration of \{1800MHz ; 0.8V\} achieving an energy consumption reduction of $41\%$ with only a $10\%$ performance downgrade. This energy consumption reduction is twice as big as the one achieved at the most energy-saving default V-F configuration.
 % In this case, it is possible to run the GPU Core at $1600$ MHz and $1000$ mV, thus achieving an energy reduction of $35.7\%$ with no performance degradation. The commented results are related to the cache benchmark. 
-However, the results of the shared memory are similar.
+The results of the shared memory are similar.
 
 \begin{figure}[!htb]
     \centering
@@ -745,7 +747,7 @@ However, the results of the shared memory are similar.
 % \end{figure}
 
 
-Figure~\ref{fig:cache_edp} and \ref{fig:sm_edp} presents the obtained \acrshort{edp} for the Cache and shared memory benchmark. These components favor the utilization of minimum voltages to achieve an EDP improvement of over $40\%$.
+Figure~\ref{fig:cache_edp} and \ref{fig:sm_edp} presents the obtained \acrshort{edp} for the Cache and shared memory benchmarks. These components favor the utilization of minimum voltages to achieve an EDP improvement of over $40\%$. Comparing the non-conventional V-F results to the default ones, and taking into account the results of the previous section, using the proposed configurations improves performance and energy-consumption, and so energy efficiency without any inconvenient.
 
 \begin{figure}[!htb]
     \centering
@@ -761,7 +763,7 @@ Figure~\ref{fig:cache_edp} and \ref{fig:sm_edp} presents the obtained \acrshort{
         \label{fig:5700XT-cache_edp}
       }
     \end{subfigmatrix}
-    \caption{Core domain - Cache L2 - Obtained Energy-Delay Product (EDP) with \texttt{OPS}=0.}
+    \caption{Core domain - Cache L2 - Obtained normalized Energy-Delay Product (EDP) with \texttt{OPS}=0.}
 \end{figure}
 
 % \begin{figure}[!htb]
@@ -811,17 +813,17 @@ Figure~\ref{fig:cache_edp} and \ref{fig:sm_edp} presents the obtained \acrshort{
         \label{fig:5700XT-sm_edp}
       }
     \end{subfigmatrix}
-    \caption{Core domain - Shared Memory - Obtained Energy-Delay Product (EDP) with \texttt{OPS}=0.}
+    \caption{Core domain - Shared Memory - Obtained normalized Energy-Delay Product (EDP) with \texttt{OPS}=0.}
 \end{figure}
 
 
 
-\subsection{MAC}
+\subsection{Arithmetic and Logic Unit}
 
 \label{sec:MAC_behaviour}
-Figure~\ref{fig:MAC_behaviour} represents the normalized energy consumption and execution time for different V-F pairs for the \acrshort{mac} benchmark. It was chosen to represent the result for single-precision floating-point data-type, due to being the most used. However, the results for the remaining data types are similar.
+Figure~\ref{fig:MAC_behaviour} represents the normalized (to the highest core domain V-F configuration) energy consumption and execution time of the \acrshort{mac} benchmark for different V-F pairs. In the figures that follow, it was chosen to represent the result of the single-precision floating-point data-type, since it is the most used. However, the results for the remaining data types are similar.
 
-An interesting phenomenon is observed in the energy-execution time plot for the highest frequencies of both \acrshort{gpu}s. Performing undervoltage not only reduces energy consumption (as expected), but it also allows for faster execution time. An explanation can be found by analyzing the power consumption during the benchmark execution. For the default voltage, the power surpasses the power cap, which activates the GPU protection mechanisms, halting the execution until the power is reduced. By applying an undervoltage, the power significantly decreases (as $P_{Static}\propto V$ and $P_{Dynamic}\propto V^2$, see \cite{guerreiro_gpgpu_2018}) and allows sustained maintenance of the desire DVFS configuration. 
+An interesting phenomenon is observed in the energy-execution time plot for the highest frequencies of both \acrshort{gpu}s. Performing undervoltage not only reduces energy consumption (as expected), but it also allows for faster execution time. An explanation can be found by analyzing the power consumption during the benchmark execution. For the default voltage, the power surpasses the power cap, which activates the GPU protection mechanisms, halting the execution until the power is reduced. By applying an undervoltage, the power significantly decreases (as $P_{Static}\propto V$ and $P_{Dynamic}\propto V^2$, see \cite{guerreiro_gpgpu_2018}) and allows a sustained maintenance of the desire DVFS configuration. 
 
 % \begin{figure}[htb]
 %   \centering
@@ -870,15 +872,15 @@ Finally, Figure~\ref{fig:MAC_EDP} presents the obtained EDP chart for single-pre
         \label{fig:5700XT-MAC_EDP}
       }
     \end{subfigmatrix}
-    \caption{Core domain - ALU-MAC - Obtained Energy-Delay Product (EDP) for \texttt{d}=${1,3}$.}
+    \caption{Core domain - ALU-MAC - Obtained normalized Energy-Delay Product (EDP) for \texttt{d}=${1,3}$.}
 \end{figure}
 
 \newpage
 \subsection{Non-linear Operations}
 
-Figure~\ref{fig:SFU_behaviour} showcases the normalized energy consumption and execution time for different V-F pairs for the single-precision floating-point \acrshort{sfu} benchmark. The \acrshort{gpu} behavior differs on the two architectures. Vega 10 displays a similar behavior in this experiment, to Cache and Shared Memory benchmark, with the undervoltage not affect performance. On the other side, the Radeon 5700 XT behavior to non-conventional V-F is more similar to the MAC benchmark. At the two highest frequencies, performing undervoltage as a more significant benefit on performance than on energy.
+Figure~\ref{fig:SFU_behaviour} showcases the normalized energy consumption and execution time for different V-F pairs for the single-precision floating-point \acrshort{sfu} benchmark. In this case, the \acrshort{gpu} behavior differs on the two architectures. Vega 10 displays a similar behavior, to Cache and Shared Memory benchmarks, with the applied undervoltage not affecting the  performance. On the other hand, the Radeon 5700 XT behavior to non-conventional V-F is more similar to the MAC benchmark. At the two highest frequencies, performing undervoltage has a more significant benefit on performance than on energy.
 
-Overall, the degree of energy savings achieved goes in line with the previous results.
+Overall, the degree of energy savings that is achieved goes in line with the previous results.
 
 
 
@@ -906,7 +908,7 @@ Overall, the degree of energy savings achieved goes in line with the previous re
     \caption{Core domain - Special Function Unit - Normalized energy and performance for single-precision floating-point data type. The dashed lines connect the results for default F-V configurations.}
 \end{figure}
 
-Figure~\ref{fig:SFU_EDP} represents the \acrshort{edp} heat-map, displaying that the best energy efficiency is achieved with the highest amount of undervoltage, with this unit favoring lower frequencies on both \acrshort{gpu}s.
+Figure~\ref{fig:SFU_EDP} represents the obtained  \acrshort{edp} heat-map, where it can be seen that the best energy efficiency is achieved with the highest amount of undervoltage, with this unit favoring lower frequencies on both \acrshort{gpu}s.
 
 % \begin{figure}[htb]
 %     \centering
@@ -935,22 +937,22 @@ Figure~\ref{fig:SFU_EDP} represents the \acrshort{edp} heat-map, displaying that
 \section{Temperature Model}
 \label{sec:temp_model}
 
-The ALU and Cache L2 benchmarks were tested at a set temperature of 45ºC by fixing the \acrshort{gpu} fan to 100\% and waiting for the temperature to stabilize between runs. This temperature was chosen by observing that \acrshort{gpu}'s temperature while executing short benchmarks, stabilized around that temperature. However, during the execution of more extended applications or changing environmental conditions, the device can become hotter. The described work of Leng \textit{et al.}~\cite{leng_safe_2015} pointed out that only a small variation on $V_{min}$ is observed due to temperature variations. However, the performed experiments only cover temperatures up to 70ºC, easily surpassed by the \acrshort{gpu} underuse. 
+The ALU and Cache L2 benchmarks were tested at a set temperature of 45ºC, by fixing the \acrshort{gpu} fan to 100\% and waiting for the temperature to stabilize between runs. This temperature was chosen by observing that the  \acrshort{gpu}'s temperature, while executing short benchmarks, stabilized around that temperature. However, during the execution of longer applications or when changing environmental conditions, the device can become hotter. The described work of Leng \textit{et al.}~\cite{leng_safe_2015} pointed out that only a small variation on $V_{min}$ is observed due to temperature variations. However, the performed experiments only cover temperatures up to 70ºC, easily surpassed by the \acrshort{gpu} underuse. 
 
-To access the undervoltage capabilities in a broader range of temperatures, the benchmarks were continuously executed on both \acrshort{gpu}s, with varying \acrshort{gpu} fan speed, and the output of the execution was analyzed. Varying the frequency did not change the temperature behavior, so the results of all executions were combined in Figure~\ref{fig:temp_model}. 
+To access the undervoltage capabilities in a broader range of temperatures, the benchmarks were continuously executed on both \acrshort{gpu}s, by varying the \acrshort{gpu} fan speed, and the output of the execution was analyzed. Varying the frequency did not change the temperature behavior, so the results of all executions were combined in Figure~\ref{fig:temp_model}, where only the results corresponding to voltage variations were represented. 
 
 \begin{figure}[htb]
     \centering
         \includegraphics[width=0.7\textwidth]{Figures/GPU_characterization/UndervoltageWithTemperature_new.pdf}
-        \caption{Undervoltage capabilties with changing temperature and defined temperature model.}
+        \caption{Undervoltage capabilties with changing temperature condition and defined temperature model.}
     \label{fig:temp_model}
 \end{figure}
 
-Changing the amount of undervolt or fan speed resulted in the three different output scenarios. 
-\textit{Working} - the benchmark's output was correct and the same as when running with conventional V-F pairs.
+Hence, changing the amount of undervolt or fan speed resulted in the three different output scenarios. 
+\textit{Working} - the benchmark's output was correct and was the same as when running with conventional V-F pairs.
 \textit{Computation Errors} - the benchmark's output was not correct. However, the \acrshort{gpu} was still working and responding to the kernel commands. \textit{Crash} - the \acrshort{gpu} stop working and responding to the commands of the application.
 
-Overall, the undervoltage capabilities stay relatively the same until the 70 to 75ºC, with the highest undervoltage capabilities being achieved at the 55ºC mark. After the 75ºC, and following Freijado's work~\cite{freijedo_modeling_2012}, the carriers' mobility decreases and starts to limit the undervolting capabilities of the \acrshort{cmos} circuit. This result leads to the creation of a simple temperature model that limits the undervoltage potential for temperatures above 70ºC, as indicated in Figure~\ref{fig:temp_model}. This model acts as a fail-safe that guarantees that the non-conventional V-F exploration performed at 45ºC can be safely used across the complete temperature spectrum. The final user will have to limit the percentage of undervoltage according to the model, depending on the current \acrshort{gpu} temperature. By doing so, it guarantees that setting a safe non-conventional V-F pair will not cause a \acrshort{gpu} crash with temperature rise.
+Overall, the undervoltage capabilities stay relatively the same until the 70ºC to 75ºC temperature, with the highest undervoltage capabilities being achieved at the 55ºC mark. After the 75ºC mark, and following Freijado's work~\cite{freijedo_modeling_2012}, the carriers' mobility decreases and starts limiting the undervolting capabilities of the \acrshort{cmos} circuit. This result leads to the creation of a simple temperature model that limits the undervoltage potential for temperatures above 70ºC, as indicated in Figure~\ref{fig:temp_model}. This model acts as a fail-safe that guarantees that the non-conventional V-F exploration performed at 45ºC (as described until now) can be safely used across the complete temperature spectrum. The final user will have to limit the percentage of undervoltage according to this model, depending on the current \acrshort{gpu} temperature. By doing so, it guarantees that setting a safe non-conventional V-F pair will not cause a \acrshort{gpu} crash with temperature rise.
 
 
 
@@ -958,8 +960,8 @@ Overall, the undervoltage capabilities stay relatively the same until the 70 to 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Summary}
 
-The work presented in this chapter has three distinct intentions. It acts as a feasibility assessment, allowing us to understand, measure and evaluate the degree of undervoltage that current \acrshort{gpu} architecture allows. It characterizes the optimization space that one should consider to achieve the best energy-efficiency out of the devices. Furthermore, it works as a target energy-efficiency optimization benchmark to measure against non-conventional V-F pairs in complete applications.
+The work presented in this chapter has three distinct objectives: 1) it acts as a feasibility assessment, allowing us to understand, measure and evaluate the degree of undervoltage that current \acrshort{gpu} architectures allow; 2) it characterizes the optimization space that one should consider to achieve the best energy-efficiency out of the devices; and 3), it works as a target energy-efficiency optimization benchmark to measure against non-conventional V-F pairs in complete applications.
 
-Analyzing both \acrshort{dvfs} domains, the characterization of the Vega 10 \acrshort{gpu} showed that the \acrshort{dram} domain does not benefit from either non-conventional V-F pairs or even solely frequency scaling. AMD should have made the same conclusion since the next generation card (Radeon 5700 XT) omitted this \acrshort{dvfs} domain.
+After analyzing both \acrshort{dvfs} domains, the characterization of the Vega 10 \acrshort{gpu} showed that the \acrshort{dram} domain does not benefit from either non-conventional V-F pairs or even solely frequency scaling. AMD should have made the same conclusion since the next generation card (Radeon 5700 XT) omitted this \acrshort{dvfs} domain.
 
-The following chapters will focus on improving the device energy efficiency by controlling the Core \acrshort{dvfs} domain. On this domain, it was found that both \acrshort{gpu}s significantly benefit from non-conventional V-F pairs, by allowing to achieve the energy consumption of lower frequencies while having (and even surpassing) the performance of the traditional highest frequency and voltage configurations.
+The following chapters will focus on improving the device energy efficiency by controlling the Core \acrshort{dvfs} domain. On this domain, it was found that both \acrshort{gpu}s significantly benefit from non-conventional V-F pairs, by allowing an increase of the energy efficiency at lower operating frequencies while having (and even surpassing) the performance corresponding to the traditional highest frequency and voltage configurations.
