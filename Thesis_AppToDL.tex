@@ -131,7 +131,7 @@ Another important characteristic of \acrshort{dnn} is their tolerance to a certa
 
 As discussed, at the particular case of the \acrshort{cnn}, its feature extraction ability is supported by the convolution operator. Nonetheless, \acrshort{cnn} also includes other types of layers, such as fully connected and pooling layers. However, convolution and fully connected layers take up to $97\%$ of the \acrshort{gpu} energy consumption~\cite{li_evaluating_2016}, which makes them particularly suited to exploit energy-saving mechanisms. 
 
-Hence, to assess and apply non-conventional V-F pairs on the execution of \acrshort{cnn}s, the high-level deep learning framework PyTorch and the default mathematical libraries (rocBLAS and MIOpen) provided by the considered \acrshort{gpu} manufacturer (AMD) were extensively evaluated. This section reports the main achieved conclusions for the convolution operator and fully connected layers.
+Hence, to assess and apply non-conventional V-F pairs on the execution of \acrshort{cnn}s, the high-level deep learning framework PyTorch and the default mathematical libraries (rocBLAS and MIOpen) provided by the considered \acrshort{gpu} manufacturer (AMD) were extensively evaluated on the Vega 10 \acrshort{gpu}. This section reports the main achieved conclusions for the convolution operator and fully connected layers.
 
 \subsection{Convolution Layer}
 
@@ -394,306 +394,107 @@ The inference of the same \acrshort{cnn} models is tested independently. This te
 
 \subsection{Optimization algorithm adaptation to CNN training}
 
-As described, the optimization mechanism is comprised of two phases. This section presents how each of them was adapted to the training of \acrshort{cnn}s. In the particular case presented, the chosen target of optimization is energy-efficiency, with the \acrshort{edp} being chosen as the optimization metric.
+To benefit from automatically adjusting the V-F configuration to \acrshort{cnn} training, the Python wrapper that enables the V-F optimization mechanism presented in the previous Chapter was introduced to the training script.
 
+As the block diagram of Figure~\ref{fig:opt_mech} presents, the V-F optimization mechanism is composed of four stages. The present subsection indicates how each of these stages was conjugated with the \acrshort{cnn} training procedure. Similarly to the example given in Chapter 4, the optimization metric chosen was the energy-efficiency computed as the \acrshort{edp}.
 
-\subsubsection{Pre-run Optimization}
+\subsubsection{Gather DVFS information}
 
-The \textit{Pre-run Optimization} tries to quickly find an approximate ideal V-F configuration that maximizes the energy-efficiency. The previous subsection results showed that the global minimum of the \acrshort{edp} on the inference is a good approximation of the V-F configuration that achieves the highest energy efficiency in the training session. So, since running the inference over a set of data is faster than running the training algorithm, the \textit{Pre-run Optimization} optimizes for the inference. It was found that the best number of Pre-Run epochs is 20 and if no better configuration is found on the last N=4 epochs, the pre-run stops.
-
-\subsubsection{Online Monitoring Optimization}
-
-The \textit{Online Monitoring Optimization} monitors the \acrshort{cnn} training and fine-tunes the V-F configuration to the training + inference. After each training epoch's execution, the \acrshort{edp} is computed and the configuration is accepted or not, accordingly. The use of the Hill Climbing search algorithm guarantees that only better configurations are used for the training procedure. The fail-safe mechanism analysis the loss value during the execution. If a \textit{NaN} (Not a Number) is detected, the mechanism is activated, decreasing the amount of undervoltage being applied.
-
-
-\subsection{Experimental Results}
-
-The developed optimization mechanism can achieve an even higher degree of energy-efficiency compared to the results of the previous sections. This comes from the better fine-tuning of frequency and voltage that is performed during the \acrshort{cnn} training. Figure~\ref{fig:Algori_comp} compares the \acrshort{edp} of the default \acrshort{dvfs} system versus the best V-F configuration found on the feasibility assessment, the best found configuration achievable (attained by performing a new training session with the final configuration chosen by optimization algorithm) and training with the optimization algorithm (that encompasses the overhead of the pre-run over the training session). Training with the developed mechanism yields a reduction of the \acrshort{edp} of 27\% to 42\% over the default \acrshort{dvfs} system. In two of the cases, the developed mechanism with its optimization overhead is even able to beat the best configuration found in Section~\ref{sec:fea_ass}. This is due to the best possible V-F not being one of the tested frequencies. For the other two cases, the mechanism only falls less than 5\% short compared to the previous results. However, this mechanism able to achieve this acrshort{edp} optimization without any prior testing of the acrshort{cnn} model and while performing the final training procedure.
+To set the usable execution space for the \acrshort{cnn} training and execution, both the results of the \acrshort{gpu} characterization (listed in Chapter 3) and the specific results of the preliminary assessment performed in this chapter (see Section~\ref{section:baseline}) were used. Figure~\ref{fig:ues} presents the usable execution space for the Vega 10 \acrshort{gpu}, optimized for  \acrshort{cnn} training and execution.
 
 \begin{figure}[htb]
     \centering
-        \includegraphics[width=0.8\textwidth]{Figures/Application To Deep Learning/Algorithm_Opt_comp.pdf}
-        \caption{EDP comparison and optimization.}
-    \label{fig:Algori_comp}
+        \includegraphics[width=0.6\textwidth]{Figures/Application To Deep Learning/UES.pdf}
+        \caption{Usable Execution Space for the Vega 10 \acrshort{gpu}.}
+    \label{fig:ues}
 \end{figure}
 
 
 
+For the first stage of the algorithm execution, \textit{Space Exploration}, only the green bars that correspond to tested frequencies are considered. However, for the second stage of the algorithm execution, \textit{Fine-Tuning}, the area between the dashed lines, corresponding to the linear regression between the margins of two adjacent frequencies, is also regarded as valid V-F configurations.
+
+\subsubsection{Establish baseline measurement}
+
+It was chosen to take two individualized baseline measurements, one for one inference epoch and another for one training epoch. This was necessary for the way that the algorithm execution stages are going to be executed. For that, using the Python wrapper, the \acrshort{gpu} was set to the highest V-F configuration \{1600MHz; 1.2V\} and the execution time and energy consumption were measured, computing the \acrshort{edp} by multiplying both results.
+
+\subsubsection{Algorithm Execution - Space Exploration}
+
+For these two algorithm execution stages, the logical development would be to split the total number of training epochs by the \textit{Space Exploration} and \textit{Fine-Tunning} stages. However, the inference \acrshort{edp} heat-map (see Figure~\ref{fig:CNN_EDP_inf}) present a similar shape to the training + inference \acrshort{edp} heat-map (see Figure~\ref{fig:CNN_EDP_training_inf}) with one additional significant advantage. Performing just the inference is significantly faster than performing one training epoch. So, it was concluded that in a long training session (with a high number of training epochs), if the \textit{Space Exploration} was performed, optimizing just the inference, this process could be done faster than optimizing the training epoch since the training process would already start with a more energy-efficient V-F configuration. This would offset the initial \textit{Space Exploration} stage, where the algorithm to be optimized is not already being executed.
+
+The decision was then to execute inference epochs on the \textit{Space Exploration} stage.
+
+
+\subsubsection{Algorithm Execution - Fine-tuning}
+
+For the \textit{Fine-Tunning} stage, the \acrshort{cnn} training proceed as usual. In this stage, the optimization mechanism tries to explore the in-between tested frequencies and voltages to achieve the V-F configuration that results in the most energy-efficiency possible.  
+
+\subsubsection{Online Monitorization}
+
+The output validity metric given for the optimization mechanism was the result of the loss function and the value of the network weights. If a not a number (NaN) is detected, the output is considered as invalid, with the appropriate action to mitigate the problem being performed by the developed mechanism.
+
+
+
+\subsection{Experimental Results}
+
+The four different \acrshort{cnn} architectures were tested under the V-F Optimization Mechanism, with each model being tested 10 times. It was allowed 20 \textit{Space Exploration} epochs, value obtained by measuring how many epochs on average does the algorithm take to achieve a good V-F configuration across the four models. Figure~\ref{fig:3d} presents an example of the V-F configuration and resulting normalized \acrshort{edp} value when applied to the WideResNet model.
+
+\begin{figure}[h]
+\centering
+    \begin{tikzpicture}
+    \begin{axis}
+    [  
+    width=0.8\linewidth,
+    height=0.45\linewidth,
+    view={-45}{45},
+    xmin=990, xmax=1600,
+    ymin=900, ymax=1200,
+    zmin=0.5, zmax=1,
+    ytick={900, 1000, 1100, 1200},
+    ztick={0.5, 0.75, 1},
+    xlabel={Frequency [MHz]},
+	ylabel={Voltage [mV]},
+	zlabel={EDP/EDP@CORE=\{1600MHz;1.2V\}},
+	label style=sloped,
+	%point meta=explicit symbolic,
+	nodes near coords
+    ]
+    \addplot3[ycomb,scatter] file {./3d_data.dat};
+    \addplot3[scatter] file {./3d_data.dat};
+    \end{axis}
+
+    \end{tikzpicture}
+    \caption{WideResNet - \textit{Space Exploration} normalized \acrshort{edp} values for 20 epochs. Initial value is 1600MHz and 1.2V.}
+    \label{fig:3d}
+\end{figure}
+
+
+At the end of the \textit{Space Exploration}, performed with just an inference epoch, the V-F configuration that achieved the lowest \acrshort{edp} value is given for the textit{Fine-Tuning} stage, where the \acrshort{cnn}  training process is executed.
+
+The developed optimization mechanism can achieve an even higher degree of energy-efficiency than the previous sections' results. This comes from the better fine-tuning of frequency and voltage that is performed during the \acrshort{cnn} training. Figure~\ref{fig:Algori_comp} compares the \acrshort{edp} of the default \acrshort{dvfs} system versus the best V-F configuration found on the feasibility assessment, the best found configuration achievable (attained by performing a new training session with the final configuration chosen by optimization algorithm) and training with the optimization algorithm (that encompasses the overhead attained by running the \textit{Space Exploration} with only an inference epoch). Training with the developed mechanism yields a reduction of the \acrshort{edp} of 27\% to 42\% over the default \acrshort{dvfs} system. In two of the cases, the developed mechanism with its optimization overhead is even able to beat the best configuration found in Section~\ref{sec:fea_ass}. This is due to the best possible V-F not being one of the tested frequencies. For the other two cases, the mechanism only falls less than 5\% short compared to the previous results. However, this mechanism able to achieve this acrshort{edp} optimization without any prior testing of the acrshort{cnn} model and while performing the final training procedure.
+\begin{figure}[htb]
+    \centering
+        \includegraphics[width=0.95\textwidth]{Figures/Application To Deep Learning/Algorithm_Opt_comp.pdf}
+        \caption{Median normalized EDP of default DVFS vs training CNN with V-F optimization model.}
+    \label{fig:Algori_comp}
+\end{figure}
+
+Table~\ref{tab:bestVF} indicates the mode V-F configuration (configuration that appeared more times) at the end of each algorithm execution stages.
+
+\begin{table}[htb]
+    \centering
+    \label{tab:bestVF}
+    \begin{tabular}{lcccc}
+        \multicolumn{1}{r}{{\textbf{Model}}} &  \textbf{LeNet} & \textbf{VGG11} &\textbf{AlexNet} & \textbf{WideResNet} \\ \hline
+        \textit{Space Exploration} &  [1140MHz; 0.95V] & [1140MHz; 1.0V] & [1350MHz; 0.95V]  & [1350MHz; 0.9V]\\
+        \textit{Fine-Tunning} &  [1230MHz; 0.95V] & [1370MHz; 0.97V] & [1410MHz; 0.98V]  &[1500MHz; 0.99V]\\ \hline
+    \end{tabular}%
+     \caption{Mode of selected V-F configurations at the end of each optimization stage.}
+\end{table}
+
+
+
 \section{Summary}
-% % ----------------------------------------------------------------------
-% \subsection{Figures}
-% \label{subsection:figures}
 
-% Insert your section material and possibly a few figures...
+Deep learning and, more specific deep neural networks are a prominent type of algorithm being executed on \acrshort{gpu}s nowadays. These types of algorithms use special mathematical operations (like the convolution) to be able to extract features from the input data. The execution (inference) of these algorithms and, more importantly, the training session can significantly benefit if the energy-efficiency of \acrshort{gpu}s improves.
 
-% Make sure all figures presented are referenced in the text!
-
-
-% % ----------------------------------------------------------------------
-% \subsubsection{Images}
-% \label{subsection:images}
-
-% \begin{figure}[!htb]
-%   \centering
-%   \includegraphics[width=0.25\textwidth]{Figures/Airbus_A350.jpg}
-%   \caption[Caption for figure in TOC.]{Caption for figure.}
-%   \label{fig:airbus1}
-% \end{figure}
-
-% \begin{figure}[!htb]
-%   \begin{subfigmatrix}{2}
-%     \subfigure[Airbus A320]{\includegraphics[width=0.49\linewidth]{Figures/Airbus_A320_sharklets.png}}
-%     \subfigure[Bombardier CRJ200]{\includegraphics[width=0.49\linewidth]{Figures/Bombardier_CRJ200.png}}
-%   \end{subfigmatrix}
-%   \caption{Some aircrafts.}
-%   \label{fig:aircrafts}
-% \end{figure}
-
-% Make reference to Figures \ref{fig:airbus1} and \ref{fig:aircrafts}.
-
-% By default, the supported file types are {\it .png,.pdf,.jpg,.mps,.jpeg,.PNG,.PDF,.JPG,.JPEG}.
-
-% See \url{http://mactex-wiki.tug.org/wiki/index.php/Graphics_inclusion} for adding support to other extensions.
-
-
-% % ----------------------------------------------------------------------
-% \subsubsection{Drawings}
-% \label{subsection:drawings}
-
-% Insert your subsection material and for instance a few drawings...
-
-% The schematic illustrated in Fig.~\ref{fig:algorithm} can represent some sort of algorithm.
-
-% \begin{figure}[!htb]
-%   \centering
-%   \scriptsize
-% %  \footnotesize 
-% %  \small
-%   \setlength{\unitlength}{0.9cm}
-%   \begin{picture}(8.5,6)
-%     \linethickness{0.3mm}
-
-%     \put(3,6){\vector(0,-1){1}}
-%     \put(3.5,5.4){$\bf \alpha$}
-%     \put(3,4.5){\oval(6,1){}}
-%     %\put(0,4){\framebox(6,1){}}
-%     \put(0.3,4.4){Grid Generation: \quad ${\bf x} = {\bf x}\left({\bf \alpha}\right)$}
-
-%     \put(3,4){\vector(0,-1){1}}
-%     \put(3.5,3.4){$\bf x$}
-%     \put(3,2.5){\oval(6,1){}}
-%     %\put(0,2){\framebox(6,1){}}
-%     \put(0.3,2.4){Flow Solver: \quad ${\cal R}\left({\bf x},{\bf q}\left({\bf x}\right)\right) = 0$}
-
-%     \put(6.0,2.5){\vector(1,0){1}}
-%     \put(6.4,3){$Y_1$}
-
-%     \put(3,2){\vector(0,-1){1}}
-%     \put(3.5,1.4){$\bf q$}
-%     \put(3,0.5){\oval(6,1){}}
-%     %\put(0,0){\framebox(6,1){}}
-%     \put(0.3,0.4){Structural Solver: \quad ${\cal M}\left({\bf x},{\bf q}\left({\bf x}\right)\right) = 0$}
-
-%     \put(6.0,0.5){\vector(1,0){1}}
-%     \put(6.4,1){$Y_2$}
-
-%     %\put(7.8,2.5){\oval(1.6,5){}}
-%     \put(7.0,0){\framebox(1.6,5){}}
-%     \put(7.1,2.5){Optimizer}
-%     \put(7.8,5){\line(0,1){1}}
-%     \put(7.8,6){\line(-1,0){4.8}}
-%   \end{picture}
-%   \caption{Schematic of some algorithm.}
-%   \label{fig:algorithm}
-% \end{figure}
-
-
-% % ----------------------------------------------------------------------
-% \subsection{Equations}
-% \label{subsection:equations}
-
-% Equations can be inserted in different ways.
-
-% The simplest way is in a separate line like this
-
-% \begin{equation}
-%   \frac{{\rm d} q_{ijk}}{{\rm d} t} + {\cal R}_{ijk}({\bf q}) = 0 \,.
-% \label{eq:ode}
-% \end{equation}
-
-% If the equation is to be embedded in the text. One can do it like this ${\partial {\cal R}}/{\partial {\bf q}}=0$.
-
-% It may also be split in different lines like this
-
-% \begin{eqnarray}
-%   {\rm Minimize}   && Y({\bf \alpha},{\bf q}({\bf \alpha}))            \nonumber           \\
-%   {\rm w.r.t.}     && {\bf \alpha} \,,                                 \label{eq:minimize} \\
-%   {\rm subject~to} && {\cal R}({\bf \alpha},{\bf q}({\bf \alpha})) = 0 \nonumber           \\
-%                   &&       C ({\bf \alpha},{\bf q}({\bf \alpha})) = 0 \,. \nonumber
-% \end{eqnarray}
-
-% It is also possible to use subequations. Equations~\ref{eq:continuity}, \ref{eq:momentum} and \ref{eq:energy} form the Naver--Stokes equations~\ref{eq:NavierStokes}.
-
-% \begin{subequations}
-%     \begin{equation}
-%     \frac{\partial \rho}{\partial t} + \frac{\partial}{\partial x_j}\left( \rho u_j \right) = 0 \,,
-%     \label{eq:continuity}
-%     \end{equation}
-%     \begin{equation}
-%     \frac{\partial}{\partial t}\left( \rho u_i \right) + \frac{\partial}{\partial x_j} \left( \rho u_i u_j + p \delta_{ij} - \tau_{ji} \right) = 0, \quad i=1,2,3 \,,
-%     \label{eq:momentum}
-%     \end{equation}
-%     \begin{equation}
-%         \frac{\partial}{\partial t}\left( \rho E \right) + \frac{\partial}{\partial x_j} \left( \rho E u_j + p u_j - u_i \tau_{ij} + q_j \right) = 0 \,.
-%     \label{eq:energy}
-%     \end{equation}
-% \label{eq:NavierStokes}%
-% \end{subequations}
-
-
-% % ----------------------------------------------------------------------
-% \subsection{Tables}
-% \label{section:tables}
-
-% Insert your subsection material and for instance a few tables...
-
-% Make sure all tables presented are referenced in the text!
-
-% Follow some guidelines when making tables:
-
-% \begin{itemize}
-%   \item Avoid vertical lines
-%   \item Avoid “boxing up” cells, usually 3 horizontal lines are enough: above, below, and after heading
-%   \item Avoid double horizontal lines
-%   \item Add enough space between rows
-% \end{itemize}
-
-% \begin{table}[!htb]
-%   \renewcommand{\arraystretch}{1.2} % more space between rows
-%   \centering
-%   \begin{tabular}{lccc}
-%     \toprule
-%     Model           & $C_L$ & $C_D$ & $C_{M y}$ \\
-%     \midrule
-%     Euler           & 0.083 & 0.021 & -0.110    \\
-%     Navier--Stokes  & 0.078 & 0.023 & -0.101    \\
-%     \bottomrule
-%   \end{tabular}
-%   \caption[Table caption shown in TOC.]{Table caption.}
-%   \label{tab:aeroCoeff}
-% \end{table}
-
-% Make reference to Table \ref{tab:aeroCoeff}.
-
-% Tables \ref{tab:memory} and \ref{tab:multipleColumns} are examples of tables with merging columns:
-
-% \begin{table}[!htb]
-%   \renewcommand{\arraystretch}{1.2} % more space between rows
-%   \centering
-%   \begin{tabular}[]{lrr}
-%     \toprule
-%                 & \multicolumn{2}{c}{\underline{Virtual memory [MB]}} \\
-%                 & Euler       & Navier--Stokes \\
-%     \midrule
-%       Wing only &  1,000      &    2,000       \\
-%       Aircraft  &  5,000      &   10,000       \\
-%       (ratio)   & $5.0\times$ & $5.0\times$    \\
-%     \bottomrule
-%   \end{tabular}
-%   \caption{Memory usage comparison (in MB).}
-%   \label{tab:memory}
-% \end{table}
-
-% \begin{table}[!htb]
-%   \centering
-%   \renewcommand{\arraystretch}{1.2} % more space between rows
-%   \begin{tabular}{@{}rrrrcrrr@{}} % remove space to the vertical edges @{}...@{}
-%     \toprule
-%       & \multicolumn{3}{c}{$w = 2$} & \phantom{abc} & \multicolumn{3}{c}{$w = 4$} \\
-%     \cmidrule{2-4}
-%     \cmidrule{6-8}
-%       & $t=0$ & $t=1$ & $t=2$ && $t=0$ & $t=1$ & $t=2$ \\
-%     \midrule
-%       $dir=1$
-%       \\
-%       $c$ &  0.07 &  0.16 &  0.29 &&  0.36 &  0.71 &   3.18 \\
-%       $c$ & -0.86 & 50.04 &  5.93 && -9.07 & 29.09 &  46.21 \\
-%       $c$ & 14.27 &-50.96 &-14.27 && 12.22 &-63.54 &-381.09 \\
-%       $dir=0$
-%       \\
-%       $c$ &  0.03 &  1.24 &  0.21 &&  0.35 & -0.27 &  2.14 \\
-%       $c$ &-17.90 &-37.11 &  8.85 &&-30.73 & -9.59 & -3.00 \\
-%       $c$ &105.55 & 23.11 &-94.73 &&100.24 & 41.27 &-25.73 \\
-%     \bottomrule
-%   \end{tabular}
-%   \caption{Another table caption.}
-%   \label{tab:multipleColumns}
-% \end{table}
-
-% An example with merging rows can be seen in Tab.\ref{tab:multipleRows}.
-
-% \begin{table}[!htb]
-%   \renewcommand{\arraystretch}{1.2} % more space between rows
-%   \centering
-%   \begin{tabular}{ccccc}
-%     \toprule
-%       \multirow{2}{*}{ABC} & \multicolumn{4}{c}{header} \\
-%       \cmidrule{2-5} & 1.1 & 2.2 & 3.3 & 4.4 \\
-%     \midrule
-%       \multirow{2}{*}{IJK} & \multicolumn{2}{c}{\multirow{2}{*}{group}} & 0.5 & 0.6 \\
-%       \cmidrule{4-5}       & \multicolumn{2}{c}{}                       & 0.7 & 1.2 \\
-%     \bottomrule
-%   \end{tabular}
-%   \caption{Yet another table caption.}
-%   \label{tab:multipleRows}
-% \end{table}
-
-% If the table has too many columns, it can be scaled to fit the text widht, as in Tab.\ref{tab:scale}.
-% \begin{table}[!htb]
-%   \renewcommand{\arraystretch}{1.2} % more space between rows
-%   \centering
-%   \resizebox*{\textwidth}{!}{%
-%     \begin{tabular}[]{lcccccccccc}
-%       \toprule
-%         Variable &  a  &  b  &  c  &  d  &  e  &  f  &  g  &  h  &  i  &  j  \\
-%       \midrule
-%         Test 1   &  10,000 &  20,000 &  30,000 &  40,000 &  50,000 &  60,000 &  70,000 &  80,000 &  90,000 & 100,000 \\
-%         Test 2   &  20,000 &  40,000 &  60,000 &  80,000 & 100,000 & 120,000 & 140,000 & 160,000 & 180,000 & 200,000 \\
-%       \bottomrule
-%     \end{tabular}
-%   }%
-%   \caption{Very wide table.}
-%   \label{tab:scale}%
-% \end{table}
-
-
-% % ----------------------------------------------------------------------
-% \subsection{Mixing}
-% \label{section:mixing}
-
-% If necessary, a figure and a table can be put side-by-side as in Fig.\ref{fig:side_by_side}
-
-% \begin{figure}[!htb]
-%   \begin{minipage}[b]{0.60\linewidth}
-%     \centering
-%     \includegraphics[width=\linewidth]{Figures/Bombardier_CRJ200}
-%   \end{minipage}%
-%   \begin{minipage}[b]{0.30\linewidth}
-%     \centering
-%     \begin{tabular}[b]{lll}
-%       \toprule
-%         \multicolumn{3}{c}{Legend} \\
-%       \midrule
-%         A & B & C \\
-%         0 & 0 & 0 \\
-%         0 & 1 & 0 \\
-%         1 & 0 & 0 \\
-%         1 & 1 & 1 \\
-%       \bottomrule
-%     \end{tabular}
-%     \vspace{5em}
-%   \end{minipage}
-% \caption{Figure and table side-by-side.}
-% \label{fig:side_by_side}
-% \end{figure}
-
+This chapter combines all the previous knowledge acquired and presented in the previous chapter of the dissertation. It sets the usable execution space of the convolutional neural networks and, it adapts the V-F Optimization Mechanism to the training of this algorithm with excellent results. By characterizing the target \acrshort{gpu} to the target application, it was concluded that the energy efficiency of the training session could be significantly improved, with an \acrshort{edp} reduction of 27\% to 42\% depending on the \acrshort{cnn} model, over the default \acrshort{dvfs} system.
