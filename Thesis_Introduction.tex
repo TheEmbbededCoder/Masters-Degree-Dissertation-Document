@@ -58,13 +58,13 @@ The scientiﬁc contributions of this work have been published for communication
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Dissertation Outline}
 \label{section:outline}
-\textcolor{red}{ACABAR DE DESCREVER CADA CAPITULO}
-This dissertation is organized in 4 chapters with the following outline:
+
+This dissertation is organized in 5 chapters with the following outline:
 \begin{itemize}
-    \item Chapter 2 - Background: This chapter presents a summary of the current state-of-the art related with the subject in study.
-    \item Chapter 3 - GPU architectural characterization to decoupled V-F:
-    \item Chapter 4 - V-F Optimization Mechanism:
-    \item Chapter 5 - Application to Deep Learning:
-    \item Chapter 6 - Conclusions:
+    \item \textbf{Chapter 2 - Background:} This chapter presents a summary of the current state-of-the-art related to the subject in focus on this dissertation. First, it introduces an overview of general-purpose computing on \acrshort{gpu}s, providing a summary of their architecture and programming model. It presents the key concepts that should be present when developing for this kind of device and the standard programming interfaces between the \acrshort{gpu} and the host  \acrshort{cpu}. A bottom-up approach is drawn to present the fundamental concepts of frequency and voltage scaling on \acrshort{cmos} devices, and how those translate to the current \acrshort{dvfs} systems presented in out-of-the-shelf \acrshort{gpu}s. It finalizes by granting a sketch of how better exploring and going against the conventional voltage-frequency scaling allows for better energy efficiency of \acrshort{gpu}s, being that the stepping stone of this dissertation. 
+    \item \textbf{Chapter 3 - GPU architectural characterization to decoupled V-F:} In this chapter, the methodology to characterize the use of non-conventional V-F scaling is presented. The chapter starts by exploring each developed stressing component benchmark's motivation and objectives, and it follows by testing the methodology in two different architecture \acrshort{gpu} devices. The methodology is used to: determine the minimum voltage allowed by each architectural component and evaluate the performance, energy consumption and energy efficiency of the devices, when prompting on them, non-conventional V-F pairs. It finishes by experimentally testing the effects of temperature on the undervoltage capabilities of the \acrshort{gpu} architecture.
+    \item \textbf{Chapter 4 - V-F Optimization Mechanism:} This chapter analyses and proposes a solution to dynamically adjust frequency and voltage using the newly tested non-conventional V-F pairs. Programmers can execute their algorithms using this tool, while the most energy-efficient V-F configuration is being discovered, targetting the current \acrshort{gpu} state and performance metrics, and application output.
+    \item \textbf{Chapter 5 - Application to Deep Learning:} In this chapter, the previous two chapters' results are combined and used to perform an application for deep learning. This chapter as three objectives: showcase the practical advantages of extending the default frequency-voltage scaling with non-conventional V-F pairs on a target application; evaluate the use of the developed optimization mechanism, and, overall, the chapter indicates how a user should proceed to safely and beneficially use the work developed in this dissertation.
+    \item \textbf{Chapter 6 - Conclusions:} This final chapter presents the accomplished results from this work and the possible directions to take in future work.
 \end{itemize}
 

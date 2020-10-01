@@ -8,96 +8,153 @@
 %                                                                      %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{V-F Optimization Mechanism}
+\chapter{Decoupled V-F Optimization Mechanism}
 \label{chapter:mech}
 
 
-The results from the previous chapter display that the energy-efficiency (through the \acrshort{edp}) of an out-of-the-shelf \acrshort{gpu} can be significantly improved if a specific non-conventional V-F pair is applied on the Core \acrshort{dvfs} domain. 
+The preliminary results that were presented in the previous chapter denote the idea that energy-efficiency (in particular, the \acrshort{edp} metric) of an out-of-the-shelf \acrshort{gpu} can be significantly improved if a specific non-conventional V-F pair is applied on the Core \acrshort{dvfs} domain. 
 
-However, in the previous chapter, one does not perform the frequency and voltage scaling dynamically, being one of the dissertation's objectives.
-To address this dynamic tunning of frequency and voltage while using the increased exploration space (and taking into account that it is necessary to guarantee safe \acrshort{gpu} operation), two approaches can be followed: creating a forecasting model or creating an online optimization mechanism.
+However, in the preliminary experiments that were conducted in the previous chapter, it was not performed any adaptation of the frequency and voltage scaling in a dynamic way, being one of this dissertation's objectives.
+To address this dynamic tunning of frequency and voltage, while using the increased exploration space (and taking into account that it is necessary to guarantee a safe \acrshort{gpu} operation), two approaches are envisioned: creating a forecasting model, or creating an online optimization mechanism.
 
-The forecasting model would predict the V-F pair to use based on the executing code (analysis of the Assembly code) and performance counters (the trace of the application being executed). This option has the benefit of allowing the complete execution of the target application under the best possible configuration. However, such a forecasting model would also have to take into consideration the \acrshort{gpu} temperature, utilization (the target application being executed by itself or concurrently with others) and more importantly, it would be very tied to a specific \acrshort{gpu} model. In so, this option would become complicated and not easily scalable between different \acrshort{gpu}s.
+The forecasting model would predict the most appropriate V-F pair based on the application executing code (static analysis of the Assembly code) and performance counters (run-time trace of the application being executed). This option would have the benefit of allowing the complete execution of the target application under the best possible configuration. However, such a forecasting model would also have to take into consideration the \acrshort{gpu} temperature, utilization (the target application being executed by itself or concurrently with others) and more importantly, it would be very tied to a specific \acrshort{gpu} model. Consequently, this option would become complicated and not easily scalable between different \acrshort{gpu}s.
 
-On the other hand, the online optimization mechanism can target the native code repetition on \acrshort{gpgpu} applications solving algorithms. For these applications, the best overall configuration is the best V-F pair for each algorithm's step. In algorithms where the time it takes to perform a step is significantly shorter than the time it takes to compute the total algorithm, it is possible to discover and achieve the optimal V-F configuration quickly. This approach has the added advantage of optimizing the \acrshort{gpu} for their current state: temperature, utilization, aging and all \acrshort{pvt} variation.
+On the other hand, an online iterative optimization mechanism could target the native code repetition patterns usually observed in \acrshort{gpgpu} applications. For these applications, the best overall configuration is the best V-F pair for each algorithm's step, so by intelligently exploring a V-F configuration in each iteration of the user application, it is possible to find the best V-F pair for the running algorithm.
+This approach brings the added advantage of optimizing the \acrshort{gpu} pre-execution state, accounting for the aging and all \acrshort{pvt} variations, and also react to the on-execution state, changing the V-F configuration in accordance with device temperature and utilization.
 
-Due to the benefits of targeting the current \acrshort{gpu} state, the second approach, the creation of an online V-F optimization mechanism, is followed. 
-Accordingly, this chapter is divided into two sections with the following outline: Section~\ref{section:opt} presents an overview  of the developed optimization mechanism, with its objective and requirements and Section~\ref{sec:usage} which presents how the users should use the developed mechanism to optimize their applications.
+
+
+Due to the benefits of targeting the current \acrshort{gpu} state, the second approach, the creation of an online V-F optimization mechanism, was followed. 
+Accordingly, this chapter is divided into two sections with the following outline: Section~\ref{section:opt} presents a description of the developed optimization mechanism; Section~\ref{sec:implementation} indicates which interfaces  and other programs were used to develop the devised mechanism, and finally, Section~\ref{sec:usage} presents a description of the implemented functions and how should them be integrated in the user application.
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{V-F Optimization Mechanism description}
+\section{Decoupled V-F Optimization Mechanism description}
 \label{section:opt}
 
-The devised V-F optimization mechanism is developed in Python and acts as a wrapper with functions that allow the user to implement the mechanism around its developing application. Figure~\ref{fig:layer} presents a layer diagram of the developed optimization mechanism, illustrating the main \acrshort{api}s used by the tool to communicate with the \acrshort{gpu} device, in order to control the voltage frequency pair that is applied on the \acrshort{dvfs} Core domain according to the user application output and device energy consumption and performance.
 
-The user invokes the appropriate developed functions (more detail provided on Section~\ref{sec:usage}) that communicate with the gpowerSAMPLER, rocm-smi and ROCk \acrshort{api}s to retrieve and control the specific aspects of their \acrshort{gpu} device. The following subsections provide an in-depth explanation of each aspect of the mechanism.
+The envisioned V-F optimization mechanism aims to search and achieve the optimal V-F configuration to the running \acrshort{gpgpu} application and current \acrshort{gpu} state, optimizing it for \textit{performance}, \textit{energy consumption} or \textit{energy-efficiency} (\acrshort{edp}). As it was described in the previous chapter, this optimal V-F configuration depends on the type of computations being performed, the \acrshort{gpu} temperature, utilization, \acrshort{pvt} variations and aging and is obtained by searching over an exploration space based on the set of observations that were obtained from the set of experiments covered on chapter~\ref{chapter:gpu_char}. 
 
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width=0.6\textwidth]{Figures/Optimization/layerDiagram.pdf}
-  \caption{Layer diagram of the developed V-F Optimization Mechanism.}
-  \label{fig:layer}
-\end{figure}
-
-
-
-\subsection{Objective and Requirements}
-
-The V-F optimization mechanism aims to discover and achieve the optimal V-F configuration to the running \acrshort{gpgpu} application and current \acrshort{gpu} state, optimizing for \textit{performance}, \textit{energy consumption} or \textit{energy-efficiency} (\acrshort{edp}). This optimal V-F configuration depends on the type of computations being performed, the \acrshort{gpu} temperature, utilization and aging and is selected from an exploration space concluded from the set of experiments covered on chapter~\ref{chapter:gpu_char}. 
-
-The envisioned optimization mechanism is better suited to \acrshort{gpgpu} applications with a native code repetition - iterative algorithms like the training of deep neural networks. In particular, to applications where each iteration step takes significantly less time to compute than the algorithm's total computation time. This requirement is not mandatory; however, applications that follow this pattern can more significantly benefit from the mechanism since it can find the most appropriate configuration faster.
-
-Another important characteristic of the optimization mechanism is that it takes into account the time that the regular \acrshort{gpu}s voltage frequency controllers take to change these parameters. As described in Chapter 2, the types of controllers that exist on out-of-the-shelf devices take between 200 to 500 ms to change and set the new V-F pair, making them not suitable to be continuously adapting to each and every operation being executed on the device. Instead, it is necessary to group a collection of operations (as described, a complete step of an algorithm) and find the most suitable V-F configuration for that set.
-It is necessary to allow a portion of time between V-F changes to guarantee that the control mechanism has time to perform the change and stabilize both the frequency and the voltage before continuing to execute the computation.
+An essential consideration taken into account when designing the optimization mechanism was the time that the regular \acrshort{gpu}s voltage frequency controllers take to change these parameters. As described in Chapter 2, the controllers equipping out-of-the-shelf devices take between 200 to 500 ms to change and set the new V-F pair, making them unsuitable for continuously adapting to each operation executed on the device. Instead, it is necessary to group a collection of operations (as described, a complete iteration of the user application) and find the most suitable V-F configuration for that set.
+In particular, it is necessary to allow a portion of time between V-F changes to guarantee that the control mechanism has time to perform the change and stabilize both the frequency and the voltage before continuing to execute the computation.
 
 As previously indicated, at the time of this dissertation, only AMD provides the necessary tools to independently control voltage and frequency, being that a requirement that is out of our control when designing this tool. However, if other manufacturers develop command-line applications that provide the same degree of control, this optimization mechanism can easily be ported to accommodate the same.
 
 
-\subsection{Architecture Overview}
+\subsection{Architecture and Execution Overview}
 
 
-The devised V-F optimization mechanism follows the block diagram of Figure~\ref{fig:opt_mech}, consisting of a two-phase process where first data about the \acrshort{gpu} and application is gathered, and a second one where the algorithm is executed while the best V-F pair is found. 
+The devised V-F optimization mechanism follows the block diagram of Figure~\ref{fig:opt_mech}, consisting of a two-phase process. In the first phase, data about the \acrshort{gpu} \acrshort{dvfs} system is gathered and application baseline metrics are taken. In the second phase, the user application algorithm is executed while searching for the best V-F pair. When the best V-F configuration is found, the devised optimization mechanism continues to monitor the user application to guarantee safe operation, reacting to eventual \acrshort{gpu} state changes (for example, changing temperature).
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=0.95\textwidth]{Figures/Optimization/full_mech_5.pdf}
+  \includegraphics[width=\textwidth]{Figures/Optimization/full_mech6.pdf}
   \caption{V-F Optimization Mechanism Block Diagram.}
   \label{fig:opt_mech}
 \end{figure}
 
-On this context, the best V-F configuration is, depending on the optimization metric, the one that achieves the highest \textit{performance}, lowest \textit{energy consumption}, or higher \textit{energy efficiency} for the running application. Targeting the dissertation objective, the chosen and exemplified metric from now on is \textit{energy efficiency} compute as the \acrshort{edp}, where 
+On this context, and depending on the considered optimization metric, the best V-F configuration is the one that achieves the highest \textit{performance}, lowest \textit{energy consumption}, or higher \textit{energy efficiency} for the running application. Taking into account the main objective of this dissertation, the chosen and exemplified metric from now on is \textit{energy efficiency}, evaluated using the \acrshort{edp} metric, where 
 \begin{equation}
 	EDP=energy * computation \: time.
 	\label{eq:edp}
 \end{equation}
 
-\subsubsection{Gather DVFS information}
+\subsubsection{Analyze user input and test DVFS information}
 
-The proposed procedure starts with an initial stage where information about the current \acrshort{gpu} device \acrshort{dvfs} is gathered. This information is a summary of the characterization results obtained in Chapter 3, which includes the Core \acrshort{dvfs} default frequencies and voltages and attained $V_{min}$ of each frequency (that guaranteed correct operation in all tested benchmarks). The collected data sets the usable execution space (top right chart of Figure~\ref{fig:gpu_char}), which will be explored by the optimization mechanism.
-
-\subsubsection{Establish baseline measurement}
-
-In this stage, a step of the algorithm is executed with the highest frequency-voltage pair select, while the execution time and energy consumption are measured to compute the baseline \acrshort{edp} value. All the following measurements are normalized to this first result, in order to compare the results at different V-F pairs.
+The proposed procedure starts by receiving a user input that summarizes the characterization results obtained in Chapter 3. The summary includes the tested Core \acrshort{dvfs} frequencies and allowed voltage range for each frequency that guaranteed a correct operation in all tested benchmarks. Figure~\ref{fig:input} shows an example input to the mechanism and their corresponding usable execution space. There, the user should indicate the tested frequencies and corresponding $V_{max}$ and $V_{min}$. After that, information about the current \acrshort{gpu} device \acrshort{dvfs} system is gathered and compared to the user input, guaranteeing the validity of the proposed usable execution space, which will be explored by the optimization mechanism.
 
 
-\subsubsection{Algorithm Execution}
-
-In general, each stage of the Algorithm Execution phase follows the block diagram of Figure~\ref{fig:detail_mech}. Before executing the algorithm step, the energy and computation time measurement is started. After the step is concluded, the energy and computation time are computed, and in addition to specific application status, the results are provided for the optimization mechanism. 
-
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width=0.75\textwidth]{Figures/Optimization/opt_pre_run.pdf}
-  \caption{Pre-Run V-F Optimization Mechanism Block Diagram.}
-  \label{fig:detail_mech}
+\begin{figure}[!htb]
+    \begin{center}
+        \begin{minipage}[t]{.5\textwidth}
+            \vspace{0pt}
+            \centering
+            \resizebox{\textwidth}{!}{%
+            \begin{tabular}{l}
+                \texttt{[Frequencies] 990  1140  1270  1350  1440  1530  1600}\\
+                \texttt{[Vmax]        900  950   1000  1050  1100  1150  1200}\\
+                \texttt{[Vmin]        900  900   900   950   975   1000  1075}
+            \end{tabular}
+            }
+        \end{minipage}%
+        \begin{minipage}[t]{.45\textwidth}
+            \vspace{0pt}
+            \centering
+            \includegraphics[width=\textwidth]{Figures/Optimization/UESex.pdf}
+            \label{fig:uesex}
+        \end{minipage}
+    \end{center}
+    \label{fig:input}
+    \caption{Input example for the optimization mechanism (left) and correspondent usable execution space chart (rigth).}
 \end{figure}
 
-\subsubsection{Algorithm Execution - Space Exploration}
 
-The objective of the this stage, \textit{Space Exploration}, is to find a V-F configuration that achieves an \acrshort{edp} value near the best possible one. In mathematical terms, to each V-F pair corresponds one \acrshort{edp} value, forming the function $EDP(f, V)$, so the objective is to find a good approximation of $min(EDP(f, V))$. The main difficulty is finding a valid configuration without testing all the possible ones, as performed on Chapter~\ref{chapter:gpu_char}. To tackle this problem, the mechanism applies the \textit{Simulated Annealing} algorithm to accept or reject a new V-F configuration based on the computed \acrshort{edp} value. This algorithm excels at finding an approximate global optimum in a fixed amount of iterations. 
 
-At the end of each step of the space exploration stage, if the achieved \acrshort{edp} value is smaller than the current baseline, the current V-F configuration is stored alongside the \acrshort{edp} value as the current \textit{V-F pair baseline} and also inserted on a list of best configurations. If the tested configuration did not improve the \acrshort{edp} value, it can also be stored as \textit{V-F pair baseline} accordingly with the simulated annealing algorithm. Based on the current \textit{V-F pair baseline}, the new V-F configuration is randomly generated accordingly with Algorithm~\ref{alg:space-frequency} followed by Algorithm~\ref{alg:space-voltage}.
+
+
+% \begin{figure}[!htb]
+%     \centering
+%     \begin{subfigmatrix}{2}
+%     \subfigure[Data input.]{
+%       \label{tab:input}
+%       \resizebox{0.4\textwidth}{!}{%
+%         \begin{tabular}{l}
+%             \texttt{[Frequencies] 990  1140  1270  1350  1440  1530  1600}\\
+%             \texttt{[Vmax]        900  950   1000  1050  1100  1150  1200}\\
+%             \texttt{[Vmin]        900  900   900   950   975   1000  1075}
+%         \end{tabular}
+%         }
+%     }
+%       \subfigure[Example Usable Execution Space.]{
+%         \centering\includegraphics[width=0.45\textwidth]{Figures/Optimization/UESex.pdf}
+%         \label{fig:uesex}
+%       }
+%     \end{subfigmatrix}
+%     \caption{Input example for the optimization mechanism. - QUAL ESCOLHER???}
+% \end{figure}
+
+
+
+\subsubsection{Establishment of baseline measurement}
+
+In this stage, a single step of the user application is executed with the highest frequency-voltage pair that was identified on the previous step, while the execution time and energy consumption are measured to compute the baseline \acrshort{edp} value. All the following measurements are normalized to this first result, in order to compare the results at different V-F configurations.
+
+\subsubsection{Optimization Algorithm Execution}
+
+In general, each stage of the Optimization Algorithm Execution phase (\textit{Space Exploration} and \textit{Fine-Tuning}) follows the flowchart presented in Figure~\ref{fig:flowchart}. This has three distinct phases indicated as \textit{Application execution and metrics}, \textit{V-F control} and \textit{Online monitorization}. The first and last phase stay the same for the two stages of the Optimization Algorithm Execution, however, the second \textit{V-F control}, varies between the \textit{Space Exploration} and \textit{Fine-Tuning} stages as depicted above.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[height=0.95\textwidth]{Figures/Optimization/flowchart.pdf}
+  \caption{Flowchart of iteration of Optimization Algorithm Execution.}
+  \label{fig:flowchart}
+\end{figure}
+
+\bigskip
+\noindent\underline{Application execution and metrics}
+\bigskip
+
+On the \textit{Application execution and metrics}, an iteration of the user application is executed, and the performance and energy consumption is evaluated to compute the optimization metric \acrshort{edp}. 
+
+\bigskip
+\noindent\underline{V-F control}
+\bigskip
+
+
+This phase aims to analyze the optimization metric, \acrshort{edp} value, and, according to a probabilistic technique, accept or reject the tested V-F configuration to generate a new V-F pair.
+
+As previously state, the devised V-F Optimization Mechanism iterative optimization mechanism works by exploring the usable execution space V-F configurations while measuring the resulting \acrshort{edp} value for each of them. The challenge here is to find the most suitable configuration (corresponding to the V-F pair that minimizes the target metric) without testing every possible configuration, as performed on Chapter~\ref{chapter:gpu_char}. A panoply of algorithms could be employed to decide which configurations to test while searching for the global minimum of the $EDP(f, V)$ function. The decision was to use as probabilistic technique, the mathematical optimization technique of Hill Climbing~\cite{vaughan_simultaneous_2005} or the metaheuristic algorithm Simulated Annealing~\cite{kirkpatrick_optimization_1983} (depending on the Optimization Algorithm Execution stage), that builds on the first by improving its ability to escape local minimums and, and so improving the chances of finding an approximate global optimum in a fixed amount of iterations. 
+
+In more detail, after the \textit{Application execution and metrics} stage, if the achieved \acrshort{edp} value is smaller than the current baseline, the current V-F configuration is stored alongside the corresponding \acrshort{edp} value as the current \textit{V-F pair baseline} and it is inserted on a list of best configurations. Based on the current \textit{V-F pair baseline}, the new V-F configuration is randomly generated using the specific algorithms depicted ahead.
+
+
+\bigskip
+\underline{Space Exploration}
+\bigskip
+
+As the name implies, this stage's objective is to explore the usable execution space, finding a V-F configuration that achieves a good approximation of $min(EDP(f, V))$ in a reduced number of iterations.
+To tackle this problem, the \textit{Simulated Annealing} algorithm was applied as the Probabilistic Technique (see Figure~\ref{fig:flowchart}) of this stage. Since without any prior knowledge, it is impossible to guarantee that $EDP(f, V)$ does not contain any local minimums, it is better to use an algorithm that can decrease the chance of those impacting the final chosen V-F configuration. This is reflected in practice by the algorithm allowing for some tested V-F pairs that did not achieve a better \acrshort{edp} value, to be accepted as stored as \textit{V-F pair baseline} and so, escaping from a possible local minimum. Based on the current \textit{V-F pair baseline}, the new V-F configuration is randomly generated according to Algorithm~\ref{alg:space-frequency} followed by Algorithm~\ref{alg:space-voltage}.
 
 \begin{algorithm}
     \caption{Space Exploration - Generate new frequency.}
@@ -136,15 +193,14 @@ At the end of each step of the space exploration stage, if the achieved \acrshor
 \end{algorithmic}
 \end{algorithm}
 
+If no better configuration is found after $ N $ execution steps, or the predefined \textit{Space Exploration Steps} are concluded, the \textit{Space Exploration} phase is ended, and the list of best configurations is analyzed, with the V-F configuration that achieved the best \acrshort{edp} acting as a baseline for the \textit{Fine-Tuning} phase.
 
-If, after $ N $ execution steps, if no better configuration is found, or the predefined \textit{Space Exploration Steps} are concluded, the \textit{Space Exploration} phase is ended, and the list of best configurations is analyzed, with the V-F configuration that achieved the best \acrshort{edp} acting as a baseline for the \textit{Fine-Tuning} phase.
 
+\bigskip
+\underline{Fine-Tuning}
+\bigskip
 
-\subsubsection{Algorithm Execution - Fine-tuning}
-
-After the execution of the \textit{Space Exploration} phase, a quasi-optimal configuration is found. The second phase is responsible for fine-tuning the V-F pair obtained by the previous stage to achieve the actual global minimum of $EDP(f, V)$. That optimal configuration may be between two default frequencies and at a voltage level than required to discretize the voltage range more finely.
-
-The overall scheme of this phase is similar to the \textit{Space Exploration}. However, in this case, the \textit{Hill Climbing} algorithm is used instead. This algorithm only accepts a new configuration if it is able to further minimize the \acrshort{edp} value, being specialized in finding the global optimization minimum having the certainty that it is on the neighborhood of the initial phase V-F configuration. The new V-F configuration is now obtained with Algorithm~\ref{alg:fine-frequency} followed by Algorithm~\ref{alg:fine-voltage}.
+After the execution of the \textit{Space Exploration} stage, a quasi-optimal configuration is found. Considering that the current \textit{V-F pair baseline} is near the global minimum of $EDP(f, V)$, the second stage is responsible for fine-tuning the that V-F pair to achieve the actual global minimum. For that, it performs  \textit{Hill Climbing} around the baseline configuration, only accepting V-F pairs that achieve a better \acrshort{edp} value. The optimal configuration may be between two default frequencies and at a voltage level than required to discretize the voltage range more finely. For that, the Algorithms~\ref{alg:fine-frequency} and \ref{alg:fine-voltage} are used that discretize both variables in 10 mV and 10 MHz steps.
 
 \begin{algorithm}
     \caption{Fine-tuning - Generate new frequency.}
@@ -188,85 +244,177 @@ The overall scheme of this phase is similar to the \textit{Space Exploration}. H
 \end{algorithmic}
 \end{algorithm}
 
+\bigskip
+\noindent\underline{Online monitorization}
+\bigskip
+
+The \textit{Online monitorization} introduces two other inputs to the optimization mechanism: the device temperature and optionally, the application output that helps to guarantee that the system is safe to use. As it was referred to in Chapter 3, these two new metrics impact the amount of undervoltage that is allowed by changing the voltage defined by the \textit{V-F control} phase. 
+
+If the user is able to get an output variable from their application that can identify the output validity (for example, a floating-point number which is tested to see if it becomes Not a Number - NaN), it is possible to include that analysis metric to be executed in each iteration of the user application, or at every $x$ number of iterations.
+Considering that it is possible to validate the application output, the new V-F configuration is provided to that procedure (\textit{Analyze Application Output}), which analyzes the user application iteration output and conclude its validity. If the output is evaluated as invalid, this procedure increases the voltage by $10$mV (decreasing the amount of undervoltage). Finally, the chosen frequency is given to the \textit{Temperature Model}, depicted in Section~\ref{sec:temp_model}, which reduces the amount of undervoltage when the device temperature surpasses the 70ºC.  At the end of these two processes, the new V-F pair is generated and applied on the \acrshort{gpu} in order to proceed with the algorithm execution.
+
+It should be noted that the analysis of the application output acts as a fail-safe, and it is not mandatory in the execution of the optimization mechanism since the correct use of the methodology introduced in Chapter 3 already guarantees the correct \acrshort{gpu} voltage operation limits.
 
 
-\subsection{Online Monitorization}
 
-The online monitorization is in action on the algorithm executions phases of the optimization mechanism. It introduces two other inputs to the optimization mechanism, device temperature and application status that help to guarantee that the system is safe to use. These two new metrics impact the amount of undervoltage allowed, by changing the voltage produced by Algorithms~\ref{alg:space-frequency} to \ref{alg:fine-voltage}. As depicted in Figure~\ref{fig:monitorization}, the Algorithms~ref{alg:space-frequency} generates a new V-F pair based on the current baseline V-F configuration. The new configuration is then provided to the \textit{Analyze Application Output} procedure that receives a flag from the user that indicates if the last application output is valid (for example, a float did not become a Not a Number - NaN). If that is the case, this block increases the voltage by $10$mV. Finally, the chosen frequency is given to the \textit{Temperature Model} depicted in Section~\ref{sec:temp_model}, which reduces the amount of undervoltage when the device temperature surpasses the 70ºC.  At the end of these three stages, the new V-F pair is generated and applied on the \acrshort{gpu} in order for the algorithm execution to proceed.
+
+\section{Optimization Mechanism Implementation}
+\label{sec:implementation}
+
+The devised V-F optimization mechanism was developed in Python and acts as a wrapper with functions that allow the user to implement and integrate the mechanism around its application. The decision for this programming language was purely out of convenience for the language used on the application to deep learning performed in Chapter 5. The same procedures can and should be implemented on the target application's programming language to improve and facilitate the communication of the measurements between the different blocks that implement the optimization mechanism.
+Figure~\ref{fig:layer} presents a layer diagram of the developed optimization mechanism, illustrating the main \acrshort{api}s used by the tool to communicate with the \acrshort{gpu} device, in order to control the voltage-frequency pair that is applied on the \acrshort{dvfs} Core domain, according to the user application output and device target energy consumption and performance profile.
+
+The user invokes the appropriate developed functions (more detail provided on Section~\ref{sec:usage}) that communicate with the gpowerSAMPLER (energy measuring) tool and rocm-smi and ROCk (voltage-frequency control) \acrshort{api}s to retrieve and control the related parameters of their \acrshort{gpu} device. 
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=0.9\textwidth]{Figures/Optimization/online_monitoring.pdf}
-  \caption{Online Monitorization Block Diagram.}
-  \label{fig:monitorization}
+  \includegraphics[width=0.6\textwidth]{Figures/Optimization/layerDiagram.pdf}
+  \caption{Layer diagram of the developed V-F Optimization Mechanism.}
+  \label{fig:layer}
 \end{figure}
 
 
-
-To note that the analyze of the application output acts as a fail-safe that should not be necessary if a valid exploration space and temperature model are acquired for the present \acrshort{gpu}.
-
-
-
-\section{Users guide}
+\section{Library description}
 \label{sec:usage}
 
-This section presents the correct way for users to include the V-F optimization mechanism on their \acrshort{gpgpu} applications. As indicated, the wrapper that provides all the functions to enable this mechanism was developed in Python. Using this languange, it is possible to launch any other application developed in Python or not. To accomodate those cases, the interface between the Python wrapper and the user application is made through a named pipe (FIFO).
+This section presents the correct way for users to include the V-F optimization mechanism on their \acrshort{gpgpu} applications. As indicated, the wrapper that provides all the functions to enable this mechanism was developed in Python. However, the description of the functions provided in Listing~\ref{lst:wrapper_doc} should allow for porting the same for others programming languages. 
+
+\begin{lstlisting}[language=Python, caption=Python wrapper documentation., label=lst:wrapper_doc, basicstyle=\footnotesize\ttfamily,abovecaptionskip=0pt, captionpos=b,escapechar=@]
+@\textbf{def initOptimizationMechanism(pathToCharacterizationResults):}@
+    """Analyze the user provided Usable Execution Space and query the dvfs control 
+    interface of the device (rocm-smi on the current implementation) to guarantee 
+    that the indicated frequency and voltage ranges are allowed by the target device.
+    
+    Args:
+        pathToCharacterizationResults: string
+            path to the \texttt{.txt} file in the format indicated on Figure 4.2.
+    """
+    
+@\textbf{def initMesurements():}@
+    """Initiates the execution time and energy consumption measurement 
+    (gpowerSAMPLER on the current implementation).
+    """
+
+@\textbf{def computeMesurements(baseline=None):}@
+    """indicates to end of the execution time and energy consumption measurement 
+    (gpowerSAMPLER on the current implementation). 
+    If argument baseline is provided, the output is normalized to each baseline value
+    
+    Args:
+        baseline: dictionary, default: None
+            dictionary containing the entries performance and energy that indicate the
+            baseline values.
+    Returns:
+        dictionary containing the entries performance and energy that indicate the
+        measured values.
+    """
+
+@\textbf{def analiseOutput(output):}@
+    """method that should be implemented by final user.
+    Analyzes user application output to determine its validity.
+    
+    Args:
+        output: string/float/int
+            output of the user application.
+    Returns:
+        Boolean indicating user application output valitidy.
+    """
+    
+@\textbf{def optimizationMechanismSpaceExploration(measurements, 
+                                          optimizationMetric="EDP", 
+                                          outputValid=None):}@
+    """Analyzes application measurements and applies new V-F configuration
+    
+    Implements the Simulated Annealing algorithm to accept or reject the tested V-F pair
+    in accordance with the current baseline V-F pair. If configuration is accepted,
+    current baseline V-F pair becomes tested V-F pair. It also implements the 
+    Online Monitorization phase.
+    
+    Args:
+        measurements: dictionary
+            dictionary containing the entries performance and energy that indicate the
+            measured application results.
+        optimizationMetric: string
+            chosen optimization metric between "energy", "performance" and "EDP".
+        measurements: boolean, default=None
+            bolean indicating the user application output is valid. If equal to None,
+            the Analyze Application Output step is ignored.
+    Returns:
+        Boolean indicating if the new V-F pair was accepted or not.
+    """
+    
+@\textbf{def optimizationMechanismFineTunning(measurements, 
+                                     optimizationMetric="EDP", 
+                                     outputValid=None):}@
+    """Analyzes application measurements and applies new V-F configuration
+    
+    Implements the Hill Climbing algorithm to accept or reject the tested V-F pair
+    in accordance with the current baseline V-F pair. If configuration is accepted,
+    current baseline V-F pair becomes tested V-F pair. It also implements the 
+    Online Monitorization phase.
+    
+    Args:
+        measurements: dictionary
+            dictionary containing the entries performance and energy that indicate the
+            measured application results.
+        optimizationMetric: string
+            chosen optimization metric between "energy", "performance" and "EDP".
+        measurements: boolean, default=None
+            bolean indicating the user application output is valid. If equal to None,
+            the Analyze Application Output step is ignored.
+    """
+\end{lstlisting}
+
 
 Listing~\ref{lst:wrapper} provides an example of the order and place where each function call should be performed and where the user should insert its application code.
 
-
-\begin{figure}[h]
-    \begin{lstlisting}[language=Python, caption=Example of usage of V-F Optimization Mechanism, label=lst:wrapper, basicstyle=\footnotesize\ttfamily,abovecaptionskip=0pt, captionpos=b]
-    initOptimizationMechanism(pathToCharacterizationResults)
-    ...
-    initMesurements()
+\begin{lstlisting}[language=Python, caption=Example of usage of V-F Optimization Mechanism Library. Bold statements represents the added programming elements for the mechanism, label=lst:wrapper, basicstyle=\footnotesize\ttfamily,abovecaptionskip=0pt, captionpos=b,escapechar=@]
+    @\textbf{initOptimizationMechanism(pathToCharacterizationResults)}@
+    ... initiate user application ...
+    @\textbf{initMesurements()}@
     ... execute baseline execution ...
-    baselineMeasurements = computeMesurements()
-    ...
+    baselineMeasurements = @\textbf{computeMesurements()}@
+    @\textbf{rejected = 0}@
+    @\textbf{executedIterations = 0}@
     for epoch in range(space_exploration_epochs):
-        initMesurements()
-        
+        @\textbf{initMesurements()}@
         ... code of application step ...
-        
-        measurements = computeMesurements()
-        
-        outputValid = analiseOutput(output)
+        measurements = @\textbf{computeMesurements(baselineMeasurements)}@
+        ... other necessary user application iteration operations that do not account
+        for the user algorithm execution ...
+        outputValid = @\textbf{analiseOutput(output)}@
         
         # analyses the measurements, application output, temperature
         # generates and applies new V-F configuration
-        optimizationMechanismSpaceExploration(measurements, outputValid)
-    ...
-    for epoch in range(total_number_of_epochs - space_exploration_epochs):
-        initMesurements()
-        
+        @\textbf{accepted = optimizationMechanismSpaceExploration(measurements, outputValid)}@
+        @\textbf{executedIterations += 1}@
+        @\textbf{if accepted == False:}@
+            @\textbf{rejected += 1}@
+        @\textbf{if rejected == 5:}@
+            @\textbf{break}@
+    
+    for epoch in range(total_number_of_epochs - executedIterations):
+        @\textbf{initMesurements()}@
         ... code of application step ...
-        
-        measurements = computeMesurements()
-        
-        outputValid = analiseOutput(output)
+        @\textbf{measurements = computeMesurements(baselineMeasurements)}@
+         ... other necessary user application iteration operations that do not account
+        for the user algorithm execution ...
+        outputValid = @\textbf{analiseOutput(output)}@
         
         # analyses the measurements, application output, temperature
         # generates and applies new V-F configuration
-        optimizationMechanismFineTunning(measurements, outputValid)
-    ...
-    \end{lstlisting}
-\end{figure}
+        @\textbf{optimizationMechanismFineTunning(measurements, outputValid)}@
+\end{lstlisting}
 
 
-The user should implement the \texttt{analiseOutput()} function in accordance with Listing~\ref{lst:analiseOutput}
 
-\begin{figure}[h]
-    \begin{lstlisting}[language=Python, caption=analiseOutput function prototype, label=lst:analiseOutput, basicstyle=\footnotesize\ttfamily,abovecaptionskip=0pt, captionpos=b]
-    def analiseOutput(output):
-        ... analise output variable content to understand if output is valid ...
-        if(valid)
-            return True
-        return False
-    \end{lstlisting}
-\end{figure}
+
 
 \section{Summary}
 
-The development of the V-F Optimization Mechanism described in this chapter fulfills the objective of having a concrete manner of providing a non-conventional \acrshort{dvfs} system. The devised mechanism uses the previous chapter's experimental results to enable a final user to use the uncover V-F pairs to extract better energy-efficiency of their devices without having any detailed knowledge of the \acrshort{gpu} architecture.
+The development of the V-F Optimization Mechanism that was described in this chapter fulfills the objective of having a concrete 
 
-The following chapter provides the application of both the characterization and implementation of this mechanism to improve the energy-efficiency of the Vega 10 \acrshort{gpu} when running deep learning applications.
+to providing a non-conventional \acrshort{dvfs} system. The devised mechanism uses the previous chapter's experimental results to provide the user with convenient models that support the uncover V-F pairs to extract better energy-efficiency of their devices without having any detailed knowledge of the \acrshort{gpu} architecture.
+
+The following chapter demonstrates and evaluates the application of both the characterization and optimization mechanisms to improve the energy-efficiency of the Vega 10 \acrshort{gpu} when running deep learning applications.
+
