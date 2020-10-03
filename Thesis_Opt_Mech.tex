@@ -285,133 +285,74 @@ The user invokes the appropriate developed functions (more details provided on S
 \section{Library description}
 \label{sec:usage}
 
-This section describes how users should include the V-F optimization mechanism on their \acrshort{gpgpu} applications. As indicated, the wrapper that provides all the functions to enable this mechanism was developed in Python. However, the description of the functions provided in Listing~\ref{lst:wrapper_doc} should allow for porting the same for others programming languages. 
+This section describes how users should include the V-F optimization mechanism on their \acrshort{gpgpu} applications. As indicated, the wrapper that provides all the functions to enable this mechanism was developed in Python. However, the description of the functions provided ahead should allow for porting the same for others programming languages.
 
-\begin{lstlisting}[language=Python, caption=Python wrapper documentation., label=lst:wrapper_doc, basicstyle=\footnotesize\ttfamily,abovecaptionskip=0pt, captionpos=b,escapechar=@]
-@\textbf{def initOptimizationMechanism(pathToCharacterizationResults):}@
-    """Analyze the user provided Usable Execution Space and query the dvfs control 
-    interface of the device (rocm-smi on the current implementation) to guarantee 
-    that the indicated frequency and voltage ranges are allowed by the target device.
-    
-    Args:
-        pathToCharacterizationResults: string
-            path to the \texttt{.txt} file in the format indicated on Figure 4.2.
-    """
-    
-@\textbf{def initMesurements():}@
-    """Initiates the execution time and energy consumption measurement 
-    (gpowerSAMPLER on the current implementation).
-    """
+\textbf{def initOptimizationMechanism(pathToCharacterizationResults):}
 
-@\textbf{def computeMesurements(baseline=None):}@
-    """indicates to end of the execution time and energy consumption measurement 
-    (gpowerSAMPLER on the current implementation). 
-    If argument baseline is provided, the output is normalized to each baseline value
-    
-    Args:
-        baseline: dictionary, default: None
-            dictionary containing the entries performance and energy that indicate the
-            baseline values.
-    Returns:
-        dictionary containing the entries performance and energy that indicate the
-        measured values.
-    """
+Analyzes the user-provided Usable Execution Space file and queries the device \acrshort{dvfs} control interface (rocm-smi on the current implementation) to guarantee that the indicated frequency and voltage ranges are allowed by the target device.
 
-@\textbf{def analiseOutput(output):}@
-    """method that should be implemented by final user.
-    Analyzes user application output to determine its validity.
+\textbf{def initMesurements():}
+
+Initiates the execution time and energy consumption measurement (gpowerSAMPLER on the current implementation).
+
+\textbf{def computeMesurements(baseline=None):}
+
+Indicates to end of the execution time and energy consumption measurement (gpowerSAMPLER on the current implementation) and returns both results. If the argument baseline, containing the baseline performance and energy measurement values, is provided, the output is normalized to each baseline value.
+
+
+\textbf{def analiseOutput(output):}
+
+A method that should be implemented by the developer that analyzes the user application output to determine its validity. The function returns a boolean indicating the ser application output validity.
     
-    Args:
-        output: string/float/int
-            output of the user application.
-    Returns:
-        Boolean indicating user application output valitidy.
-    """
-    
-@\textbf{def optimizationMechanismSpaceExploration(measurements, 
-                                          optimizationMetric="EDP", 
-                                          outputValid=None):}@
-    """Analyzes application measurements and applies new V-F configuration
-    
-    Implements the Simulated Annealing algorithm to accept or reject the tested V-F pair
-    in accordance with the current baseline V-F pair. If configuration is accepted,
-    current baseline V-F pair becomes tested V-F pair. It also implements the 
-    Online Monitorization phase.
-    
-    Args:
-        measurements: dictionary
-            dictionary containing the entries performance and energy that indicate the
-            measured application results.
-        optimizationMetric: string
-            chosen optimization metric between "energy", "performance" and "EDP".
-        measurements: boolean, default=None
-            bolean indicating the user application output is valid. If equal to None,
-            the Analyze Application Output step is ignored.
-    Returns:
-        Boolean indicating if the new V-F pair was accepted or not.
-    """
-    
-@\textbf{def optimizationMechanismFineTunning(measurements, 
-                                     optimizationMetric="EDP", 
-                                     outputValid=None):}@
-    """Analyzes application measurements and applies new V-F configuration
-    
-    Implements the Hill Climbing algorithm to accept or reject the tested V-F pair
-    in accordance with the current baseline V-F pair. If configuration is accepted,
-    current baseline V-F pair becomes tested V-F pair. It also implements the 
-    Online Monitorization phase.
-    
-    Args:
-        measurements: dictionary
-            dictionary containing the entries performance and energy that indicate the
-            measured application results.
-        optimizationMetric: string
-            chosen optimization metric between "energy", "performance" and "EDP".
-        measurements: boolean, default=None
-            bolean indicating the user application output is valid. If equal to None,
-            the Analyze Application Output step is ignored.
-    """
-\end{lstlisting}
+\textbf{def optimizationMechanismSpaceExploration(measurements, optimizationMetric="EDP", outputValid=None):}
+
+Analyzes application measurements and apply the new V-F configuration. The function receives the performance and energy measurements, the optimization metric and the results of the application output validity and implements the Simulated Annealing algorithm to accept or reject the tested V-F pair in accordance with the current \textit{V-F pair baseline}. If the configuration is accepted, the current \textit{V-F pair baseline} becomes the tested V-F pair. The method returns if the tested pair was accepted or not. It also implements the Online Monitorization phase.
+
+
+\textbf{def optimizationMechanismFineTunning(measurements, optimizationMetric="EDP", outputValid=None):}
+
+Similar to the previous function, however it implements the Hill-Climbing algorithm as Probabilistic Technique.
 
 
 Listing~\ref{lst:wrapper} provides an example of the order and place where each function call should be performed and where the user should insert its application code.
 
-\begin{lstlisting}[language=Python, caption=Example of usage of V-F Optimization Mechanism Library. Bold statements represents the added programming elements for the mechanism, label=lst:wrapper, basicstyle=\footnotesize\ttfamily,abovecaptionskip=0pt, captionpos=b,escapechar=@]
-    @\textbf{initOptimizationMechanism(pathToCharacterizationResults)}@
+
+\begin{lstlisting}[language=Python, caption=Example of usage of V-F Optimization Mechanism Library. Blue statements represents the added programming elements for the mechanism, label=lst:wrapper, basicstyle=\footnotesize\ttfamily,abovecaptionskip=0pt, captionpos=b,escapechar=@]
+    @\textcolor{blue}{\textbf{initOptimizationMechanism(pathToCharacterizationResults)}}@
     ... initiate user application ...
-    @\textbf{initMesurements()}@
+    @\textcolor{blue}{\textbf{initMesurements()}}@
     ... execute baseline execution ...
-    baselineMeasurements = @\textbf{computeMesurements()}@
-    @\textbf{rejected = 0}@
-    @\textbf{executedIterations = 0}@
+    baselineMeasurements = @\textcolor{blue}{\textbf{computeMesurements()}}@
+    @\textcolor{blue}{\textbf{rejected = 0}}@
+    @\textcolor{blue}{\textbf{executedIterations = 0}}@
     for epoch in range(space_exploration_epochs):
-        @\textbf{initMesurements()}@
+        @\textcolor{blue}{\textbf{initMesurements()}}@
         ... code of application step ...
-        measurements = @\textbf{computeMesurements(baselineMeasurements)}@
+        measurements = @\textcolor{blue}{\textbf{computeMesurements(baselineMeasurements)}}@
         ... other necessary user application iteration operations that do not account
         for the user algorithm execution ...
-        outputValid = @\textbf{analiseOutput(output)}@
+        outputValid = @\textcolor{blue}{\textbf{analiseOutput(output)}}@
         
         # analyses the measurements, application output, temperature
         # generates and applies new V-F configuration
-        @\textbf{accepted = optimizationMechanismSpaceExploration(measurements, outputValid)}@
-        @\textbf{executedIterations += 1}@
-        @\textbf{if accepted == False:}@
-            @\textbf{rejected += 1}@
-        @\textbf{if rejected == 5:}@
-            @\textbf{break}@
+        @\textcolor{blue}{\textbf{accepted = optimizationMechanismSpaceExploration(measurements, outputValid)}}@
+        @\textcolor{blue}{\textbf{executedIterations += 1}}@
+        @\textcolor{blue}{\textbf{if accepted == False:}}@
+            @\textcolor{blue}{\textbf{rejected += 1}}@
+        @\textcolor{blue}{\textbf{if rejected == 5:}}@
+            @\textcolor{blue}{\textbf{break}}@
     
     for epoch in range(total_number_of_epochs - executedIterations):
-        @\textbf{initMesurements()}@
+        @\textcolor{blue}{\textbf{initMesurements()}}@
         ... code of application step ...
-        @\textbf{measurements = computeMesurements(baselineMeasurements)}@
+        @\textcolor{blue}{\textbf{measurements = computeMesurements(baselineMeasurements)}}@
          ... other necessary user application iteration operations that do not account
         for the user algorithm execution ...
-        outputValid = @\textbf{analiseOutput(output)}@
+        outputValid = @\textcolor{blue}{\textbf{analiseOutput(output)}}@
         
         # analyses the measurements, application output, temperature
         # generates and applies new V-F configuration
-        @\textbf{optimizationMechanismFineTunning(measurements, outputValid)}@
+        @\textcolor{blue}{\textbf{optimizationMechanismFineTunning(measurements, outputValid)}}@
 \end{lstlisting}
 
 
