@@ -185,8 +185,8 @@ Figures~\ref{fig:Convolution_behaviour} and \ref{fig:Convolution_EDP} illustrate
 
 \begin{figure}[htb]
   \begin{subfigmatrix}{2}
-    \subfigure[Inference]{\label{fig:Convolution_Inference_behaviour}\includegraphics[width=0.65\textwidth]{Figures/Application To Deep Learning/Convolution_Inference_Behaviour.pdf}}
-    \subfigure[Training]{\label{fig:Convolution_Backprop_behaviour}\includegraphics[width=0.65\textwidth]{Figures/Application To Deep Learning/Convolution_Backprop_Behaviour.pdf}}
+    \subfigure[Inference]{\label{fig:Convolution_Inference_behaviour}\includegraphics[width=0.47\textwidth]{Figures/Application To Deep Learning/Convolution_Inference_Behaviour.pdf}}
+    \subfigure[Training]{\label{fig:Convolution_Backprop_behaviour}\includegraphics[width=0.47\textwidth]{Figures/Application To Deep Learning/Convolution_Backprop_Behaviour.pdf}}
   \end{subfigmatrix}
   \caption{Core domain - Convolution Layer behaviour to non-conventional V-F configurations.}
   \label{fig:Convolution_behaviour}
@@ -279,7 +279,7 @@ Figure~\ref{fig:MatrixMult_errors} represents the same evaluation for the Fully 
 
 Hence, the obtained results demonstrate that the amount of error introduced by these lowest voltages before crash conditions, on the two most important layers, are cooped with both \acrshort{dnn} training and inference, demonstrating the ample viability of this approach.
 
-\newpage
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{CNN training and inference with non-conventional V-F}
 \label{section:enhanced}
@@ -327,7 +327,7 @@ In more detail, Figure~\ref{fig:CNN_loss}, presents the behavior of the loss and
 
 \begin{figure}[htb]
     \centering
-        \includegraphics[width=0.95\textwidth]{Figures/Application To Deep Learning/CNN_loss_acc.pdf}
+        \includegraphics[width=0.9\textwidth]{Figures/Application To Deep Learning/CNN_loss_acc.pdf}
         \caption{Core domain - CNN models - superposition of all V-F configuration test set loss and model accuracy.}
     \label{fig:CNN_loss}
 \end{figure}
@@ -444,9 +444,9 @@ The four different \acrshort{cnn} architectures were tested under the V-F Optimi
     \begin{axis}
     [  
     width=0.8\linewidth,
-    height=0.45\linewidth,
+    height=0.4\linewidth,
     view={-45}{45},
-    xmin=990, xmax=1600,
+    xmin=950, xmax=1600,
     ymin=900, ymax=1200,
     zmin=0.5, zmax=1,
     ytick={900, 1000, 1100, 1200},
@@ -463,7 +463,7 @@ The four different \acrshort{cnn} architectures were tested under the V-F Optimi
     \end{axis}
 
     \end{tikzpicture}
-    \caption{WideResNet - \textit{Space Exploration} normalized \acrshort{edp} values for 20 epochs. Initial value is 1600MHz and 1.2V.}
+    \caption{WideResNet \textit{Space Exploration} example - normalized \acrshort{edp} values for 20 epochs. Initial value is 1600MHz and 1.2V.}
     \label{fig:3d}
 \end{figure}
 

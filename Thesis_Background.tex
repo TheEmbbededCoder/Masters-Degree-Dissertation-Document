@@ -70,18 +70,36 @@ For the last 40 years, \acrshort{cmos} (Complementary metal-oxide-semiconductor)
 
 There are two defined logic levels in digital circuits: logic level $0$ and $1$, each represented by an analog voltage range. To ensure its operations, the circuit requires a DC voltage value $V_{DD}$. The logic gates are excited through an input voltage $V_{i}$ and an output voltage $V_o$, corresponding to the logic level resulting from their logic function (see Figure~\ref{fig:cmos}). As it is illustrated in Figure~\ref{fig:cmos_noise_margin}, the voltage range at the input of the logic gates is correctly interpreted if it falls inside a given range. Logic level $0$ corresponds to the interval between $GND$ ($0V$) to $V_{IL}$, while logic level $1$ corresponds to the interval between $V_{IH}$ to $V_{DD}$. In turn, the output is considered $0$ if it goes from $GND$ ($0V$) to $V_{OL}$ and logic level $1$ from $V_{OH}$ to $V_{DD}$. The limits of the input and output logic levels depend on the intrinsic characteristics of the transistors, such as their dimensions and transconductance values. In addition to the transistors characteristics and operating voltage, any digital circuit is also characterized by their frequency of operation.
 
-\begin{figure}[htb]
-    \centering
-    \includegraphics[width=30mm]{Figures/Background/cmos_inverter.pdf}
-    \caption{CMOS inverter.}
-    \label{fig:cmos}
-\end{figure}
+% \begin{figure}[htb]
+%     \centering
+%     \includegraphics[height=5cm]{Figures/Background/cmos_inverter.pdf}
+%     \caption{CMOS inverter.}
+%     \label{fig:cmos}
+% \end{figure}
 
-\begin{figure}[htb]
+% \begin{figure}[htb]
+%     \centering
+%     \includegraphics[width=85mm]{Figures/Background/voltage_margin.pdf}
+%     \caption{Noise margin definitions: $NM_L=V_{IL}-V_{OL}$ and $NM_H=V_{OH}-V_{IH}$.}
+%     \label{fig:cmos_noise_margin}
+% \end{figure}
+
+
+\begin{figure}[!htb]
     \centering
-    \includegraphics[width=85mm]{Figures/Background/voltage_margin.pdf}
-    \caption{Noise margin definitions: $NM_L=V_{IL}-V_{OL}$ and $NM_H=V_{OH}-V_{IH}$.}
-    \label{fig:cmos_noise_margin}
+  \begin{subfigmatrix}{2}
+    \subfigure[]{
+        \centering
+        \includegraphics[height=5cm]{Figures/Background/cmos_inverter.pdf}
+        \label{fig:cmos}
+    }
+    \subfigure[]{
+        \centering
+        \includegraphics[height=6.75cm]{Figures/Background/voltage_margin.pdf}
+        \label{fig:cmos_noise_margin}
+    }
+  \end{subfigmatrix}
+  \caption{a) CMOS inverter. b) Noise margin definitions: $NM_L=V_{IL}-V_{OL}$ and $NM_H=V_{OH}-V_{IH}$.}
 \end{figure}
 
 The remaining of this section provides an introduction to the effects of voltage and frequency scaling on the transistor and circuit level operation.
@@ -290,7 +308,7 @@ Newer \acrshort{gpu} \acrshort{dvfs} systems, like the one used on the second \a
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=0.75\textwidth]{Figures/Background/voltage_frequency_curve.pdf}
+  \includegraphics[width=0.7\textwidth]{Figures/Background/voltage_frequency_curve.pdf}
   \caption{GPU Core voltage frequency curve, red dots indicate the default user-defined voltage frequency pair - AMD Radeon 5700 XT.}
   \label{fig:voltage_curve}
 \end{figure}
@@ -315,7 +333,7 @@ A \textit{governor} is a set of parameters (such as frequency and voltage tables
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=\textwidth]{Figures/Background/DVFSprogram.png}
+  \includegraphics[width=0.75\textwidth]{Figures/Background/DVFSprogram.pdf}
   \caption{Interval-based DVFS procedure.}
   \label{fig:DVFSprocedure}
 \end{figure}
@@ -334,7 +352,7 @@ The \acrshort{gpu} \acrshort{dvfs} control mechanism that is used nowadays by bo
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=0.8\textwidth]{Figures/Background/DVFS.png}
+  \includegraphics[width=0.7\textwidth]{Figures/Background/DVFS.png}
   \caption{AMD/NVIDIA DVFS control mechanism.}
   \label{fig:DVFSmechanism}
 \end{figure}

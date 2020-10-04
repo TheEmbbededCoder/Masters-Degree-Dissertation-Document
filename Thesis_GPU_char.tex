@@ -510,18 +510,17 @@ The dependencies effect also varied from integer to floating-point operation. In
       \label{fig:MAC_guardband}
       \subfigure[Vega 10.]{
         \centering
-        \includegraphics[width=\textwidth]{Figures/GPU_characterization/MAC_Guardband.pdf}
+        \includegraphics[width=0.97\textwidth]{Figures/GPU_characterization/MAC_Guardband.pdf}
         \label{fig:Vega10-MAC_guardband}
       }
       \subfigure[Radeon 5700 XT.]{
-        \centering\includegraphics[width=\textwidth]{Figures/GPU_characterization/5700XT-MAC_Guardband.pdf}
+        \centering\includegraphics[width=0.97\textwidth]{Figures/GPU_characterization/5700XT-MAC_Guardband.pdf}
         \label{fig:5700XT-MAC_guardband}
       }
     \end{subfigmatrix}
     \caption{Core domain - ALU-MAC - Usable voltage margins for the different data types and operand's precision.}
 \end{figure}
 
-\clearpage
 
 
 \subsection{Non-linear Operations}
@@ -805,11 +804,11 @@ Figure~\ref{fig:cache_edp} and \ref{fig:sm_edp} presents the obtained \acrshort{
       \label{fig:sm_edp}
       \subfigure[Vega 10.]{
         \centering
-        \includegraphics[width=0.53\textwidth]{Figures/GPU_characterization/SM_EDP_OPS0.pdf}
+        \includegraphics[width=0.5\textwidth]{Figures/GPU_characterization/SM_EDP_OPS0.pdf}
         \label{fig:Vega10-sm_edp}
       }
       \subfigure[Radeon 5700 XT.]{
-        \centering\includegraphics[width=0.37\textwidth]{Figures/GPU_characterization/5700XT-SharedMemory_EDP_0OP.pdf}
+        \centering\includegraphics[width=0.35\textwidth]{Figures/GPU_characterization/5700XT-SharedMemory_EDP_0OP.pdf}
         \label{fig:5700XT-sm_edp}
       }
     \end{subfigmatrix}
@@ -868,14 +867,13 @@ Finally, Figure~\ref{fig:MAC_EDP} presents the obtained EDP chart for single-pre
         \label{fig:Vega10-MAC_EDP}
       }
       \subfigure[Radeon 5700 XT.]{
-        \centering\includegraphics[width=0.75\textwidth]{Figures/GPU_characterization/5700XT-MAC_EDP.pdf}
+        \centering\includegraphics[width=0.7\textwidth]{Figures/GPU_characterization/5700XT-MAC_EDP.pdf}
         \label{fig:5700XT-MAC_EDP}
       }
     \end{subfigmatrix}
     \caption{Core domain - ALU-MAC - Obtained normalized Energy-Delay Product (EDP) for \texttt{d}=${1,3}$.}
 \end{figure}
 
-\newpage
 \subsection{Non-linear Operations}
 
 Figure~\ref{fig:SFU_behaviour} showcases the normalized energy consumption and execution time for different V-F pairs for the single-precision floating-point \acrshort{sfu} benchmark. In this case, the \acrshort{gpu} behavior differs on the two architectures. Vega 10 displays a similar behavior, to Cache and Shared Memory benchmarks, with the applied undervoltage not affecting the  performance. On the other hand, the Radeon 5700 XT behavior to non-conventional V-F is more similar to the MAC benchmark. At the two highest frequencies, performing undervoltage has a more significant benefit on performance than on energy.
@@ -933,6 +931,7 @@ Figure~\ref{fig:SFU_EDP} represents the obtained  \acrshort{edp} heat-map, where
     \end{subfigmatrix}
     \caption{Core domain - Special Function Unit - Obtained Energy-Delay Product (EDP) for single-precision floating-point data type.}
 \end{figure}
+
 
 \section{Temperature Model}
 \label{sec:temp_model}

@@ -3,15 +3,30 @@
 %     File: Thesis_Conclusions.tex                                     %
 %     Tex Master: Thesis.tex                                           %
 %                                                                      %
-%     Author: Andre C. Marta                                           %
-%     Last modified :  2 Jul 2015                                      %
+%     Author: Francisco Mendes                                         %
+%     Last modified :  3 Oct 2020                                      %
 %                                                                      %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Conclusions}
 \label{chapter:conclusions}
 
-Insert your chapter material here...
+The question that steered this masters thesis's development was, "How can we improve the energy-efficiency of already deployed \acrshort{gpu}s?". This question guided all possible solutions to creating and improving the software stack that controls these devices, since introducing or modifying already deployed hardware is impossible.
+
+The current literature on the topic presents a panoply of strategies to achieve this objective, ranging from improving device execution units utilization, optimizing the number of threads per block or performing the computations with reduced precision operands, to tunning the applied voltage-frequency levels to the current \acrshort{gpu} state and running application. The followed path was to further investigate this last option, targetting the improvement of current \acrshort{gpu}s \acrshort{dvfs} systems implementations. Enhancing the \acrshort{dvfs} systems allows to benefit a broader range of both devices and applications, since the improvement does not come from optimizing the application to the target hardware, but instead, from better matching the hardware to the running application.
+
+At this point, the state of the art implementations of \acrshort{dvfs} systems use many techniques to choose the most appropriate default V-F pair for the current device state. However, one could go one step back and argue that the manufacturer's chosen V-F configurations do not allow for extracting the best energy-efficiency of \acrshort{gpu}s. Having this premise, the first developed task devised a methodology to analyze non-conventional V-F configuration's impact on the different architectural components and \acrshort{dvfs} domains. The methodology was tested in two architectural different AMD \acrshort{gpu}s with great success. Both devices allow for up to 21\% voltage reduction, depending on the tested frequency and stressed component. Running all the benchmarks that compose the methodology defines an usable execution space, consisting of a set of V-F pairs that, even though are not the default ones, do not compromise the \acrshort{gpu} architecture. The use of those non-conventional V-F configurations allows for decreasing the device's energy consumption on up to 40\% without (in some cases, it can even improve) penalizing the performance. This results in energy-efficiency gains, measured through the \acrshort{edp} metric, of up to 43\%.
+
+Demonstrating that such configurations are so beneficial, the next step was to create a V-F optimization mechanism that explores all those V-F pairs and, without testing all of them, find and set the most appropriate one for the running application and current \acrshort{gpu} state. This iterative optimization mechanism takes into advantage the natural code repetition found in \acrshort{gpgpu} applications to be continually monitoring, adjusting and selecting the fittest V-F configuration.
+
+Deep learning applications, and more specifically, convolutional neural networks (\acrshort{cnn}s), were chosen as a target application to demonstrate the added benefits of defining a usable execution space that comprises non-conventional V-F pairs, with the iterative V-F optimization mechanism.
+First, it was demonstrated with the execution of the two most energy-consuming \acrshort{cnn} layers the validity of non-conventional V-F pairs in concrete applications. These algorithms' usable execution space corresponds to the one exhibited by the component that they stress the most. Second, the computational errors that emerge when running at the minimum allowed voltage, $V_{min}$, were studied by comparing the layer output when running conventional V-F pairs versus the non-conventional ones. It was observed that the single output maximum relative error did not exceed the 0.14\% and that, even in these circumstances, up to 99.99\% of the results are shown to be accurate. Finally, the training procedure of four \acrshort{cnn} models were executed while exploring the usable execution space with no effect on the final testing accuracy being measured when undervolting the \acrshort{gpu} core. Using the novel V-F pairs yields an \acrshort{edp} improvement of up to 44\% over the regular automatic  \acrshort{dvfs} system of the Vega 10  \acrshort{gpu}. 
+With the adaptation of the V-F mechanism to the training procedure of the \acrshort{cnn}, the discovery of the configuration that achieves the best energy efficiency is performed automatically. 
+
+The adoption of the devised optimization mechanism, which builds on the benefits of using non-conventional V-F pairs, is this dissertation answer to the objective of improving the energy-efficiency of already deployed \acrshort{gpu}s.
+
+
+
 
 
 
@@ -19,5 +34,11 @@ Insert your chapter material here...
 \section{Future Work}
 \label{section:future}
 
-os fabricantes disponiobilizarem diretivas (cuda hip) que ajudem o sistema de DVFS
+Two significant advancements to the state of the art are put forward in this thesis, contributing positively to increase the energy-efficiency of \acrshort{gpu}s. However, the devised methodologies still have room to be further explored.
+
+Even though the current AMD software stack, ROCm, allows for independent control of frequency and voltage, the tool is not made to allow proper dynamic voltage and frequency scaling controlled by the user. Instead, it is targeted to allow some degree of freedom, but to still be the automatic system in control of those two variables. If other manufacturers (for example, NVIDIA) start allowing what AMD already offers, a substantial benefit could already be put forward. Nevertheless, one further step could be made by developing a control \acrshort{api} that allows developers to hint the \acrshort{dvfs} system through CUDA, HIP or OpenCL directives. By doing so, researchers could have more freedom to experiment and create novel solutions.
+
+The methodology to characterize the architecture to non-conventional V-F scaling could be further expanded by going one step below and one step above. Going one step below,  kernels that characterize in more detail could be added to the methodology. These would use Assembly calls of the determine which are the operations inside each architectural component that are limiting the usable exploration space. Going one step above, the exploration of the V-F configurations for each benchmark could be done more intelligently, creating an algorithm that would indicate which configurations to test (in the current implementation, it is necessary to examine all possible configurations).
+
+The V-F execution mechanism already considers the application performance and energy-consuming characteristics to choose the most appropriate V-F pair. However, the generation of the V-F pair to be tested is randomly done. By monitoring each iteration of the user application's performance counters, that information could be used to guide the generation of the new V-F configuration. To allow that, a model that relates the performance counters results with the observed performance and energy-consuming behavior to non-conventional V-F scaling needed to be added to the current optimization mechanism.
 
