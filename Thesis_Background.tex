@@ -66,7 +66,7 @@ During the execution of each \textit{thread}, an identifier presents the locatio
 \section{CMOS Circuit Characterization}
 \label{section:CMOS}
 
-For the last 40 years, \acrshort{cmos} (Complementary metal-oxide-semiconductor) has been the most used technology in the creation of digital circuits and processors in general [REF]. 
+For the last 40 years, \acrshort{cmos} (Complementary metal-oxide-semiconductor) has been the most used technology in the creation of digital circuits and processors in general~\cite{zhang_metal_2003}. 
 
 There are two defined logic levels in digital circuits: logic level $0$ and $1$, each represented by an analog voltage range. To ensure its operations, the circuit requires a DC voltage value $V_{DD}$. The logic gates are excited through an input voltage $V_{i}$ and an output voltage $V_o$, corresponding to the logic level resulting from their logic function (see Figure~\ref{fig:cmos}). As it is illustrated in Figure~\ref{fig:cmos_noise_margin}, the voltage range at the input of the logic gates is correctly interpreted if it falls inside a given range. Logic level $0$ corresponds to the interval between $GND$ ($0V$) to $V_{IL}$, while logic level $1$ corresponds to the interval between $V_{IH}$ to $V_{DD}$. In turn, the output is considered $0$ if it goes from $GND$ ($0V$) to $V_{OL}$ and logic level $1$ from $V_{OH}$ to $V_{DD}$. The limits of the input and output logic levels depend on the intrinsic characteristics of the transistors, such as their dimensions and transconductance values. In addition to the transistors characteristics and operating voltage, any digital circuit is also characterized by their frequency of operation.
 
