@@ -10,12 +10,13 @@
 
 \section*{Abstract}
 
-% Add entry in the table of contents as section
 \addcontentsline{toc}{section}{Abstract}
 
-Insert your abstract here with a maximum of 250 words, followed by 4 to 6 keywords...
+Graphics Processing Units (GPUs) are the primary computational devices used to accelerate highly parallel applications. However, this immense performance comes at the cost of high energy consumption. Several solutions can be followed to increase the energy-efficiency of these devices. Though, Voltage-Frequency (V-F) scaling has been the one that achieves better results by allowing to improve this metric automatically and independently of the workload. 
+
+However, current implementations of Dynamic Voltage and Frequency Scaling (DVFS) on GPUs are still one-dimensional, by simply adjusting frequency while relying on default voltage settings. To overcome this, this dissertation introduces a methodology to fully characterize the impact of non-conventional DVFS in GPUs. The proposed approach creates a Usable Execution Space (UES) that determines the voltage range allowed by each frequency, showing that two out-of-the-shelf AMD GPUs are able to be safely undervolted by more than 20\%. The UES is then used by the devised V-F optimization mechanism to select the most energy-efficiency configuration. When applied to Deep Learning applications and, specifically, Convolutional Neural Networks (CNNs), the mechanism can improve the GPU energy efficiency by up to 44\% without any measured deterioration of the model accuracy.
 
 \vfill
 
-\textbf{\Large Keywords:} keyword1, keyword2,...
+\textbf{\Large Keywords:} Graphics Processing Unit, Dynamic Voltage and Frequency Scaling, Undervoltage, Optimization Mechanism, Deep Learning, Deep Neural Networks.
 

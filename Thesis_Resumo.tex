@@ -13,9 +13,11 @@
 % Add entry in the table of contents as section
 \addcontentsline{toc}{section}{Resumo}
 
-Inserir o resumo em Portugu\^{e}s aqui com o máximo de 250 palavras e acompanhado de 4 a 6 palavras-chave...
+As unidades de processamento gráfico (do inglês GPUs) são os principais dispositivos computacionais usados para acelerar aplicações altamente paralelas. Contudo, esse imenso desempenho acarreta um alto consumo energético. Diversas soluções podem ser seguidas para aumentar a eficiência energética desses dispositivos. Porém, o escalonamento de tensão-frequência (T-F) tem sido a solução que obtém melhores resultados, permitindo melhorar as métricas de eficiência energética de forma automática e independente do tipo de aplicações a ser executadas. 
+
+As implementações atuais de escalonamento dinâmico de tensão e frequência (do inglês DVFS) em GPUs são unidimensionais, ajustando a frequência dentro dos pares de tensão-frequência padrão. No entanto, este ajuste é insuficiente, pois não garante o par T-F mais adequado à aplicação a ser executada. Esta dissertação apresenta uma metodologia para caraterizar o impacto do DVFS não convencional em GPUs, capaz de colmatar o carácter unidimensional das implmentações actuais. A abordagem proposta cria um Espaço de Execução Usável (EEU) que determina a faixa de tensão permitida para cada frequência. A mesma foi testada em duas GPUs da AMD com os resultados a mostrarem que ambas são capazes de operar em segurança com até menos 20\% do valor padrão de tensão.
+O EEU é então usado pelo mecanismo de otimização T-F desenvolvido para selecionar a configuração de maior eficiência energética. Quando aplicado a aplicações de Aprendizagem Profunda e, especificamente, Redes Neurais Convolucional, o mecanismo pode melhorar a eficiência energética da GPU em até 44\% sem qualquer deterioração medida da precisão do modelo.
 
 \vfill
 
-\textbf{\Large Palavras-chave:} palavra-chave1, palavra-chave2,...
-
+\textbf{\Large Palavras-chave:} Unidade de Processamento Gráfico, Escalonamento Dinâmico de Tensão e Frequência, Redução da Tensão, Mecanismo de Optimização, Aprendizagem Profunda, Redes Neuronais Profundas.
