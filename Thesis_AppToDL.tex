@@ -194,7 +194,7 @@ Figures~\ref{fig:Convolution_behaviour} and \ref{fig:Convolution_EDP} illustrate
     \subfigure[Inference]{\label{fig:Convolution_Inference_behaviour}\includegraphics[width=0.47\textwidth]{Figures/Application To Deep Learning/Convolution_Inference_Behaviour.pdf}}
     \subfigure[Training]{\label{fig:Convolution_Backprop_behaviour}\includegraphics[width=0.47\textwidth]{Figures/Application To Deep Learning/Convolution_Backprop_Behaviour.pdf}}
   \end{subfigmatrix}
-  \caption{Core domain - Convolution Layer behaviour to non-conventional V-F configurations.}
+  \caption{Core domain - Convolution Layer normalized energy and performance chart to non-conventional V-F configurations.}
   \label{fig:Convolution_behaviour}
 \end{figure}
 
@@ -203,7 +203,7 @@ The \acrshort{edp} charts, depicted in Figure~\ref{fig:Convolution_EDP}, indicat
 \begin{figure}[htbp]
     \centering
         \includegraphics[width=0.9\textwidth]{Figures/Application To Deep Learning/Convolution_EDP.pdf}
-        \caption{Core Domain - Convolution Layer - EDP heatmap for the three algorithms.}
+        \caption{Core Domain - Convolution Layer - Obtained normalized Energy-Delay Product heat-map for the three algorithms.}
     \label{fig:Convolution_EDP}
 \end{figure}
 
@@ -237,7 +237,7 @@ From the observation of the results presented in Figures~\ref{fig:MatrixMult_beh
 \begin{figure}[htbp]
     \centering
         \includegraphics[width=0.65\textwidth]{Figures/Application To Deep Learning/MatrixMul_behaviour.pdf}
-        \caption{Core Domain - Fully-Connected Layer - Behaviour.}
+        \caption{Core Domain - Fully-Connected Layer normalized energy and performance chart to non-conventional V-F configurations..}
     \label{fig:MatrixMult_behaviour}
 \end{figure}
 
@@ -248,7 +248,7 @@ From the observation of the results presented in Figures~\ref{fig:MatrixMult_beh
 \begin{figure}[htbp]
     \centering
         \includegraphics[width=0.65\textwidth]{Figures/Application To Deep Learning/MatrixMul_EDP.pdf}
-        \caption{Core Domain - Fully-Connected Layer - EDP heatmap.}
+        \caption{Core Domain - Fully-Connected Layer - Obtained normalized Energy-Delay Product heat-map.}
     \label{fig:MatrixMult_EDP}
 \end{figure}
 
@@ -290,23 +290,23 @@ Hence, the obtained results demonstrate that the amount of error introduced by t
 \section{CNN training and inference with non-conventional V-F}
 \label{section:enhanced}
 
-The preliminary assessment of the \acrshort{cnn} primitives exhibits the same behavior of the primitive operations analyze, performed on the Chapter~\ref{chapter:gpu_char}. It is possible to safely undervolt the \acrshort{gpu} of the two main \acrshort{cnn} primitives without compromising the accuracy and with energy and performance gains. With so, the logical next step is to adapt the optimization mechanism described on Chapter~\ref{chapter:mech} to the training of complete state-of-the-art \acrshort{cnn}s.
+The preliminary assessment of the main \acrshort{cnn} primitives, presented in the previous sections, exhibits the same behavior of the primitive operations analysis, performed in Chapter~\ref{chapter:gpu_char}. From the obtained results, it can be concluded that it is possible to safely undervolt the \acrshort{gpu} of the two main \acrshort{cnn} primitives without compromising the accuracy and with relevant energy and performance gains. In accordance, the logical next step is to adapt the optimization mechanism described in Chapter~\ref{chapter:mech} to the training procedure of complete state-of-the-art \acrshort{cnn}s.
 
 
-This section starts by presenting the usability of non-conventional V-F on the complete training of \acrshort{cnn}s, followed by how the optimization mechanism was adapted to achieve the same energy efficiency gains automatically.
+This section starts by presenting the usability of non-conventional V-F on the complete training of \acrshort{cnn}s, followed by a description of how the optimization mechanism was adapted to achieve the same energy efficiency gains automatically.
 
 \subsection{Feasibility Assessment}
 \label{sec:fea_ass}
 The results that were obtained in the previous section evidence that the small number and relative amount of computation errors introduced by these near threshold conditions is well cooped with the operations that are conducted in \acrshort{dnn} layers. However, the same evaluation urged to be done for the whole network.
 
 
-Following the same methodology as before, an exploration of the frequency and voltage was performed for the training + inference and inference phase of four complete well-know \acrshort{cnn} models. The tested models are LeNet, VGG11, AlexNet and WideResNet, corresponding to increasing model size, complexity, and characteristics. The feasibility assessment will prove that using such configurations is allowed by the algorithms under execution, both with negligent impacts on the models' final training accuracy and with energy-efficiency improvements. To guarantee that the changing V-F is the only source of the observed variation, in all tests, the networks' weights are initialized with the same value.
+Following the same methodology as before, an exploration of decoupled frequency and voltage variations was performed for the training + inference and inference phase of four complete well-know \acrshort{cnn} models. The tested models are LeNet~\cite{lecun_gradient-based_1998}, VGG11~\cite{simonyan_very_2015}, AlexNet~\cite{krizhevsky_imagenet_2012} and WideResNet~\cite{zagoruyko_wide_2017}, corresponding to increasing model sizes, complexity, and characteristics. This feasibility assessment will prove that the considered voltage and frequency scaling is allowed by the algorithms under execution, both with negligent impacts on the models' final training accuracy and with considerable energy-efficiency improvements. To guarantee that the changing V-F is the only source of the observed variation, in all tests, the networks' weights are initialized with the same value.
 
 
 \subsubsection{Training and Inference}
 
-Table~\ref{tab:trainingAcc} presents the median classification accuracy over ten training runs and demonstrates that, when compared with the default setup (i.e., undervolt = 0), the introduced computation errors do not induce any significant change in the network's final training accuracy. 
-In more detail, Figure~\ref{fig:CNN_loss}, presents the behavior of the loss and model accuracy measured on the test set over the training session. It is possible to observe that the two metrics' progress is, within small variations, the same for all tested V-F configurations.
+Table~\ref{tab:trainingAcc} presents the median classification accuracy over ten training runs of the considered networks after applying four different undervoltage levels. The obtained results demonstrate that, when compared with the default setup (i.e., undervolt = 0), the introduced computation errors do not induce any significant change in the network's final training accuracy. 
+In more detail, Figure~\ref{fig:CNN_loss}, presents the behavior of the loss and model accuracy of each network, measured on the test set over the training session on all the tested V-F pairs. It is possible to observe that the two metrics' progress is, within small variations, the same for all tested V-F configurations.
 
 \begin{table}[htb]
     \centering
@@ -338,11 +338,11 @@ In more detail, Figure~\ref{fig:CNN_loss}, presents the behavior of the loss and
     \label{fig:CNN_loss}
 \end{figure}
 
-Figures~\ref{fig:CNN_Behaviour_training_inf} and \ref{fig:CNN_EDP_training_inf} display the energy performance charts and \acrshort{edp} results for the V-F exploration. Of significant importance is the comparison of the automatic  \acrshort{dvfs} system versus the non-conventional V-F configurations done in Figure~\ref{fig:CNN_Behaviour_training_inf}. In neither of the four tested models, the automatic system can achieve the best performance or energy consumption, demonstrating the analysis provided on the Chapter~ref{chapter:background}, that the automatic \acrshort{dvfs} systems of \acrshort{gpu}s are not able to take full advantage of the hardware. 
+Figures~\ref{fig:CNN_Behaviour_training_inf} and \ref{fig:CNN_EDP_training_inf} depict the energy performance charts and \acrshort{edp} results for the conducted V-F exploration. Of significant importance is the comparison of the automatic \acrshort{dvfs} system versus the non-conventional V-F configurations, represented as a black dot Figure~\ref{fig:CNN_Behaviour_training_inf}. For this configuration, the training procedure was executed, while allowing the \acrshort{dvfs} system to vary the current V-F pair and adjust all parameters automatically. In neither of the four tested models, the automatic system can achieve the best performance or energy consumption, demonstrating the analysis provided in Chapter~\ref{chapter:background}, that the automatic \acrshort{dvfs} systems of \acrshort{gpu}s are not able to take full advantage of the hardware. 
 
-The default V-F pairs are able to produce either the lowest energy consumption or the highest performance. 
+In particular, the default V-F pairs are able to produce either the lowest energy consumption or the highest performance. 
 The main benefit of exploring non-conventional V-F is allowing for higher or even the highest frequency (maximizing performance) while having similar energy consumption to using the lower frequency/energy savings performance levels.
-Overall, these new configurations decrease the \acrshort{edp} of the training sessions the most (Figure~\ref{fig:CNN_EDP_training_inf}).
+Overall, these new configurations decrease the \acrshort{edp} of the training sessions the most, as depicted in Figure~\ref{fig:CNN_EDP_training_inf}.
 
 
 
@@ -356,11 +356,11 @@ Overall, these new configurations decrease the \acrshort{edp} of the training se
 \begin{figure}[!htb]
     \centering
         \includegraphics[width=0.8\textwidth]{Figures/Application To Deep Learning/CNN_EDP.pdf}
-        \caption{Core domain - CNN models - Obtained Energy-Delay Product (EDP) for training + inference.}
+        \caption{Core domain - CNN models - Obtained normalized Energy-Delay Product (EDP) for training + inference.}
     \label{fig:CNN_EDP_training_inf}
 \end{figure}
 
-Table~\ref{tab:trainingMetricsResults} emphasizes and summarizes the main achievements of running the \acrshort{cnn} training under non-conventional V-F. It compares the \acrshort{cnn} execution at the default V-F setup, with frequency scaling using default voltage values to non-conventional V-F. It considers two configurations: (i) at the highest frequency, and (ii) at minimum EDP. As it can be observed, by exploring non-conventional V-F, it is possible to significantly improve all three metrics (energy, training time, and EDP) without compromising the resulting accuracy of the whole \acrshort{cnn}. 
+Table~\ref{tab:trainingMetricsResults} emphasizes and summarizes the main achievements when running the \acrshort{cnn} training under non-conventional V-F. It compares the \acrshort{cnn} execution at the default V-F setup, with the results obtained with frequency scaling using the default voltage values to non-conventional V-F. It considers two configurations: (i) at the highest frequency, and (ii) at minimum EDP. As it can be observed, by exploring non-conventional V-F, it is possible to significantly improve all three metrics (energy, training time, and EDP) without compromising the resulting accuracy of the whole \acrshort{cnn}. 
 
 \begin{table}[htbp]
     \centering
@@ -389,24 +389,44 @@ Table~\ref{tab:trainingMetricsResults} emphasizes and summarizes the main achiev
 
 \subsubsection{Inference}
 
-The inference of the same \acrshort{cnn} models is tested independently. This test tries to understand if the same V-F configuration should be used for the algorithm's training and inference part. Figure~\ref{fig:CNN_EDP_inf} exhibits the \acrshort{edp} values for the V-F exploration of the four \acrshort{cnn} models. Comparing the \acrshort{edp} heatmaps of the training + inference (Figure~\ref{fig:CNN_EDP_training_inf}) versus inference(Figure~\ref{fig:CNN_EDP_inf}), the configuration that minimizes the \acrshort{edp}, and so, maximizes the energy-efficiency, only matches on the VGG11 model. However, the same model's heatmaps present an approximate distribution, with the global minimum being around the same V-F configurations for training and inference.
+The inference of the same \acrshort{cnn} models was also tested independently. This test tries to understand if the same V-F configuration should be used for the algorithm's inference part. Figure~\ref{fig:CNN_EDP_inf} exhibits the \acrshort{edp} values for the V-F exploration of the four \acrshort{cnn} models. By comparing the \acrshort{edp} heat-maps of the training + inference (Figure~\ref{fig:CNN_EDP_training_inf}) versus the heat-maps of the inference (Figure~\ref{fig:CNN_EDP_inf}), it was observed that the configuration that minimizes the \acrshort{edp}, and so, maximizes the energy-efficiency, only matches on the VGG11 model. However, it should be noted that the same model's heat-maps present an approximate distribution, with the global minimum being around the same V-F configurations for training and inference.
 
 \begin{figure}[htb]
     \centering
         \includegraphics[width=0.8\textwidth]{Figures/Application To Deep Learning/CNN_EDP_inf.pdf}
-        \caption{Core domain - CNN models - Obtained Energy-Delay Product (EDP) for inference.}
+        \caption{Core domain - CNN models - Obtained normalized Energy-Delay Product (EDP) for inference phase.}
     \label{fig:CNN_EDP_inf}
 \end{figure}
 
 \subsection{Optimization algorithm adaptation to CNN training}
 
-To benefit from automatically adjusting the V-F configuration to \acrshort{cnn} training, the Python wrapper that enables the V-F optimization mechanism presented in the previous Chapter was introduced to the training script.
+To benefit from automatically adjusting the V-F configuration to \acrshort{cnn} training, the developed V-F optimization mechanism, presented in the previous Chapter, was applied to the training procedure.
 
-As the block diagram of Figure~\ref{fig:opt_mech} presents, the V-F optimization mechanism is composed of four stages. The present subsection indicates how each of these stages was conjugated with the \acrshort{cnn} training procedure. Similarly to the example given in Chapter 4, the optimization metric chosen was the energy-efficiency computed as the \acrshort{edp}.
+As the block diagram of Figure~\ref{fig:opt_mech} presents, the V-F optimization mechanism is composed of three stages, \textit{Analysis of user input and test DVFS information}, \textit{Establishment of baseline measurement} and \textit{Optimization Algorithm Execution}. The present subsection indicates how each stage was adapted to the \acrshort{cnn} training procedure and, in specific, in which way the \textit{Online Monitorization} is performed on this application. It is first described the last stage of the Optimization Algorithm Execution - \textit{Optimization Algorithm Execution}, because the way it is implemented conditioned how the two other stages were adapted to this application. Similarly to the example given in Chapter 4, the chosen optimization metric was the energy-efficiency computed as the \acrshort{edp}. 
 
-\subsubsection{Gather DVFS information}
 
-To set the usable execution space for the \acrshort{cnn} training and execution, both the results of the \acrshort{gpu} characterization (listed in Chapter 3) and the specific results of the preliminary assessment performed in this chapter (see Section~\ref{section:baseline}) were used. Figure~\ref{fig:ues} presents the usable execution space for the Vega 10 \acrshort{gpu}, optimized for  \acrshort{cnn} training and execution.
+\subsubsection{Optimization Algorithm Execution}
+
+Chapter 4 described that on the Optimization Algorithm Execution phase of the V-F Optimization Mechanism, the user application is executed on both stages of that phase. In this case, the total number of training epochs would be split by the \textit{Space Exploration} and \textit{Fine-Tunning} stages. However, it was observed that the inference \acrshort{edp} heat-map (see Figure~\ref{fig:CNN_EDP_inf}) presents a similar shape to the training + inference \acrshort{edp} heat-map (see Figure~\ref{fig:CNN_EDP_training_inf}), with both having the $min(EDP)$ at the same or near the same V-F pair.
+Nonetheless, executing one inference epoch is significantly faster than running one training + inference epoch. This observation presented the idea of instead of executing the \acrshort{cnn} training procedure in the two Optimization Algorithm Execution stages, execute instead just the inference on the \textit{Space Exploration} phase. With this change, at the cost of introducing an overhead to the training procedure since for the first \textit{Space Exploration Steps}, the \acrshort{cnn} model is not being trained, it is possible to complete this stage faster than running the training + inference in each epoch.
+Considering that it is on the \textit{Space Exploration} stage that the less energy-efficient configurations are tested, it is possible to spend less time testing them and so, reduce the total energy consumption to complete this stage. 
+By doing so, the training procedure of the \acrshort{cnn} model starts with a configuration that is better suited for it, with improved energy-efficiency. 
+
+Figure~\ref{fig:comp} graphically exemplifies the power consumption overtime of the first ten training epochs of a \acrshort{cnn} model to compare the proposed implementation versus the one where the training procedure is executed on both stages of the \textit{Optimization Algorithm Execution}. Rendered in green is the case that was implemented, where ten \textit{Space Exploration Steps} are performed executing just the inference, and after it, on the \textit{Fine Tuning} stage, the \acrshort{cnn} training procedure starts. Represented in orange is the case where the \acrshort{cnn} training procedure starts at the \textit{Space Exploration} stage, executing in each epoch one training + inference pass. The figure exemplifies that at the end of the \textit{Space Exploration} stage, the same power consumption and execution time (length of the epoch 9 in orange and epoch 0 in green) is achieved to execute a training + inference epoch, so the correspondent \acrshort{edp} value is the same in both cases. Overall, this chart graphically represents the result obtained when adapting the V-F optimization mechanism to the training procedure of \acrshort{cnn} models. The introduced overhead created by not starting the \acrshort{cnn} training procedure at the beginning of the Optimization Algorithm Execution phase is compensated for more quickly finding a more energy-efficient V-F configuration running just the inference of the \acrshort{cnn} model.
+
+\begin{figure}[htb]
+    \centering
+        \includegraphics[width=0.95\textwidth]{Figures/Application To Deep Learning/comparacao.pdf}
+        \caption{Graphical representation of the power consumption overtime of the first ten training epochs of a \acrshort{cnn} model. The orange line represents the case where the training procedure is started at the Space Exploration stage, and the green line represents the case where the training procedure is only started on the Fine-Tuning stage.}
+    \label{fig:comp}
+\end{figure}
+
+
+
+
+\subsubsection{Analysis of user input and test DVFS information}
+
+To set the usable execution space for the \acrshort{cnn} training and execution, both the results of the \acrshort{gpu} characterization (presented in Chapter 3) and the specific results of the preliminary assessment performed in this chapter (see Section~\ref{section:baseline}) were used. Figure~\ref{fig:ues} presents the usable execution space for the Vega 10 \acrshort{gpu}, optimized for  \acrshort{cnn} training and execution.
 
 \begin{figure}[htb]
     \centering
@@ -417,26 +437,28 @@ To set the usable execution space for the \acrshort{cnn} training and execution,
 
 
 
-For the first stage of the algorithm execution, \textit{Space Exploration}, only the green bars that correspond to tested frequencies are considered. However, for the second stage of the algorithm execution, \textit{Fine-Tuning}, the area between the dashed lines, corresponding to the linear regression between the margins of two adjacent frequencies, is also regarded as valid V-F configurations.
+For the first stage of the Optimization Algorithm Execution (\textit{Space Exploration}), only the green bars that correspond to tested frequencies are considered. However, for the second stage of the Optimization Algorithm Execution (\textit{Fine-Tuning}), the area between the dashed lines, corresponding to the linear regression between the margins of two adjacent frequencies, is also regarded as valid V-F configurations.
 
-\subsubsection{Establish baseline measurement}
+\subsubsection{Establishment of baseline measurement}
 
-It was chosen to take two individualized baseline measurements, one for one inference epoch and another for one training epoch. This was necessary for the way that the algorithm execution stages are going to be executed. For that, using the Python wrapper, the \acrshort{gpu} was set to the highest V-F configuration \{1600MHz; 1.2V\} and the execution time and energy consumption were measured, computing the \acrshort{edp} by multiplying both results.
-
-\subsubsection{Algorithm Execution - Space Exploration}
-
-For these two algorithm execution stages, the logical development would be to split the total number of training epochs by the \textit{Space Exploration} and \textit{Fine-Tunning} stages. However, the inference \acrshort{edp} heat-map (see Figure~\ref{fig:CNN_EDP_inf}) present a similar shape to the training + inference \acrshort{edp} heat-map (see Figure~\ref{fig:CNN_EDP_training_inf}) with one additional significant advantage. Performing just the inference is significantly faster than performing one training epoch. So, it was concluded that in a long training session (with a high number of training epochs), if the \textit{Space Exploration} was performed, optimizing just the inference, this process could be done faster than optimizing the training epoch since the training process would already start with a more energy-efficient V-F configuration. This would offset the initial \textit{Space Exploration} stage, where the algorithm to be optimized is not already being executed.
-
-The decision was then to execute inference epochs on the \textit{Space Exploration} stage.
+In accordance with the adaptation of the V-F Optimization Mechanism to the \acrshort{cnn} training procedure described above, two individualized baseline measurements are taken, the first covering one inference epoch and the second containing one training + inference epoch. The inference baseline is used on the \textit{Space Exploration} stage, where the training + inference baseline is used for the  \textit{Fine Tuning} stage. To proceed with the measurements, the \acrshort{gpu} was set to the highest V-F configuration \{1600MHz; 1.2V\}, and the execution time and energy consumption were measured, computing the \acrshort{edp} by multiplying both results.
 
 
-\subsubsection{Algorithm Execution - Fine-tuning}
 
-For the \textit{Fine-Tunning} stage, the \acrshort{cnn} training proceed as usual. In this stage, the optimization mechanism tries to explore the in-between tested frequencies and voltages to achieve the V-F configuration that results in the most energy-efficiency possible.  
+
+
+% For these two algorithm execution stages, the logical development would be to split the total number of training epochs by the \textit{Space Exploration} and \textit{Fine-Tunning} stages. However, the inference \acrshort{edp} heat-map (see Figure~\ref{fig:CNN_EDP_inf}) present a similar shape to the training + inference \acrshort{edp} heat-map (see Figure~\ref{fig:CNN_EDP_training_inf}) with one additional significant advantage. Performing just the inference is significantly faster than performing one training epoch. So, it was concluded that in a long training session (with a high number of training epochs), if the \textit{Space Exploration} was performed, optimizing just the inference, this process could be done faster than optimizing the training epoch since the training process would already start with a more energy-efficient V-F configuration. This would offset the initial \textit{Space Exploration} stage, where the algorithm to be optimized is not already being executed.
+
+% The decision was then to execute inference epochs on the \textit{Space Exploration} stage.
+
+
+% \subsubsection{Algorithm Execution - Fine-tuning}
+
+% For the \textit{Fine-Tunning} stage, the \acrshort{cnn} training proceed as usual. In this stage, the optimization mechanism tries to explore the in-between tested frequencies and voltages to achieve the V-F configuration that results in the most energy-efficiency possible.  
 
 \subsubsection{Online Monitorization}
 
-The output validity metric given for the optimization mechanism was the result of the loss function and the value of the network weights. If a not a number (NaN) is detected, the output is considered as invalid, with the appropriate action to mitigate the problem being performed by the developed mechanism.
+The considered output validity metrics adopted in the optimization mechanism are the loss function value and the network weights' value. If any of these values becomes not a number (NaN), the output is considered invalid. NaN's appearance in these two values is attributed to computational errors that may occur when the used voltage is near $V_{min}$. To mitigate or at least reduce the computaional error, the voltage value is increased by 10 mV, decreasing the amount of applied undervoltage.
 
 
 
