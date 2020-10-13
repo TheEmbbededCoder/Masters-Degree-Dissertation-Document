@@ -412,7 +412,7 @@ Nonetheless, executing one inference epoch is significantly faster than running 
 Considering that it is on the \textit{Space Exploration} stage that the less energy-efficient configurations are tested, it is possible to spend less time testing them and so, reduce the total energy consumption to complete this stage. 
 By doing so, the training procedure of the \acrshort{cnn} model starts with a configuration that is better suited for it, with improved energy-efficiency. 
 
-Figure~\ref{fig:comp} graphically exemplifies the power consumption overtime of the first ten training epochs of a \acrshort{cnn} model to compare the proposed implementation versus the one where the training procedure is executed on both stages of the \textit{Optimization Algorithm Execution}. Rendered in green is the case that was implemented, where ten \textit{Space Exploration Steps} are performed executing just the inference, and after it, on the \textit{Fine Tuning} stage, the \acrshort{cnn} training procedure starts. Represented in orange is the case where the \acrshort{cnn} training procedure starts at the \textit{Space Exploration} stage, executing in each epoch one training + inference pass. The figure exemplifies that at the end of the \textit{Space Exploration} stage, the same power consumption and execution time (length of the epoch 9 in orange and epoch 0 in green) is achieved to execute a training + inference epoch, so the correspondent \acrshort{edp} value is the same in both cases. Overall, this chart graphically represents the result obtained when adapting the V-F optimization mechanism to the training procedure of \acrshort{cnn} models. The introduced overhead created by not starting the \acrshort{cnn} training procedure at the beginning of the Optimization Algorithm Execution phase is compensated for more quickly finding a more energy-efficient V-F configuration running just the inference of the \acrshort{cnn} model.
+Figure~\ref{fig:comp} graphically exemplifies the power consumption overtime of the first ten training epochs of a \acrshort{cnn} model to compare the proposed implementation versus the one where the training procedure is executed on both stages of the \textit{Optimization Algorithm Execution}. Rendered in green is the case that was implemented, where ten \textit{Space Exploration Steps} are performed executing just the inference, and after it, on the \textit{Fine Tuning} stage, the \acrshort{cnn} training procedure starts. Represented in orange is the case where the \acrshort{cnn} training procedure starts at the \textit{Space Exploration} stage, executing in each epoch one training + inference pass. The figure exemplifies that at the end of the \textit{Space Exploration} stage, the same power consumption and execution time (length of the epoch 9 in orange and epoch 0 in green) is achieved to execute a training + inference epoch, so the correspondent \acrshort{edp} value is the same in both cases. Overall, this chart graphically represents the results obtained when adapting the devised V-F Optimization Mechanism to the training procedure of \acrshort{cnn} models. The introduced overhead created by not starting the \acrshort{cnn} training procedure at the beginning of the Optimization Algorithm Execution phase is compensated for more quickly finding a more energy-efficient V-F configuration running just the inference of the \acrshort{cnn} model.
 
 \begin{figure}[htb]
     \centering
@@ -441,7 +441,7 @@ For the first stage of the Optimization Algorithm Execution (\textit{Space Explo
 
 \subsubsection{Establishment of baseline measurement}
 
-In accordance with the adaptation of the V-F Optimization Mechanism to the \acrshort{cnn} training procedure described above, two individualized baseline measurements are taken, the first covering one inference epoch and the second containing one training + inference epoch. The inference baseline is used on the \textit{Space Exploration} stage, where the training + inference baseline is used for the  \textit{Fine Tuning} stage. To proceed with the measurements, the \acrshort{gpu} was set to the highest V-F configuration \{1600MHz; 1.2V\}, and the execution time and energy consumption were measured, computing the \acrshort{edp} by multiplying both results.
+In accordance with the adaptation of the V-F Optimization Mechanism to the \acrshort{cnn} training procedure described above, two individualized baseline measurements are taken, the first covering one inference epoch and the second containing one training + inference epoch. The inference baseline is used on the \textit{Space Exploration} stage, whereas the training + inference baseline is used for the \textit{Fine Tuning} stage. To execute with the baseline measurements, the \acrshort{gpu} was set to the highest V-F configuration \{1600MHz; 1.2V\}, and the execution time and energy consumption were measured, computing the \acrshort{edp} by multiplying both results.
 
 
 
@@ -464,7 +464,12 @@ The considered output validity metrics adopted in the optimization mechanism are
 
 \subsection{Experimental Results}
 
-The four different \acrshort{cnn} architectures were tested under the V-F Optimization Mechanism, with each model being tested 10 times. It was allowed 20 \textit{Space Exploration} epochs, value obtained by measuring how many epochs on average does the algorithm take to achieve a good V-F configuration across the four models. Figure~\ref{fig:3d} presents an example of the V-F configuration and resulting normalized \acrshort{edp} value when applied to the WideResNet model.
+Four different \acrshort{cnn} architectures were considered in this evaluation of the proposed V-F Optimization Mechanism, with each model being executed 10 times. The total number of training epochs was the same as the one presented in Table~\ref{tab:trainingAcc}.
+
+To determine a reasonable number of \textit{Space Exploration Epochs} that guarantees that this stage is able to find a good approximation of the V-F configuration that achieves the global energy efficiency minimum, the \textit{Space Exploration} stage was independently executed on the WideResNet model 50 times. On this evaluation, no limit was set on the number of \textit{Space Exploration Epochs}, since the objective was to analyze how many epochs are necessary to achieve the intended result. It was found that, on average, on the twelfth \textit{Space Exploration Epochs}, the best \acrshort{edp} value is achieved.
+For such purpose, it was allowed a maximum of 20 \textit{Space Exploration} epochs when testing the V-F Optimization Mechanism on all the four \acrshort{cnn} models, allowing some extra epochs to guarantee that for other models the result is also achieved.
+
+Figure~\ref{fig:3d} presents an example of the V-F configuration and resulting normalized \acrshort{edp} value when applied to the WideResNet model.
 
 \begin{figure}[h]
 \centering
@@ -496,9 +501,22 @@ The four different \acrshort{cnn} architectures were tested under the V-F Optimi
 \end{figure}
 
 
-At the end of the \textit{Space Exploration}, performed with just an inference epoch, the V-F configuration that achieved the lowest \acrshort{edp} value is given for the textit{Fine-Tuning} stage, where the \acrshort{cnn}  training process is executed.
+At the end of the \textit{Space Exploration} stage, performed with just an inference epoch, the V-F configuration that achieved the lowest \acrshort{edp} value is passed to the \textit{Fine-Tuning} stage, where the \acrshort{cnn}  training process is executed.
 
-The developed optimization mechanism can achieve an even higher degree of energy-efficiency than the previous sections' results. This comes from the better fine-tuning of frequency and voltage that is performed during the \acrshort{cnn} training. Figure~\ref{fig:Algori_comp} compares the \acrshort{edp} of the default \acrshort{dvfs} system versus the best V-F configuration found on the feasibility assessment, the best found configuration achievable (attained by performing a new training session with the final configuration chosen by optimization algorithm) and training with the optimization algorithm (that encompasses the overhead attained by running the \textit{Space Exploration} with only an inference epoch). Training with the developed mechanism yields a reduction of the \acrshort{edp} of 27\% to 42\% over the default \acrshort{dvfs} system. In two of the cases, the developed mechanism with its optimization overhead is even able to beat the best configuration found in Section~\ref{sec:fea_ass}. This is due to the best possible V-F not being one of the tested frequencies. For the other two cases, the mechanism only falls less than 5\% short compared to the previous results. However, this mechanism able to achieve this acrshort{edp} optimization without any prior testing of the acrshort{cnn} model and while performing the final training procedure.
+Overall, the devised V-F Optimization Mechanism fulfilled its purpose and was able to deliver the same degree of energy-efficiency improvement that was achieved in Section~5.4.1 without having to test every possible V-F configuration previously to find the most suitable one. 
+
+
+Figure~\ref{fig:Algori_comp} presents and compares the resulting median \acrshort{edp} achieved over the 10 runs of 
+i) the default automatic \acrshort{dvfs} system of the Vega 10 \acrshort{gpu}; 
+ii) the best V-F configuration found on the feasibility assessment; 
+iii) the best configuration achievable (attained by performing a new training session with the final configuration chosen by the devised V-F Optimization Mechanism), and 
+iv) training with the V-F Optimization Mechanism (that encompasses the overhead of only starting the \acrshort{cnn} training procedure on the \textit{Fine Tuning} stage), all results are normalized to the result achieved by the default automatic \acrshort{dvfs} system. 
+As it can be observed, training with the developed mechanism yields a reduction of the \acrshort{edp} of 27\% to 42\% over the default \acrshort{dvfs} system. On the LeNet and AlexNet models, the developed mechanism (with its optimization overhead) is even able to improve on the best configuration found in Section~\ref{sec:fea_ass}, achieving 42\% (against the 41\% of the feasibility assessment) for the LeNet and 41\% (versus the 37\% of the feasibility assessment) of improvement for the AlexNet against the \acrshort{dvfs} system included on the Vega 10 \acrshort{gpu}. This is due to the finer-tuning of frequency and voltage performed by the optimization mechanism, testing and using V-F pairs between the ones pairs evaluated on Section~\ref{sec:fea_ass}. For the other two \acrshort{cnn} models, the mechanism only falls less than 5\% short compared to the results of the feasibility assessment. Nonetheless, the devised system still greatly improves the \acrshort{edp} value on 22\% for the VGG11 model and 31\% for the WideResNet model, when compared to the default result and is able to achieve this \acrshort{edp} optimization without any prior testing of the \acrshort{cnn} model and while performing the final training procedure.
+
+
+
+
+
 \begin{figure}[htb]
     \centering
         \includegraphics[width=0.95\textwidth]{Figures/Application To Deep Learning/Algorithm_Opt_comp.pdf}
@@ -506,14 +524,18 @@ The developed optimization mechanism can achieve an even higher degree of energy
     \label{fig:Algori_comp}
 \end{figure}
 
-Table~\ref{tab:bestVF} indicates the mode V-F configuration (configuration that appeared more times) at the end of each algorithm execution stages.
+Table~\ref{tab:bestVF} indicates the correspondent V-F configuration at the end of each algorithm execution stage, on the run correspondent to the results of Figure~\ref{fig:Algori_comp}. The resulting V-F configuration selected by the \textit{Space Exploration} stage corresponds, as expected, to a good approximation to the best possible V-F pair, as it is possible to conclude by observing the \acrshort{edp} heat-map of Figure~\ref{fig:CNN_EDP_training_inf}. 
+The selected V-F pair at the end of the \textit{Fine Tuning} stage is, in all four cases, in-between the ones that were tested on the feasibility assessment, both in terms of frequency and voltage. This result demonstrates that it is beneficial to finely discretize and tune both these control parameters to the target application to achieve the optimal energy-efficiency out of the out-of-the-shelf \acrshort{gpu}s, as this thesis wanted to demonstrate.
+
+
 
 \begin{table}[htb]
     \centering
     \label{tab:bestVF}
+    
     \begin{tabular}{lcccc}
         \multicolumn{1}{r}{{\textbf{Model}}} &  \textbf{LeNet} & \textbf{VGG11} &\textbf{AlexNet} & \textbf{WideResNet} \\ \hline
-        \textit{Space Exploration} &  [1140MHz; 0.95V] & [1140MHz; 1.0V] & [1350MHz; 0.95V]  & [1350MHz; 0.9V]\\
+        \textit{Space Exploration} &  [1140MHz; 0.95V] & [1440MHz; 1.0V] & [1350MHz; 0.95V]  & [1350MHz; 0.9V]\\
         \textit{Fine-Tunning} &  [1230MHz; 0.95V] & [1370MHz; 0.97V] & [1410MHz; 0.98V]  &[1500MHz; 0.99V]\\ \hline
     \end{tabular}%
      \caption{Mode of selected V-F configurations at the end of each optimization stage.}
@@ -523,6 +545,6 @@ Table~\ref{tab:bestVF} indicates the mode V-F configuration (configuration that 
 
 \section{Summary}
 
-Deep learning and, more specific deep neural networks are a prominent type of algorithm being executed on \acrshort{gpu}s nowadays. These types of algorithms use special mathematical operations (like the convolution) to be able to extract features from the input data. The execution (inference) of these algorithms and, more importantly, the training session can significantly benefit if the energy-efficiency of \acrshort{gpu}s improves.
+Deep learning and, more specifically, deep neural networks, are a prominent type of algorithm being executed on \acrshort{gpu}s nowadays. These types of algorithms use special mathematical operations (like the convolution) to be able to extract features from the input data. The execution (inference) of these algorithms and, more importantly, the training session can significantly benefit if the \acrshort{gpu} energy-efficiency is optimized.
 
-This chapter combines all the previous knowledge acquired and presented in the previous chapter of the dissertation. It sets the usable execution space of the convolutional neural networks and, it adapts the V-F Optimization Mechanism to the training of this algorithm with excellent results. By characterizing the target \acrshort{gpu} to the target application, it was concluded that the energy efficiency of the training session could be significantly improved, with an \acrshort{edp} reduction of 27\% to 42\% depending on the \acrshort{cnn} model, over the default \acrshort{dvfs} system.
+This chapter combines all the previous knowledge acquired and presented in the previous chapter of the dissertation. It sets the usable execution space of the convolutional neural networks and it adapts the V-F Optimization Mechanism to the training of this algorithm with excellent results. By characterizing the target \acrshort{gpu} to the target application, it was concluded that the energy efficiency of the training session could be significantly improved, with an \acrshort{edp} reduction of 27\% to 42\%, depending on the \acrshort{cnn} model, over the default \acrshort{dvfs} system.
