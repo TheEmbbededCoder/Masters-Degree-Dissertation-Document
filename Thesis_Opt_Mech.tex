@@ -15,7 +15,7 @@
 The preliminary results that were presented in the previous chapter denote the idea that energy-efficiency (in particular, the \acrshort{edp} metric) of an out-of-the-shelf \acrshort{gpu} can be significantly improved if a specific non-conventional V-F pair is applied on the Core \acrshort{dvfs} domain. 
 
 However, the preliminary experiments that were conducted in the previous chapter, did not include any adaptation of the frequency and voltage scaling in a dynamic way, being one of this dissertation's objectives.
-To address this dynamic tunning of frequency and voltage, while using the increased exploration space of the operation conditions (and taking into account that it is necessary to guarantee a safe \acrshort{gpu} operation), two approaches are now envisioned: creating a forecasting model, or creating an online optimization mechanism.
+To address this dynamic tuning of frequency and voltage, while using the increased exploration space of the operation conditions (and taking into account that it is necessary to guarantee a safe \acrshort{gpu} operation), two approaches are now envisioned: creating a forecasting model, or creating an online optimization mechanism.
 
 The forecasting model would predict the most appropriate V-F pair based on the application executing code (static analysis of the Assembly code) and performance counters (run-time trace of the application being executed). This option would have the benefit of allowing the complete execution of the target application under the best possible configuration. However, such a forecasting model would also have to take into consideration the \acrshort{gpu} temperature, utilization (the target application being executed by itself or concurrently with others) and more importantly, it would be very tied to a specific \acrshort{gpu} model. Consequently, this option would become rather complex and not easily scalable between different \acrshort{gpu}s.
 
@@ -128,7 +128,7 @@ In general, each stage of the Optimization Algorithm Execution phase (\textit{Sp
 
 \begin{figure}[h]
   \centering
-  \includegraphics[height=0.95\textwidth]{Figures/Optimization/flowchart.pdf}
+  \includegraphics[height=\textwidth]{Figures/Optimization/flowchart.pdf}
   \caption{Flowchart of each iteration of the Optimization Algorithm Execution.}
   \label{fig:flowchart}
 \end{figure}
@@ -272,11 +272,11 @@ Figure~\ref{fig:layer} presents a layer diagram of the developed optimization me
 The blocks colored in blue represent the developed parts of the optimization mechanism developed in the context of this dissertation.
 These act in conjunction to control the voltage-frequency pair that is applied on the \acrshort{dvfs} Core domain, according to the user application output and device target energy consumption and performance profile.
 
-The user invokes the appropriate developed functions (more details provided on Section~\ref{sec:usage}) that communicate with the \textit{gpowerSAMPLER} (energy measuring) tool, \textit{rocm-smi} and \textit{ROCk} (voltage-frequency control interface) \acrshort{api}s to retrieve and control the related parameters to the \acrshort{gpu} device. 
+The user invokes the appropriate developed functions (more details provided on Section~\ref{sec:usage}) that communicate with the \textit{gpowerSAMPLER} (energy measuring) tool, \textit{rocm-smi} and \textit{ROCk} (voltage and frequency control interface) \acrshort{api}s to retrieve and control the related parameters to the \acrshort{gpu} device. 
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=0.6\textwidth]{Figures/Optimization/layerDiagram.pdf}
+  \includegraphics[width=0.65\textwidth]{Figures/Optimization/layerDiagram.pdf}
   \caption{Layer diagram of the developed V-F Optimization Mechanism. The blocks colored in blue represent the developed parts of the optimization mechanism developed in the context of this dissertation.}
   \label{fig:layer}
 \end{figure}
@@ -309,7 +309,7 @@ A method that should be implemented by the developer that analyzes the user appl
 Analyzes application measurements and apply the new V-F configuration. The function receives the performance and energy measurements, the optimization metric and the results of the application output validity and implements the Simulated Annealing algorithm to accept or reject the tested V-F pair in accordance with the current \textit{V-F pair baseline}. If the configuration is accepted, the current \textit{V-F pair baseline} becomes the tested V-F pair. The method returns if the tested pair was accepted or not. It also implements the Online Monitorization phase.
 
 
-\textbf{def optimizationMechanismFineTunning(measurements, optimizationMetric="EDP", outputValid=None):}
+\textbf{def optimizationMechanismFinetuning(measurements, optimizationMetric="EDP", outputValid=None):}
 
 Similar to the previous function, however it implements the Hill-Climbing algorithm as Probabilistic Technique.
 
@@ -352,7 +352,7 @@ Listing~\ref{lst:wrapper} provides an example of the order and place where each 
         
         # analyses the measurements, application output, temperature
         # generates and applies new V-F configuration
-        @\textcolor{blue}{\textbf{optimizationMechanismFineTunning(measurements, outputValid)}}@
+        @\textcolor{blue}{\textbf{optimizationMechanismFinetuning(measurements, outputValid)}}@
 \end{lstlisting}
 
 

@@ -25,7 +25,7 @@ Even though the delay of a \acrshort{cmos} circuit is inversely proportional to 
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=0.8\textwidth]{Figures/GPU_characterization/gpu_char.pdf}
+  \includegraphics[width=0.9\textwidth]{Figures/GPU_characterization/gpu_char.pdf}
   \caption{Overview of the methodology and its objective outputs.}
   \label{fig:gpu_char}
 \end{figure}
@@ -453,7 +453,7 @@ For the Radeon 5700 XT a similar behaviour is observed. For frequencies below $1
 
 \subsection{Shared Memory}
 
-\label{sec:cache_guardband}
+\label{sec:sm_guardband}
 
 The obtained voltage guardband results for the Shared Memory are presented in Figure~\ref{fig:SharedMemory_guardband}. Similarly with the Vega 10 Cache results, the benchmark's output was not affected by the applied undervoltage, for frequencies below $1530MHz$, with the \acrshort{gpu} operating correctly in the complete voltage range. For the frequencies above and equal to $1530MHz$, both computation errors and crashes occur. With the increase of the \texttt{OPS} parameter, from 0 to 10, it is observable that the \acrshort{gpu} starts allowing an increase of $10mV$ of undervoltage. This phenomenon indicates (and was also confirmed with \acrshort{gpu} counters) that with the reduction of the shared memory stress, the limiting factor to $V_{min}$ switches from the shared memory to the ALU (result confirmed ahead). The conclusion was further validated for the test at $1600MHz$, where increasing  \texttt{OPS} to 40 makes the \acrshort{gpu} start  crashing, meaning that the \acrshort{alu} is now the limiting factor.
 
@@ -510,11 +510,11 @@ The dependencies effect also varied from integer to floating-point operation. In
       \label{fig:MAC_guardband}
       \subfigure[Vega 10.]{
         \centering
-        \includegraphics[width=0.97\textwidth]{Figures/GPU_characterization/MAC_Guardband.pdf}
+        \includegraphics[width=\textwidth]{Figures/GPU_characterization/MAC_Guardband.pdf}
         \label{fig:Vega10-MAC_guardband}
       }
       \subfigure[Radeon 5700 XT.]{
-        \centering\includegraphics[width=0.97\textwidth]{Figures/GPU_characterization/5700XT-MAC_Guardband.pdf}
+        \centering\includegraphics[width=\textwidth]{Figures/GPU_characterization/5700XT-MAC_Guardband.pdf}
         \label{fig:5700XT-MAC_guardband}
       }
     \end{subfigmatrix}
@@ -656,8 +656,8 @@ In general, even though two completely different \acrshort{gpu} architectures ar
     \caption{Comparison of usable GPU core voltage ranges for all the considered architectural components of the GPU.}
 \end{sidewaysfigure}
 
-
 \clearpage
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Effect of a decoupled V-F scaling on performance and energy consumption}

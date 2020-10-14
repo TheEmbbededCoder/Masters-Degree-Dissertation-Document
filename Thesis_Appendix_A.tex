@@ -8,10 +8,10 @@
 %                                                                      %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{How to control and set the desired V-F pair - rocm-smi}
+\chapter{How to control and set the desired V-F pair with rocm-smi}
 \label{chapter:appendixRocm-smi}
 
-As introduced in this dissertation, the independent control of frequency and voltage is not widely available, and only recently, AMD allows it through their ROCm software stack, more specifically through rocm-smi - ROCm system management interface. However, even the most recent version of this tool (presented on ROCm 3.8) does not provide an easy and utterly understandable way of setting the desired frequency and voltage pair. This Annex intends to describe how to command the rocm-smi tool to control and set the desired V-F pair in the two tested GPUs, AMD Vega 10 Frontier Edition and AMD Radeon 5700 XT.
+As introduced in this dissertation, the independent control of frequency and voltage is not widely available, and only recently, AMD allows it through their ROCm software stack, more specifically through rocm-smi - ROCm system management interface. However, even the most recent version of this tool (presented on ROCm 3.8) does not provide an easy and utterly understandable way of setting the desired frequency and voltage pair. This appendix intends to describe how to command the rocm-smi tool to control and set the desired V-F pair in the two tested GPUs, AMD Vega 10 Frontier Edition and AMD Radeon 5700 XT.
 
 As described in Chapter 2, rocm-smi is a Linux command line application. When launch, it prompts the interface exhibited in Figure~\ref{fig:rocm-smi} where it is possible to check the device temperature, average device power, core domain clock - \texttt{sclk}, \acrshort{dvfs} domain clock - \texttt{mclk}, percentage of fan speed, \texttt{perf} - indicating current DVFS setting as automatic or manual, current device power cap and finally, DRAM and Core utilization.
 
@@ -25,7 +25,7 @@ As described in Chapter 2, rocm-smi is a Linux command line application. When la
 
 The V-F settings' control depends on the current device underuse due to different implementations of their \acrshort{dvfs} system. However, \texttt{perf} configuration and device power cap have to be changed regardless of the implementation of the \acrshort{dvfs} system. 
 
-The following enumeration describes the steps to be made regardless of the implementation of the \acrshort{dvfs} system, stressing the reasons for the same. The following sections detail the working and tunning of the V-F pair for each of the tested \acrshort{gpu}s.
+The following enumeration describes the steps to be made regardless of the implementation of the \acrshort{dvfs} system, stressing the reasons for the same. The following sections detail the working and tuning of the V-F pair for each of the tested \acrshort{gpu}s.
 
 \begin{enumerate}
 \item \textbf{Change device performance level:} Disable automatic \acrshort{dvfs} system.\\
@@ -36,7 +36,7 @@ The following enumeration describes the steps to be made regardless of the imple
 \texttt{rocm-smi --setpoweroverdrive X --autorespond yes}
 \end{enumerate}
 
-It is necessary to change the default PowerCap value to fully unlock manual tunning of the \acrshort{dvfs} system. If not changed, the device will not allow sustained configuration of the highest frequency and voltage levels.
+It is necessary to change the default PowerCap value to fully unlock manual tuning of the \acrshort{dvfs} system. If not changed, the device will not allow sustained configuration of the highest frequency and voltage levels.
 
 \section{AMD Vega 10 Frontier Edition}
 
@@ -46,10 +46,10 @@ When editing the frequency and voltage values of each performance level, three r
 \begin{enumerate}
 \item the desired frequency and voltage values must be within the valid ranges for the target device; 
 \item the desired frequency and voltage values cannot have the same value as the default for the given performance level; 
-\item the selected frequency and voltage values of the performance level $i$ need to be at least 1 unit (1 MHz or 1 mV) above the performance level $i-1$ and one unit below the performance level $i+1$.
+\item the selected frequency and voltage values of the performance level $i$ need to be at least 1 unit (1~MHz or 1~mV) above the performance level $i-1$ and one unit below the performance level $i+1$.
 \end{enumerate}
 
-To guarantee that the desired V-F pair is selected, it is necessary to write on performance level 0 to 6 V-F pairs below all configurations that will be used and apply on the performance level 7 the desired V-F pair. In this way, even some automatic control systems that may remain active are forced to select the wanted configuration. Table~\ref{tab:gpulevels-tunning} presents the pre-defined voltage values for the performance levels.
+To guarantee that the desired V-F pair is selected, it is necessary to write on performance level 0 to 6 V-F pairs below all configurations that will be used and apply on the performance level 7 the desired V-F pair. In this way, even some automatic control systems that may remain active are forced to select the wanted configuration. Table~\ref{tab:gpulevels-tuning} presents the pre-defined voltage values for the performance levels.
 
 \begin{table}[!htb]
 \centering
@@ -65,7 +65,7 @@ To guarantee that the desired V-F pair is selected, it is necessary to write on 
 7              & \texttt{Desired Frequency}   & \texttt{Desired Voltage}                     \\ \hline
 \end{tabular}
 \caption{Vega 10 GPU core performance levels general configuration.}
-\label{tab:gpulevels-tunning}
+\label{tab:gpulevels-tuning}
 \end{table}
 
 The following enumeration indicates the rocm-smi commands that should be executed to select the desired voltage-frequency configuration.

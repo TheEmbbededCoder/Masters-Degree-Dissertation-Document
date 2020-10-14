@@ -1,4 +1,289 @@
 
+@inproceedings{mei_measurement_2013,
+	title = {A measurement study of {GPU} {DVFS} on energy conservation},
+	doi = {10.1145/2525526.2525852},
+	abstract = {Nowadays, GPUs are widely used to accelerate many high performance computing applications. Energy conservation of such computing systems has become an important research topic. Dynamic voltage/frequency scaling (DVFS) is proved to be an appealing method for saving energy for traditional computing centers. However, there is still a lack of firsthand study on the effectiveness of GPU DVFS. This paper presents a thorough measurement study that aims to explore how GPU DVFS affects the system energy consumption. We conduct experiments on a real GPU platform with 37 benchmark applications. Our results show that GPU voltage/frequency scaling is an effective approach to conserving energy. For example, by scaling down the GPU core voltage and frequency, we have achieved an average of 19.28\% energy reduction compared with the default setting, while giving up no more than 4\% of performance. For all tested GPU applications, core voltage scaling is significantly effective to reduce system energy consumption. Meanwhile the effects of scaling core frequency and memory frequency depend on the characteristics of GPU applications.},
+	booktitle = {Proceedings of the {Workshop} on {Power}-{Aware} {Computing} and {Systems}, {HotPower} 2013},
+	author = {Mei, Xinxin and Yung, Ling and Zhao, Kaiyong and Chu, Xiaowen},
+	month = nov,
+	year = {2013}
+}
+
+@inproceedings{abe_power_2012,
+	address = {Berkeley, CA, USA},
+	series = {{HotPower}'12},
+	title = {Power and {Performance} {Analysis} of {GPU}-accelerated {Systems}},
+	abstract = {Graphics processing units (GPUs) provide significant improvements in performance and performance-per-watt as compared to traditional multicore CPUs. This energy-efficiency of GPUs has facilitated the use of GPUs in many application domains. Albeit energy efficient, GPUs consume non-trivial power independently of CPUs. Therefore, we need to analyze the power and performance characteristic of GPUs and their causal relation with CPUs in order to reduce the total energy consumption of the system while sustaining high performance. In this paper, we provide a power and performance analysis of GPU-accelerated systems for better understandings of these implications. Our analysis on a real system discloses that system energy can be reduced by 28\% retaining a decrease in performance within 1\% by controlling the voltage and frequency levels of GPUs. We show that energy savings can be achieved when GPU core and memory clock frequencies are appropriately scaled considering the workload characteristics. Another interesting finding is that voltage and frequency scaling of CPUs is trivial for total system energy reduction, and even should not be applied in state-of-the-art GPU-accelerated systems. We believe that these findings are useful to develop dynamic voltage and frequency scaling (DVFS) algorithms for GPU-accelerated systems.},
+	urldate = {2019-12-09},
+	booktitle = {Proceedings of the 2012 {USENIX} {Conference} on {Power}-{Aware} {Computing} and {Systems}},
+	publisher = {USENIX Association},
+	author = {Abe, Yuki and Sasaki, Hiroshi and Peres, Martin and Inoue, Koji and Murakami, Kazuaki and Kato, Shinpei},
+	year = {2012},
+	pages = {10--10}
+}
+
+@inproceedings{leng_gpuwattch_2013,
+	address = {New York, NY, USA},
+	series = {{ISCA} '13},
+	title = {{GPUWattch}: {Enabling} {Energy} {Optimizations} in {GPGPUs}},
+	isbn = {978-1-4503-2079-5},
+	shorttitle = {{GPUWattch}},
+	doi = {10.1145/2485922.2485964},
+	abstract = {General-purpose GPUs (GPGPUs) are becoming prevalent in mainstream computing, and performance per watt has emerged as a more crucial evaluation metric than peak performance. As such, GPU architects require robust tools that will enable them to quickly explore new ways to optimize GPGPUs for energy efficiency. We propose a new GPGPU power model that is configurable, capable of cycle-level calculations, and carefully validated against real hardware measurements. To achieve configurability, we use a bottom-up methodology and abstract parameters from the microarchitectural components as the model's inputs. We developed a rigorous suite of 80 microbenchmarks that we use to bound any modeling uncertainties and inaccuracies. The power model is comprehensively validated against measurements of two commercially available GPUs, and the measured error is within 9.9\% and 13.4\% for the two target GPUs (GTX 480 and Quadro FX5600). The model also accurately tracks the power consumption trend over time. We integrated the power model with the cycle-level simulator GPGPU-Sim and demonstrate the energy savings by utilizing dynamic voltage and frequency scaling (DVFS) and clock gating. Traditional DVFS reduces GPU energy consumption by 14.4\% by leveraging within-kernel runtime variations. More finer-grained SM cluster-level DVFS improves the energy savings from 6.6\% to 13.6\% for those benchmarks that show clustered execution behavior. We also show that clock gating inactive lanes during divergence reduces dynamic power by 11.2\%.},
+	urldate = {2019-12-09},
+	booktitle = {Proceedings of the 40th {Annual} {International} {Symposium} on {Computer} {Architecture}},
+	publisher = {ACM},
+	author = {Leng, Jingwen and Hetherington, Tayler and ElTantawy, Ahmed and Gilani, Syed and Kim, Nam Sung and Aamodt, Tor M. and Reddi, Vijay Janapa},
+	year = {2013},
+	keywords = {CUDA, GPU architecture, energy, power, power estimation},
+	pages = {487--498}
+}
+
+@inproceedings{jiao_power_2010,
+	title = {Power and {Performance} {Characterization} of {Computational} {Kernels} on the {GPU}},
+	doi = {10.1109/GreenCom-CPSCom.2010.143},
+	abstract = {Nowadays Graphic Processing Units (GPU) are gaining increasing popularity in high performance computing (HPC). While modern GPUs can offer much more computational power than CPUs, they also consume much more power. Energy efficiency is one of the most important factors that will affect a broader adoption of GPUs in HPC. In this paper, we systematically characterize the power and energy efficiency of GPU computing. Specifically, using three different applications with various degrees of compute and memory intensiveness, we investigate the correlation between power consumption and different computational patterns under various voltage and frequency levels. Our study revealed that energy saving mechanisms on GPUs behave considerably different than CPUs. The characterization results also suggest possible ways to improve the 'greenness' of GPU computing.},
+	booktitle = {2010 {IEEE}/{ACM} {Int}'l {Conference} on {Green} {Computing} and {Communications} {Int}'l {Conference} on {Cyber}, {Physical} and {Social} {Computing}},
+	author = {Jiao, Y. and Lin, H. and Balaji, P. and Feng, W.},
+	month = dec,
+	year = {2010},
+	keywords = {CPU, Clocks, DVFS, Energy-Efficient Computing, GPU, GPUs, Graphics processing unit, Kernel, Memory management, Performance evaluation, Power demand, computational power, computer graphic equipment, coprocessors, energy conservation, energy efficiency, energy saving mechanism, graphic processing unit, high performance computing, low-power electronics, mainframes, power consumption},
+	pages = {221--228}
+}
+
+@article{guerreiro_dvfs-aware_2019,
+	title = {{DVFS}-aware application classification to improve {GPGPUs} energy efficiency},
+	volume = {83},
+	issn = {0167-8191},
+	doi = {10.1016/j.parco.2018.02.001},
+	abstract = {The increasing importance of GPUs as high-performance accelerators and the power and energy constraints of computing systems, make it fundamental to develop techniques for energy efficiency maximization of GPGPU applications. Among several potential techniques, dynamic voltage and frequency scaling (DVFS) stands out as one of the most promising approaches. Hence, novel DVFS-aware performance and power classification models are herein proposed that correlate application characteristics and GPU architecture features. In particular, by analysing the utilization of graphics and memory components at a single voltage and frequency levels, the proposed classification methodologies are able to predict the impact of DVFS on GPGPU applications execution time and power and energy consumption. The accuracy of the proposed approach is validated on two modern NVIDIA GPUs from the Maxwell and Pascal generations, by relying on 35 benchmarks from the Rodinia, Polybench, Parboil, SHOC and CUDA SDK suites. Experimental results show that the proposed approach can typically predict the optimal operating frequencies of graphics and memory subsystems, attaining up to 36\% energy savings (average of 16\%), which correspond to an average deviation of 0.74\% regarding the optimal case. Moreover, when considering a maximum performance penalty of 10\%, up to 26\% energy savings are still attained.},
+	language = {en},
+	urldate = {2020-05-24},
+	journal = {Parallel Computing},
+	author = {Guerreiro, João and Ilic, Aleksandar and Roma, Nuno and Tomás, Pedro},
+	year = {2019},
+	note = {Publisher: Elsevier},
+	keywords = {Application classification, DVFS, Energy savings, GPGPU, Optimal frequency},
+	pages = {93--117}
+}
+
+@inproceedings{kim_racing_2015,
+	title = {Racing and {Pacing} to {Idle}: {Theoretical} and {Empirical} {Analysis} of {Energy} {Optimization} {Heuristics}},
+	shorttitle = {Racing and {Pacing} to {Idle}},
+	doi = {10.1109/CPSNA.2015.23},
+	abstract = {The problem of minimizing energy for a performance constraint (e.g., Real-time deadline or quality-of-service requirement) has been widely studied, both in theory and in practice. Theoretical models have indicated large potential energy savings, but practical concerns have made these savings hard to realize. Instead, practitioners often rely on heuristic solutions, which achieve good results in practice but tend to be system-specific in efficacy. An example is the race-to-idle heuristic, which makes all resources available until a task completes and then idles. Theory predicts poor energy savings, but practitioners have reported good empirical results. To help bridge the gap between theory and practice, this paper presents a geometrical framework for analyzing the energy optimality of resource allocation under performance constraints. The geometry of the problem allows us to derive an optimal strategy and three commonly used heuristics: 1) race-to-idle, 2) pace-to-idle a near-optimal idling strategy, and 3) no-idle which never idles. We then implement all strategies and test them empirically for seven benchmarks on four different multicore systems, including both x86 and ARM. We find that race-to-idle is near optimal on older systems, but can consume as much as 3× more energy than the optimal strategy. In contrast, pace-to-idle is never more than 12\% worse than optimal.},
+	booktitle = {2015 {IEEE} 3rd {International} {Conference} on {Cyber}-{Physical} {Systems}, {Networks}, and {Applications}},
+	author = {Kim, David H.K. and Imes, Connor and Hoffmann, Henry},
+	month = aug,
+	year = {2015},
+	keywords = {ARM, Energy consumption, Heuristic algorithms, Multicore processing, Optimization, Power demand, Program processors, Resource management, energy minimization, energy optimization heuristics, energy savings, geometrical framework, heuristic solutions, multicore systems, near-optimal idling strategy, no-idle heuristic, optimal strategy, pace-to-idle heuristic, performance constraints, power aware computing, race-to-idle heuristic, resource allocation, x86},
+	pages = {78--85}
+}
+
+@inproceedings{hoffmann_racing_2013,
+	address = {New York, NY, USA},
+	series = {{HotPower} '13},
+	title = {Racing and {Pacing} to {Idle}: {An} {Evaluation} of {Heuristics} for {Energy}-aware {Resource} {Allocation}},
+	isbn = {978-1-4503-2458-8},
+	shorttitle = {Racing and {Pacing} to {Idle}},
+	doi = {10.1145/2525526.2525854},
+	abstract = {We examine the problem of assigning computing resources to an application to meet a performance goal while minimizing energy consumption. We present a general formulation of this problem as a linear program, discuss several potential heuristic solutions, and evaluate these heuristics on two real systems (one purchased in 2010, the other in 2013). We find that the well-known race-to-idle heuristic is close to the optimal solution on the older machine. On the newer machine, however, the optimal solution outperforms race-to-idle by over 35\%. A generalization of race-to-idle, called pace-to-idle, is found to provide better results in a wider range of scenarios.},
+	urldate = {2019-11-29},
+	booktitle = {Proceedings of the {Workshop} on {Power}-{Aware} {Computing} and {Systems}},
+	publisher = {ACM},
+	author = {Hoffmann, Henry},
+	year = {2013},
+	keywords = {energy-aware computing, optimization, power-aware computing, resource allocation},
+	pages = {13:1--13:5}
+}
+
+@article{da-ren_time_2014,
+	title = {Time and {Energy} {Efficient} {DVS} {Scheduling} for {Real}-{Time} {Pinwheel} {Tasks}},
+	volume = {12},
+	issn = {1665-6423},
+	doi = {https://doi.org/10.1016/S1665-6423(14)71663-3},
+	abstract = {Dynamic voltage/frequency scaling (DVFS) is one of the most effective techniques for reducing energy use. In this paper, we focus on the pinwheel task model to develop a variable voltage processor with d discrete voltage/speed levels. Depending on the granularity of execution unit to which voltage scaling is applied, DVFS scheduling can be defined in two categories: (i) inter-task DVFS and (ii) intra-task DVFS. In the periodic pinwheel task model, we modified the definitions of both intra- and inter-task and design their DVFS scheduling to reduce the power consumption of DVFS processors. Many previous approaches have solved DVFS problems by generating a canonical schedule in advance and thus require pseudo polynomial time and space because the length of a canonical schedule depends on the hyperperiod of the task periods and is generally of exponential length. To limit the length of the canonical schedules and predict their task execution, tasks with arbitrary periods are first transformed into harmonic periods and their key features are profiled. The proposed methods have polynomial time and space complexities, and experimental results show that, under identical assumptions, the proposed methods achieve more energy savings than the previous methods.},
+	number = {6},
+	journal = {Journal of Applied Research and Technology},
+	author = {Da-Ren, Chen and Young-Long, Chen and You-Shyang, Chen},
+	year = {2014},
+	keywords = {Dynamic voltage scaling, Hard real-time systems, Pinwheel tasks, Power-aware scheduling},
+	pages = {1025 -- 1039}
+}
+
+@misc{chen_da-ren_time_nodate,
+	title = {Time and {Energy} {Efficient} {DVS} {Scheduling} for {Real}-{Time} {Pinwheel} {Tasks} {\textbar} {Elsevier} {Enhanced} {Reader}},
+	url = {https://reader.elsevier.com/reader/sd/pii/S1665642314716633?token=A320D8E6AEACD94E4D0F78E52A78812476B17F7A403EEC03DC8E707CDC594C9935381917052C84FC19C8BABE752351B8},
+	language = {en},
+	urldate = {2019-12-04},
+	author = {{Chen Da-Ren} and {Chen Young-Long} and {Chen You-Shyang}},
+	doi = {10.1016/S1665-6423(14)71663-3}
+}
+
+@article{mei_survey_2017,
+	title = {A {Survey} and {Measurement} {Study} of {GPU} {DVFS} on {Energy} {Conservation}},
+	volume = {3},
+	issn = {2352-8648},
+	doi = {https://doi.org/10.1016/j.dcan.2016.10.001},
+	abstract = {Energy efficiency has become one of the top design criteria for current computing systems. The dynamic voltage and frequency scaling (DVFS) has been widely adopted by laptop computers, servers, and mobile devices to conserve energy, while the GPU DVFS is still at a certain early age. This paper aims at exploring the impact of GPU DVFS on the application performance and power consumption, and furthermore, on energy conservation. We survey the state-of-the-art GPU DVFS characterizations, and then summarize recent research works on GPU power and performance models. We also conduct real GPU DVFS experiments on NVIDIA Fermi and Maxwell GPUs. According to our experimental results, GPU DVFS has significant potential for energy saving. The effect of scaling core voltage/frequency and memory voltage/frequency depends on not only the GPU architectures, but also the characteristic of GPU applications.},
+	number = {2},
+	urldate = {2019-10-23},
+	journal = {Digital Communications and Networks},
+	author = {Mei, Xinxin and Wang, Qiang and Chu, Xiaowen},
+	year = {2017},
+	keywords = {Computer Science - Distributed, Parallel, and Cluster Computing, Dynamic voltage and frequency scaling, Energy efficiency, Graphics processing unit},
+	pages = {89 -- 100}
+}
+
+@phdthesis{boyer_improving_2013,
+	title = {Improving {Resource} {Utilization} in {Heterogeneous} {CPU}-{GPU} {Systems}},
+	copyright = {All rights reserved (no additional license for public reuse)},
+	abstract = {Graphics processing units (GPUs) have attracted enormous interest over the past decade due to substantial increases in both performance and programmability. Programmers can potentially leverage GPUs for substantial performance gains, but at the cost of significant software engineering effort. In practice, most GPU applications do not effectively utilize all of the available resources in a system: they either fail to use use a resource at all or use a resource to less than its full potential. This underutilization can hurt both performance and energy efficiency. In this dissertation, we address the underutilization of resources in heterogeneous CPU-GPU systems in three different contexts.
+
+First, we address the underutilization of a single GPU by reducing CPU-GPU interaction to improve performance. We use as a case study a computationally-intensive video-tracking application from systems biology. Because of the high cost of CPU-GPU coordination, our initial, straightforward attempts to accelerate this application failed to effectively utilize the GPU. By leveraging some non-obvious optimization strategies, we significantly decreased the amount of CPU-GPU interaction and improved the performance of the GPU implementation by 26x relative to the best CPU implementation. Based on the lessons we learned, we present general guidelines for optimizing GPU applications as well as recommendations for system-level changes that would simplify the development of high-performance GPU applications.
+
+Next, we address underutilization at the system level by using load balancing to improve performance. We propose a dynamic scheduling algorithm that automatically and efficiently divides the execution of a data-parallel kernel across multiple, possibly heterogeneous GPUs. We show that our scheduler can nearly match the performance of an unrealistic static scheduler when device performance is fixed, and can provide better performance when device performance varies.
+
+Finally, we address underutilization within a GPU by using frequency scaling to improve energy efficiency. We propose a novel algorithm for predicting the energy-optimal GPU clock frequencies for an arbitrary kernel. Using power measurements from real systems, we demonstrate that our algorithm improves significantly on the state of the art across multiple generations of GPUs. We also propose and evaluate techniques for decreasing the CPU's energy consumption during GPU computation.
+
+Many of the techniques presented in this dissertation can be used to improve the performance and energy efficiency of GPU applications with no programmer effort or software modifications required. As the diversity of available hardware systems continues to increase, automatic techniques such as these will become critical for software to fully realize the benefits of future hardware improvements.},
+	language = {en},
+	urldate = {2019-12-04},
+	school = {University of Virginia},
+	author = {Boyer, Michael},
+	collaborator = {Skadron, Kevin},
+	month = apr,
+	year = {2013},
+	doi = {10.18130/V3TJ7X}
+}
+
+@inproceedings{hong_integrated_2010,
+	address = {New York, NY, USA},
+	series = {{ISCA} '10},
+	title = {An {Integrated} {GPU} {Power} and {Performance} {Model}},
+	isbn = {978-1-4503-0053-7},
+	doi = {10.1145/1815961.1815998},
+	abstract = {GPU architectures are increasingly important in the multi-core era due to their high number of parallel processors. Performance optimization for multi-core processors has been a challenge for programmers. Furthermore, optimizing for power consumption is even more difficult. Unfortunately, as a result of the high number of processors, the power consumption of many-core processors such as GPUs has increased significantly. Hence, in this paper, we propose an integrated power and performance (IPP) prediction model for a GPU architecture to predict the optimal number of active processors for a given application. The basic intuition is that when an application reaches the peak memory bandwidth, using more cores does not result in performance improvement. We develop an empirical power model for the GPU. Unlike most previous models, which require measured execution times, hardware performance counters, or architectural simulations, IPP predicts execution times to calculate dynamic power events. We then use the outcome of IPP to control the number of running cores. We also model the increases in power consumption that resulted from the increases in temperature. With the predicted optimal number of active cores, we show that we can save up to 22.09\%of runtime GPU energy consumption and on average 10.99\% of that for the five memory bandwidth-limited benchmarks.},
+	urldate = {2019-11-28},
+	booktitle = {Proceedings of the 37th {Annual} {International} {Symposium} on {Computer} {Architecture}},
+	publisher = {ACM},
+	author = {Hong, Sunpyo and Kim, Hyesoon},
+	year = {2010},
+	keywords = {CUDA, GPU architecture, analytical model, energy, performance, power estimation},
+	pages = {280--289}
+}
+
+@phdthesis{s_hong_modeling_2012,
+	type = {{PhD} thesis},
+	title = {Modeling performance and power for energy-efficient {GPGPU} computing},
+	abstract = {The objective of the proposed research is to develop an analytical model that predicts performance and power for many-core architecture and further propose a mechanism, which leverages the analytical model, to enable energy-efficient execution of an application. The key insight of the model is to investigate and quantify a complex relationship that exists between the thread-level parallelism and memory-level parallelism for an application on a given many-core architecture. Two metrics are proposed: memory warp parallelism (MWP), which refers to the number of overlapping memory accesses per core, and computation warp parallelism (CWP), which characterizes an application type. By using these metrics in addition to the architectural and application parameters, the overall application performance is produced. The model uses statically-available parameters such as instruction-mixture information and input-data size, and the prediction accuracy is 13.3\% for the GPU-computing benchmarks. Another important aspect of using many-core architecture is reducing peak power and achieving energy savings. By using the proposed integrated power and performance (IPP) framework, the results showed that different optimization points exist for GPU architecture depending on the application type. The work shows that by activating fewer cores, 10.99\% of run-time energy consumption can be saved for the bandwidth-limited benchmarks, and a projection of 25.8\% energy savings is predicted when power-gating at core level is employed. Finally, the model is shifted to throughput using OpenCL for targeting more variety of processors. First, multiple outputs relating to performance are predicted, including upper-bound and lower-bound values. Second, by using the model parameters, an application can be categorized into a different category, each with its own suggestions for improving performance and energy efficiency. Third, the bandwidth saturation point accuracy is significantly improved by considering independent memory accesses and updating the performance model. Furthermore, a trade-off analysis using architectural and application parameters is straightforward, which provides more insights to improve energy efficiency. In the future, a computer system will contain hundreds of heterogeneous cores. Hence, it is mandatory that a workload gets scheduled to an efficient core or distributed on both types of cores. A preliminary work by using the analytical model to do scheduling between CPU and GPU is demonstrated in the appendix. Since profiling phase is not required, the kernel code can be transformed to run more efficiently on the specific architecture. Another extension of the work regarding the relationship between the speed-up and energy efficiency is mathematically derived. Finally, future research ideas are presented regarding the usage of the model for programmer, compiler, and runtime for future heterogeneous systems.},
+	urldate = {2019-11-28},
+	school = {Georgia Institute of Technology},
+	author = {{S. Hong}},
+	year = {2012}
+}
+
+@article{freijedo_modeling_2012,
+	title = {Modeling the {Effect} of {Process}, {Power}-{Supply} {Voltage} and {Temperature} {Variations} on the {Timing} {Response} of {Nanometer} {Digital} {Circuits}},
+	volume = {28},
+	issn = {0923-8174, 1573-0727},
+	doi = {10.1007/s10836-012-5297-0},
+	language = {en},
+	number = {4},
+	urldate = {2020-08-06},
+	journal = {Journal of Electronic Testing},
+	author = {Freijedo, Judit F. and Semião, Jorge and Rodriguez-Andina, Juan J. and Vargas, Fabian and Teixeira, Isabel C. and Teixeira, J. Paulo},
+	month = aug,
+	year = {2012},
+	pages = {421--434}
+}
+
+@incollection{wolpert_temperature_2012,
+	address = {New York, NY},
+	title = {Temperature {Effects} in {Semiconductors}},
+	isbn = {978-1-4614-0747-8 978-1-4614-0748-5},
+	shorttitle = {power},
+	language = {en},
+	urldate = {2020-08-06},
+	booktitle = {Managing {Temperature} {Effects} in {Nanoscale} {Adaptive} {Systems}},
+	publisher = {Springer New York},
+	author = {Wolpert, David and Ampadu, Paul},
+	collaborator = {Wolpert, David and Ampadu, Paul},
+	year = {2012},
+	doi = {10.1007/978-1-4614-0748-5_2},
+	pages = {15--33}
+}
+
+@article{sapatnekar_what_2013,
+	title = {What happens when circuits grow old: {Aging} issues in {CMOS} design},
+	doi = {10.1109/VLSI-TSA.2013.6545621},
+	abstract = {As CMOS technologies have shrunk to tens of nanometers, aging problems have emerged as a major challenge. There has been tremendous progress in developing new methods for modeling and diagnosing reliability at the level of individual transistors, but much less work on propagating these models to higher levels of abstraction to analyze and optimize the reliability of larger circuits. This talk will provide an introduction to various circuit aging mechanisms and will then discuss research that develops computer-aided design techniques for estimating and enhancing the reliability of large digital circuits, examining solutions that could practically be applied to analyze or improve the lifetime of a design while maintaining consistency to accurate device-level models and the associated physics.},
+	language = {en},
+	journal = {2013 International Symposium on VLSI Technology, Systems and Application (VLSI-TSA)},
+	author = {Sapatnekar, Sachin S},
+	year = {2013},
+	pages = {1--2}
+}
+
+@article{zhang_metal_2003,
+	title = {Metal {Silicides} in {CMOS} {Technology}: {Past}, {Present}, and {Future} {Trends}},
+	volume = {28},
+	issn = {1040-8436},
+	shorttitle = {Metal {Silicides} in {CMOS} {Technology}},
+	url = {https://doi.org/10.1080/10408430390802431},
+	doi = {10.1080/10408430390802431},
+	abstract = {Metal silicides have played an indispensable role in the raped development of microelectronics since PtSi was first used to improve the rectifying characteristics of diodes in early 1960s. This work first provides a brief historical overview of the many different silicides, and, correspondingly, the different processing methodologies used in the past.With regard to the present use of silicides in CMOS technologies a convergence becomes clear with the self aligned technology using only a limited number of silicides, namely, TiSi2, CoSi 2, and NiSi. A section on fundamental aspects is included to cover thermodynamics and kinetics, which are essential for understanding the silicide formation processes. The advantage and disadvantages of TiSi2, CoSi 2, and NiSi are analyzed with the development trend of CMOS technologies as a measure. Specifically, the reactive diffusion and phase formation of these silicades in the three terminals of a metal-oxides-semiconductor device, that is, gate, source, and drain are scrutinized. The review ends with an extended discussion of about future trends of metal-silicides in micro/nanoelectronics, with reference to the potential material aspects and device structures outlined in the International Technologies Roadmap for Semiconductors.},
+	number = {1},
+	urldate = {2020-10-04},
+	journal = {Critical Reviews in Solid State and Materials Sciences},
+	author = {Zhang, Shi-Li and Östling, Mikael},
+	month = nov,
+	year = {2003},
+	pages = {1--129}
+}
+
+@inproceedings{jing_energy-efficient_2013,
+	address = {New York, NY, USA},
+	series = {{ISCA} '13},
+	title = {An {Energy}-efficient and {Scalable} {eDRAM}-based {Register} {File} {Architecture} for {GPGPU}},
+	isbn = {978-1-4503-2079-5},
+	url = {http://doi.acm.org/10.1145/2485922.2485952},
+	doi = {10.1145/2485922.2485952},
+	abstract = {The heavily-threaded data processing demands of streaming multiprocessors (SM) in a GPGPU require a large register file (RF). The fast increasing size of the RF makes the area cost and power consumption unaffordable for traditional SRAM designs in the future technologies. In this paper, we propose to use embedded-DRAM (eDRAM) as an alternative in future GPGPUs. Compared with SRAM, eDRAM provides higher density and lower leakage power. However, the limited data retention time in eDRAM poses new challenges. Periodic refresh operations are needed to maintain data integrity. This is exacerbated with the scaling of eDRAM density, process variations and temperature. Unlike conventional CPUs which make use of multi-ported RF, most of the RFs in modern GPGPU are heavily banked but not multi-ported to reduce the hardware cost. This provides a unique opportunity to hide the refresh overhead. We propose two different eDRAM implementations based on 3T1D and 1T1C memory cells. To mitigate the impact of periodic refresh, we propose two novel refresh solutions using bank bubble and bank walk-through. Plus, for the 1T1C RF, we design an interleaved bank organization together with an intelligent warp scheduling strategy to reduce the impact of the destructive reads. The analysis shows that our schemes present better energy efficiency, scalability and variation tolerance than traditional SRAM-based designs.},
+	urldate = {2019-11-28},
+	booktitle = {Proceedings of the 40th {Annual} {International} {Symposium} on {Computer} {Architecture}},
+	publisher = {ACM},
+	author = {Jing, Naifeng and Shen, Yao and Lu, Yao and Ganapathy, Shrikanth and Mao, Zhigang and Guo, Minyi and Canal, Ramon and Liang, Xiaoyao},
+	year = {2013},
+	pages = {344--355}
+}
+
+@inproceedings{zhang_approxann_2015,
+	title = {{ApproxANN}: {An} approximate computing framework for artificial neural network},
+	shorttitle = {{ApproxANN}},
+	abstract = {Artificial Neural networks (ANNs) are one of the most well-established machine learning techniques and have a wide range of applications, such as Recognition, Mining and Synthesis (RMS). As many of these applications are inherently error-tolerant, in this work, we propose a novel approximate computing framework for ANN, namely ApproxANN. When compared to existing solutions, ApproxANN considers approximation for both computation and memory accesses, thereby achieving more energy savings. To be specific, ApproxANN characterizes the impact of neurons on the output quality in an effective and efficient manner, and judiciously determine how to approximate the computation and memory accesses of certain less critical neurons to achieve the maximum energy efficiency gain under a given quality constraint. Experimental results on various ANN applications with different datasets demonstrate the efficacy of the proposed solution.},
+	booktitle = {Design, {Automation} {Test} in {Europe} {Conference} {Exhibition} 2015},
+	author = {Zhang, Qian and Wang, Ting and Tian, Ye and Yuan, Feng and Xu, Qiang},
+	month = mar,
+	year = {2015},
+	note = {ISSN: 1558-1101},
+	keywords = {ApproxANN, Approximation methods, Artificial neural networks, Biological neural networks, Degradation, Energy consumption, Hardware, Neurons, approximate computing framework, artificial neural network, energy efficiency gain, neural nets, power aware computing, quality constraint},
+	pages = {701--706}
+}
+
+@article{shrestha_review_2019,
+	title = {Review of {Deep} {Learning} {Algorithms} and {Architectures}},
+	volume = {7},
+	issn = {2169-3536},
+	doi = {10.1109/ACCESS.2019.2912200},
+	abstract = {Deep learning (DL) is playing an increasingly important role in our lives. It has already made a huge impact in areas, such as cancer diagnosis, precision medicine, self-driving cars, predictive forecasting, and speech recognition. The painstakingly handcrafted feature extractors used in traditional learning, classification, and pattern recognition systems are not scalable for large-sized data sets. In many cases, depending on the problem complexity, DL can also overcome the limitations of earlier shallow networks that prevented efficient training and abstractions of hierarchical representations of multi-dimensional training data. Deep neural network (DNN) uses multiple (deep) layers of units with highly optimized algorithms and architectures. This paper reviews several optimization methods to improve the accuracy of the training and to reduce training time. We delve into the math behind training algorithms used in recent deep networks. We describe current shortcomings, enhancements, and implementations. The review also covers different types of deep architectures, such as deep convolution networks, deep residual networks, recurrent neural networks, reinforcement learning, variational autoencoders, and others.},
+	journal = {IEEE Access},
+	author = {Shrestha, Ajay and Mahmood, Ausif},
+	year = {2019},
+	keywords = {Computer architecture, DL, Deep learning, Feature extraction, Feedforward neural networks, Machine learning algorithm, Recurrent neural networks, Training, artificial intelligence, backpropagation, cancer diagnosis, classification systems, convolution neural network, deep architectures, deep convolution networks, deep learning algorithms, deep neural network, deep neural network architectures, deep residual networks, large-sized data sets, learning (artificial intelligence), multidimensional training data, neural nets, optimisation, optimization, optimization methods, painstakingly handcrafted feature extractors, pattern recognition systems, precision medicine, predictive forecasting, recurrent neural networks, reinforcement learning, self-driving cars, speech recognition, supervised and unsupervised learning, variational autoencoders},
+	pages = {53040--53065}
+}
+
 @article{zagoruyko_wide_2017,
 	title = {Wide {Residual} {Networks}},
 	url = {http://arxiv.org/abs/1605.07146},
@@ -33,19 +318,6 @@
 	editor = {Pereira, F. and Burges, C. J. C. and Bottou, L. and Weinberger, K. Q.},
 	year = {2012},
 	pages = {1097--1105}
-}
-
-@article{simonyan_very_2015,
-	title = {Very {Deep} {Convolutional} {Networks} for {Large}-{Scale} {Image} {Recognition}},
-	url = {http://arxiv.org/abs/1409.1556},
-	abstract = {In this work we investigate the effect of the convolutional network depth on its accuracy in the large-scale image recognition setting. Our main contribution is a thorough evaluation of networks of increasing depth using an architecture with very small (3x3) convolution filters, which shows that a significant improvement on the prior-art configurations can be achieved by pushing the depth to 16-19 weight layers. These findings were the basis of our ImageNet Challenge 2014 submission, where our team secured the first and the second places in the localisation and classification tracks respectively. We also show that our representations generalise well to other datasets, where they achieve state-of-the-art results. We have made our two best-performing ConvNet models publicly available to facilitate further research on the use of deep visual representations in computer vision.},
-	urldate = {2020-10-12},
-	journal = {arXiv:1409.1556 [cs]},
-	author = {Simonyan, Karen and Zisserman, Andrew},
-	month = apr,
-	year = {2015},
-	note = {arXiv: 1409.1556},
-	keywords = {Computer Science - Computer Vision and Pattern Recognition}
 }
 
 @article{lecun_gradient-based_1998,
@@ -145,25 +417,6 @@ Publisher: Nature Publishing Group},
 	note = {Number: 6088
 Publisher: Nature Publishing Group},
 	pages = {533--536}
-}
-
-@article{zhang_metal_2003,
-	title = {Metal {Silicides} in {CMOS} {Technology}: {Past}, {Present}, and {Future} {Trends}},
-	volume = {28},
-	issn = {1040-8436},
-	shorttitle = {Metal {Silicides} in {CMOS} {Technology}},
-	url = {https://doi.org/10.1080/10408430390802431},
-	doi = {10.1080/10408430390802431},
-	abstract = {Metal silicides have played an indispensable role in the raped development of microelectronics since PtSi was first used to improve the rectifying characteristics of diodes in early 1960s. This work first provides a brief historical overview of the many different silicides, and, correspondingly, the different processing methodologies used in the past.With regard to the present use of silicides in CMOS technologies a convergence becomes clear with the self aligned technology using only a limited number of silicides, namely, TiSi2, CoSi 2, and NiSi. A section on fundamental aspects is included to cover thermodynamics and kinetics, which are essential for understanding the silicide formation processes. The advantage and disadvantages of TiSi2, CoSi 2, and NiSi are analyzed with the development trend of CMOS technologies as a measure. Specifically, the reactive diffusion and phase formation of these silicades in the three terminals of a metal-oxides-semiconductor device, that is, gate, source, and drain are scrutinized. The review ends with an extended discussion of about future trends of metal-silicides in micro/nanoelectronics, with reference to the potential material aspects and device structures outlined in the International Technologies Roadmap for Semiconductors.},
-	number = {1},
-	urldate = {2020-10-04},
-	journal = {Critical Reviews in Solid State and Materials Sciences},
-	author = {Zhang, Shi-Li and Östling, Mikael},
-	month = nov,
-	year = {2003},
-	note = {Publisher: Taylor \& Francis
-\_eprint: https://doi.org/10.1080/10408430390802431},
-	pages = {1--129}
 }
 
 @article{vaughan_simultaneous_2005,
@@ -283,22 +536,6 @@ Publisher: Nature Publishing Group},
 	pages = {141--146}
 }
 
-@article{freijedo_modeling_2012,
-	title = {Modeling the {Effect} of {Process}, {Power}-{Supply} {Voltage} and {Temperature} {Variations} on the {Timing} {Response} of {Nanometer} {Digital} {Circuits}},
-	volume = {28},
-	issn = {0923-8174, 1573-0727},
-	url = {http://link.springer.com/10.1007/s10836-012-5297-0},
-	doi = {10.1007/s10836-012-5297-0},
-	language = {en},
-	number = {4},
-	urldate = {2020-08-06},
-	journal = {Journal of Electronic Testing},
-	author = {Freijedo, Judit F. and Semião, Jorge and Rodriguez-Andina, Juan J. and Vargas, Fabian and Teixeira, Isabel C. and Teixeira, J. Paulo},
-	month = aug,
-	year = {2012},
-	pages = {421--434}
-}
-
 @article{chen_predicting_1997,
 	title = {Predicting {CMOS} speed with gate oxide and voltage scaling and interconnect loading effects},
 	volume = {44},
@@ -312,30 +549,6 @@ Publisher: Nature Publishing Group},
 	month = nov,
 	year = {1997},
 	pages = {1951--1957}
-}
-
-@incollection{wolpert_temperature_2012,
-	address = {New York, NY},
-	title = {Temperature {Effects} in {Semiconductors}},
-	isbn = {978-1-4614-0747-8 978-1-4614-0748-5},
-	url = {http://link.springer.com/10.1007/978-1-4614-0748-5_2},
-	language = {en},
-	urldate = {2020-08-06},
-	booktitle = {Managing {Temperature} {Effects} in {Nanoscale} {Adaptive} {Systems}},
-	publisher = {Springer New York},
-	author = {Wolpert, David and Ampadu, Paul},
-	collaborator = {Wolpert, David and Ampadu, Paul},
-	year = {2012},
-	doi = {10.1007/978-1-4614-0748-5_2},
-	pages = {15--33}
-}
-
-@article{sapatnekar_what_nodate,
-	title = {What happens when circuits grow old: {Aging} issues in {CMOS} design},
-	abstract = {As CMOS technologies have shrunk to tens of nanometers, aging problems have emerged as a major challenge. There has been tremendous progress in developing new methods for modeling and diagnosing reliability at the level of individual transistors, but much less work on propagating these models to higher levels of abstraction to analyze and optimize the reliability of larger circuits. This talk will provide an introduction to various circuit aging mechanisms and will then discuss research that develops computer-aided design techniques for estimating and enhancing the reliability of large digital circuits, examining solutions that could practically be applied to analyze or improve the lifetime of a design while maintaining consistency to accurate device-level models and the associated physics.},
-	language = {en},
-	author = {Sapatnekar, Sachin S and Department, ECE},
-	pages = {2}
 }
 
 @article{schemmert_threshold-voltage_1974,
@@ -398,23 +611,6 @@ Publisher: Nature Publishing Group},
 	author = {Stachowski, Matthias and Fiebig, Alexander and Rauber, Thomas},
 	month = apr,
 	year = {2020}
-}
-
-@article{guerreiro_dvfs-aware_2019,
-	title = {{DVFS}-aware application classification to improve {GPGPUs} energy efficiency},
-	volume = {83},
-	issn = {0167-8191},
-	url = {http://www.sciencedirect.com/science/article/pii/S0167819118300243},
-	doi = {10.1016/j.parco.2018.02.001},
-	abstract = {The increasing importance of GPUs as high-performance accelerators and the power and energy constraints of computing systems, make it fundamental to develop techniques for energy efficiency maximization of GPGPU applications. Among several potential techniques, dynamic voltage and frequency scaling (DVFS) stands out as one of the most promising approaches. Hence, novel DVFS-aware performance and power classification models are herein proposed that correlate application characteristics and GPU architecture features. In particular, by analysing the utilization of graphics and memory components at a single voltage and frequency levels, the proposed classification methodologies are able to predict the impact of DVFS on GPGPU applications execution time and power and energy consumption. The accuracy of the proposed approach is validated on two modern NVIDIA GPUs from the Maxwell and Pascal generations, by relying on 35 benchmarks from the Rodinia, Polybench, Parboil, SHOC and CUDA SDK suites. Experimental results show that the proposed approach can typically predict the optimal operating frequencies of graphics and memory subsystems, attaining up to 36\% energy savings (average of 16\%), which correspond to an average deviation of 0.74\% regarding the optimal case. Moreover, when considering a maximum performance penalty of 10\%, up to 26\% energy savings are still attained.},
-	language = {en},
-	urldate = {2020-05-24},
-	journal = {Parallel Computing},
-	author = {Guerreiro, João and Ilic, Aleksandar and Roma, Nuno and Tomás, Pedro},
-	year = {2019},
-	note = {Publisher: Elsevier},
-	keywords = {Application classification, DVFS, Energy savings, GPGPU, Optimal frequency},
-	pages = {93--117}
 }
 
 @article{guerreiro_gpu_2019,
@@ -502,20 +698,6 @@ Publisher: Multidisciplinary Digital Publishing Institute},
 	pages = {789--800}
 }
 
-@article{shrestha_review_2019,
-	title = {Review of {Deep} {Learning} {Algorithms} and {Architectures}},
-	volume = {7},
-	issn = {2169-3536},
-	doi = {10.1109/ACCESS.2019.2912200},
-	abstract = {Deep learning (DL) is playing an increasingly important role in our lives. It has already made a huge impact in areas, such as cancer diagnosis, precision medicine, self-driving cars, predictive forecasting, and speech recognition. The painstakingly handcrafted feature extractors used in traditional learning, classification, and pattern recognition systems are not scalable for large-sized data sets. In many cases, depending on the problem complexity, DL can also overcome the limitations of earlier shallow networks that prevented efficient training and abstractions of hierarchical representations of multi-dimensional training data. Deep neural network (DNN) uses multiple (deep) layers of units with highly optimized algorithms and architectures. This paper reviews several optimization methods to improve the accuracy of the training and to reduce training time. We delve into the math behind training algorithms used in recent deep networks. We describe current shortcomings, enhancements, and implementations. The review also covers different types of deep architectures, such as deep convolution networks, deep residual networks, recurrent neural networks, reinforcement learning, variational autoencoders, and others.},
-	journal = {IEEE Access},
-	author = {Shrestha, Ajay and Mahmood, Ausif},
-	year = {2019},
-	note = {Conference Name: IEEE Access},
-	keywords = {Computer architecture, DL, Deep learning, Feature extraction, Feedforward neural networks, Machine learning algorithm, Recurrent neural networks, Training, artificial intelligence, backpropagation, cancer diagnosis, classification systems, convolution neural network, deep architectures, deep convolution networks, deep learning algorithms, deep neural network, deep neural network architectures, deep residual networks, large-sized data sets, learning (artificial intelligence), multidimensional training data, neural nets, optimisation, optimization, optimization methods, painstakingly handcrafted feature extractors, pattern recognition systems, precision medicine, predictive forecasting, recurrent neural networks, reinforcement learning, self-driving cars, speech recognition, supervised and unsupervised learning, variational autoencoders},
-	pages = {53040--53065}
-}
-
 @inproceedings{papadimitriou_harnessing_2017,
 	address = {Cambridge, Massachusetts},
 	series = {{MICRO}-50 '17},
@@ -539,7 +721,6 @@ Publisher: Multidisciplinary Digital Publishing Institute},
 	url = {https://dl.acm.org/doi/10.1145/3123939.3124537},
 	urldate = {2020-05-20}
 }
-
 @inproceedings{kalogirou_exploiting_2019,
 	title = {Exploiting {CPU} {Voltage} {Margins} to {Increase} the {Profit} of {Cloud} {Infrastructure} {Providers}},
 	doi = {10.1109/CCGRID.2019.00044},
@@ -607,6 +788,7 @@ Publisher: Multidisciplinary Digital Publishing Institute},
 	keywords = {Deep Convolutional Neural Network, Dynamic Voltage and Frequency Scaling, Graphics Processing Units},
 	pages = {315--325}
 }
+
 @misc{noauthor_deep_nodate,
 	title = {Deep learning state of the art 2020 ({MIT} {Deep} {Learning} {Series}) - {Part} 1 · {Buomsoo} {Kim}},
 	url = {https://buomsoo-kim.github.io/learning/2020/04/02/deep-learning-sota-part-1.md/},
@@ -675,19 +857,6 @@ Publisher: Multidisciplinary Digital Publishing Institute},
 	month = may,
 	year = {2015},
 	pages = {436--444}
-}
-
-@inproceedings{zhang_approxann_2015,
-	title = {{ApproxANN}: {An} approximate computing framework for artificial neural network},
-	shorttitle = {{ApproxANN}},
-	abstract = {Artificial Neural networks (ANNs) are one of the most well-established machine learning techniques and have a wide range of applications, such as Recognition, Mining and Synthesis (RMS). As many of these applications are inherently error-tolerant, in this work, we propose a novel approximate computing framework for ANN, namely ApproxANN. When compared to existing solutions, ApproxANN considers approximation for both computation and memory accesses, thereby achieving more energy savings. To be specific, ApproxANN characterizes the impact of neurons on the output quality in an effective and efficient manner, and judiciously determine how to approximate the computation and memory accesses of certain less critical neurons to achieve the maximum energy efficiency gain under a given quality constraint. Experimental results on various ANN applications with different datasets demonstrate the efficacy of the proposed solution.},
-	booktitle = {2015 {Design}, {Automation} {Test} in {Europe} {Conference} {Exhibition} ({DATE})},
-	author = {Zhang, Qian and Wang, Ting and Tian, Ye and Yuan, Feng and Xu, Qiang},
-	month = mar,
-	year = {2015},
-	note = {ISSN: 1558-1101},
-	keywords = {ApproxANN, Approximation methods, Artificial neural networks, Biological neural networks, Degradation, Energy consumption, Hardware, Neurons, approximate computing framework, artificial neural network, energy efficiency gain, neural nets, power aware computing, quality constraint},
-	pages = {701--706}
 }
 
 @misc{noauthor_approxann_nodate,
@@ -817,30 +986,6 @@ Publisher: Multidisciplinary Digital Publishing Institute},
 	year = {2019},
 	keywords = {DNN model, Deep neural network, FP32 precision, Graphics processing units, Neural networks, PIT, Power demand, Runtime, Servers, Tesla P40 GPU, Time factors, Time-frequency analysis, accuracy, coordinated DVFS, deep neural network applications, energy consumption, graphics processing units, hardware accelerator, high power consumption, job scheduler, neural nets, power, power aware computing, power consumption, power-inference accuracy trading, precision control, response time, scheduling},
 	pages = {136--140}
-}
-
-@article{da-ren_time_2014,
-	title = {Time and {Energy} {Efficient} {DVS} {Scheduling} for {Real}-{Time} {Pinwheel} {Tasks}},
-	volume = {12},
-	issn = {1665-6423},
-	url = {http://www.scielo.org.mx/scielo.php?script=sci_arttext&pid=S1665-64232014000600003&nrm=iso},
-	language = {en},
-	journal = {Journal of applied research and technology},
-	author = {Da-Ren, Chen and Young-Long, Chen and You-Shyang, Chen},
-	year = {2014},
-	pages = {1025 -- 1039}
-}
-
-@article{da-ren_time_2014-1,
-	title = {Time and {Energy} {Efficient} {DVS} {Scheduling} for {Real}-{Time} {Pinwheel} {Tasks}},
-	volume = {12},
-	issn = {1665-6423},
-	url = {http://www.scielo.org.mx/scielo.php?script=sci_arttext&pid=S1665-64232014000600003&nrm=iso},
-	language = {en},
-	journal = {Journal of applied research and technology},
-	author = {Da-Ren, Chen and Young-Long, Chen and You-Shyang, Chen},
-	year = {2014},
-	pages = {1025 -- 1039}
 }
 
 @article{seongki_gpgpu-perf:_2015,
@@ -1160,7 +1305,6 @@ applications.},
 	keywords = {Adaptation models, CUDA application, Graphics processing units, Kernel, NVIDIA Fermi M2090s, Predictive models, Radiation detectors, Runtime, Training, complex memory hierarchy, emergent GPU architecture, emergent heterogeneous system, graphics processing units, high-performance code, machine learning, memory access pattern, multiple linear regression model, optimisation, optimization strategy, parallel architectures, power consumption, power-performance efficiency, regression analysis},
 	pages = {673--686}
 }
-
 @inproceedings{ghosh_statistical_2013,
 	title = {Statistical modeling of power/energy of scientific kernels on a multi-{GPU} system},
 	doi = {10.1109/IGCC.2013.6604488},
@@ -1213,6 +1357,7 @@ applications.},
 	year = {2010},
 	pages = {115--122}
 }
+
 @misc{noauthor_polybench/c_nodate,
 	title = {{PolyBench}/{C} -- {Homepage} of {Louis}-{Noël} {Pouchet}},
 	url = {http://web.cs.ucla.edu/~pouchet/software/polybench/},
@@ -1239,25 +1384,6 @@ applications.},
 	note = {ISSN: 2379-3155},
 	keywords = {Dynamic Voltage and Frequency Scaling, Equalizer, Equalizers, GPGPUs, GPU resource dynamic tuning, Graphics processing units, Instruction sets, Kernel, Memory management, Pipelines, Resource Utilization, Runtime, Runtime System, bottleneck resource, concurrent threads, core frequency, energy conservation, energy saving, graphics processing units, hardware runtime system, kernel characteristics, kernel resource requirements, memory frequency, on-chip concurrency, resource allocation},
 	pages = {647--658}
-}
-
-@inproceedings{leng_gpuwattch:_2013,
-	address = {New York, NY, USA},
-	series = {{ISCA} '13},
-	title = {{GPUWattch}: {Enabling} {Energy} {Optimizations} in {GPGPUs}},
-	isbn = {978-1-4503-2079-5},
-	shorttitle = {{GPUWattch}},
-	url = {http://doi.acm.org/10.1145/2485922.2485964},
-	doi = {10.1145/2485922.2485964},
-	abstract = {General-purpose GPUs (GPGPUs) are becoming prevalent in mainstream computing, and performance per watt has emerged as a more crucial evaluation metric than peak performance. As such, GPU architects require robust tools that will enable them to quickly explore new ways to optimize GPGPUs for energy efficiency. We propose a new GPGPU power model that is configurable, capable of cycle-level calculations, and carefully validated against real hardware measurements. To achieve configurability, we use a bottom-up methodology and abstract parameters from the microarchitectural components as the model's inputs. We developed a rigorous suite of 80 microbenchmarks that we use to bound any modeling uncertainties and inaccuracies. The power model is comprehensively validated against measurements of two commercially available GPUs, and the measured error is within 9.9\% and 13.4\% for the two target GPUs (GTX 480 and Quadro FX5600). The model also accurately tracks the power consumption trend over time. We integrated the power model with the cycle-level simulator GPGPU-Sim and demonstrate the energy savings by utilizing dynamic voltage and frequency scaling (DVFS) and clock gating. Traditional DVFS reduces GPU energy consumption by 14.4\% by leveraging within-kernel runtime variations. More finer-grained SM cluster-level DVFS improves the energy savings from 6.6\% to 13.6\% for those benchmarks that show clustered execution behavior. We also show that clock gating inactive lanes during divergence reduces dynamic power by 11.2\%.},
-	urldate = {2019-12-09},
-	booktitle = {Proceedings of the 40th {Annual} {International} {Symposium} on {Computer} {Architecture}},
-	publisher = {ACM},
-	author = {Leng, Jingwen and Hetherington, Tayler and ElTantawy, Ahmed and Gilani, Syed and Kim, Nam Sung and Aamodt, Tor M. and Reddi, Vijay Janapa},
-	year = {2013},
-	note = {event-place: Tel-Aviv, Israel},
-	keywords = {CUDA, GPU architecture, energy, power, power estimation},
-	pages = {487--498}
 }
 
 @inproceedings{lee_dynamic_2014,
@@ -1296,30 +1422,6 @@ applications.},
 	pages = {44--54}
 }
 
-@inproceedings{abe_power_2012,
-	address = {Berkeley, CA, USA},
-	series = {{HotPower}'12},
-	title = {Power and {Performance} {Analysis} of {GPU}-accelerated {Systems}},
-	url = {http://dl.acm.org/citation.cfm?id=2387869.2387879},
-	abstract = {Graphics processing units (GPUs) provide significant improvements in performance and performance-per-watt as compared to traditional multicore CPUs. This energy-efficiency of GPUs has facilitated the use of GPUs in many application domains. Albeit energy efficient, GPUs consume non-trivial power independently of CPUs. Therefore, we need to analyze the power and performance characteristic of GPUs and their causal relation with CPUs in order to reduce the total energy consumption of the system while sustaining high performance. In this paper, we provide a power and performance analysis of GPU-accelerated systems for better understandings of these implications. Our analysis on a real system discloses that system energy can be reduced by 28\% retaining a decrease in performance within 1\% by controlling the voltage and frequency levels of GPUs. We show that energy savings can be achieved when GPU core and memory clock frequencies are appropriately scaled considering the workload characteristics. Another interesting finding is that voltage and frequency scaling of CPUs is trivial for total system energy reduction, and even should not be applied in state-of-the-art GPU-accelerated systems. We believe that these findings are useful to develop dynamic voltage and frequency scaling (DVFS) algorithms for GPU-accelerated systems.},
-	urldate = {2019-12-09},
-	booktitle = {Proceedings of the 2012 {USENIX} {Conference} on {Power}-{Aware} {Computing} and {Systems}},
-	publisher = {USENIX Association},
-	author = {Abe, Yuki and Sasaki, Hiroshi and Peres, Martin and Inoue, Koji and Murakami, Kazuaki and Kato, Shinpei},
-	year = {2012},
-	note = {event-place: Hollywood, CA},
-	pages = {10--10}
-}
-
-@inproceedings{mei_measurement_2013,
-	title = {A measurement study of {GPU} {DVFS} on energy conservation},
-	doi = {10.1145/2525526.2525852},
-	abstract = {Nowadays, GPUs are widely used to accelerate many high performance computing applications. Energy conservation of such computing systems has become an important research topic. Dynamic voltage/frequency scaling (DVFS) is proved to be an appealing method for saving energy for traditional computing centers. However, there is still a lack of firsthand study on the effectiveness of GPU DVFS. This paper presents a thorough measurement study that aims to explore how GPU DVFS affects the system energy consumption. We conduct experiments on a real GPU platform with 37 benchmark applications. Our results show that GPU voltage/frequency scaling is an effective approach to conserving energy. For example, by scaling down the GPU core voltage and frequency, we have achieved an average of 19.28\% energy reduction compared with the default setting, while giving up no more than 4\% of performance. For all tested GPU applications, core voltage scaling is significantly effective to reduce system energy consumption. Meanwhile the effects of scaling core frequency and memory frequency depend on the characteristics of GPU applications.},
-	author = {Mei, Xinxin and Yung, Ling and Zhao, Kaiyong and Chu, Xiaowen},
-	month = nov,
-	year = {2013}
-}
-
 @inproceedings{ge_effects_2013,
 	title = {Effects of {Dynamic} {Voltage} and {Frequency} {Scaling} on a {K20} {GPU}},
 	doi = {10.1109/ICPP.2013.98},
@@ -1328,19 +1430,6 @@ applications.},
 	month = oct,
 	year = {2013},
 	pages = {826--833}
-}
-
-@inproceedings{jiao_power_2010,
-	title = {Power and {Performance} {Characterization} of {Computational} {Kernels} on the {GPU}},
-	doi = {10.1109/GreenCom-CPSCom.2010.143},
-	abstract = {Nowadays Graphic Processing Units (GPU) are gaining increasing popularity in high performance computing (HPC). While modern GPUs can offer much more computational power than CPUs, they also consume much more power. Energy efficiency is one of the most important factors that will affect a broader adoption of GPUs in HPC. In this paper, we systematically characterize the power and energy efficiency of GPU computing. Specifically, using three different applications with various degrees of compute and memory intensiveness, we investigate the correlation between power consumption and different computational patterns under various voltage and frequency levels. Our study revealed that energy saving mechanisms on GPUs behave considerably different than CPUs. The characterization results also suggest possible ways to improve the 'greenness' of GPU computing.},
-	booktitle = {2010 {IEEE}/{ACM} {Int}'l {Conference} on {Green} {Computing} and {Communications} {Int}'l {Conference} on {Cyber}, {Physical} and {Social} {Computing}},
-	author = {Jiao, Y. and Lin, H. and Balaji, P. and Feng, W.},
-	month = dec,
-	year = {2010},
-	note = {ISSN: null},
-	keywords = {CPU, Clocks, DVFS, Energy-Efficient Computing, GPU, GPUs, Graphics processing unit, Kernel, Memory management, Performance evaluation, Power demand, computational power, computer graphic equipment, coprocessors, energy conservation, energy efficiency, energy saving mechanism, graphic processing unit, high performance computing, low-power electronics, mainframes, power consumption},
-	pages = {221--228}
 }
 
 @misc{noauthor_opencl_2013,
@@ -1352,37 +1441,6 @@ applications.},
 	journal = {The Khronos Group},
 	month = jul,
 	year = {2013}
-}
-
-@misc{noauthor_time_nodate,
-	title = {Time and {Energy} {Efficient} {DVS} {Scheduling} for {Real}-{Time} {Pinwheel} {Tasks} {\textbar} {Elsevier} {Enhanced} {Reader}},
-	url = {https://reader.elsevier.com/reader/sd/pii/S1665642314716633?token=A320D8E6AEACD94E4D0F78E52A78812476B17F7A403EEC03DC8E707CDC594C9935381917052C84FC19C8BABE752351B8},
-	language = {en},
-	urldate = {2019-12-04},
-	doi = {10.1016/S1665-6423(14)71663-3}
-}
-
-@phdthesis{boyer_improving_2013,
-	title = {Improving {Resource} {Utilization} in {Heterogeneous} {CPU}-{GPU} {Systems}},
-	copyright = {All rights reserved (no additional license for public reuse)},
-	url = {https://libraetd.lib.virginia.edu/public_view/z890rt45j},
-	abstract = {Graphics processing units (GPUs) have attracted enormous interest over the past decade due to substantial increases in both performance and programmability. Programmers can potentially leverage GPUs for substantial performance gains, but at the cost of significant software engineering effort. In practice, most GPU applications do not effectively utilize all of the available resources in a system: they either fail to use use a resource at all or use a resource to less than its full potential. This underutilization can hurt both performance and energy efficiency. In this dissertation, we address the underutilization of resources in heterogeneous CPU-GPU systems in three different contexts.
-
-First, we address the underutilization of a single GPU by reducing CPU-GPU interaction to improve performance. We use as a case study a computationally-intensive video-tracking application from systems biology. Because of the high cost of CPU-GPU coordination, our initial, straightforward attempts to accelerate this application failed to effectively utilize the GPU. By leveraging some non-obvious optimization strategies, we significantly decreased the amount of CPU-GPU interaction and improved the performance of the GPU implementation by 26x relative to the best CPU implementation. Based on the lessons we learned, we present general guidelines for optimizing GPU applications as well as recommendations for system-level changes that would simplify the development of high-performance GPU applications.
-
-Next, we address underutilization at the system level by using load balancing to improve performance. We propose a dynamic scheduling algorithm that automatically and efficiently divides the execution of a data-parallel kernel across multiple, possibly heterogeneous GPUs. We show that our scheduler can nearly match the performance of an unrealistic static scheduler when device performance is fixed, and can provide better performance when device performance varies.
-
-Finally, we address underutilization within a GPU by using frequency scaling to improve energy efficiency. We propose a novel algorithm for predicting the energy-optimal GPU clock frequencies for an arbitrary kernel. Using power measurements from real systems, we demonstrate that our algorithm improves significantly on the state of the art across multiple generations of GPUs. We also propose and evaluate techniques for decreasing the CPU's energy consumption during GPU computation.
-
-Many of the techniques presented in this dissertation can be used to improve the performance and energy efficiency of GPU applications with no programmer effort or software modifications required. As the diversity of available hardware systems continues to increase, automatic techniques such as these will become critical for software to fully realize the benefits of future hardware improvements.},
-	language = {en},
-	urldate = {2019-12-04},
-	school = {University of Virginia},
-	author = {Boyer, Michael},
-	collaborator = {Skadron, Kevin},
-	month = apr,
-	year = {2013},
-	doi = {10.18130/V3TJ7X}
 }
 
 @misc{noauthor_gpgpu-sim/gpgpu-sim_distribution_2019,
@@ -1419,68 +1477,6 @@ Many of the techniques presented in this dissertation can be used to improve the
 	author = {Hibben, Mark},
 	month = mar,
 	year = {2019}
-}
-
-@inproceedings{hoffmann_racing_2013,
-	address = {New York, NY, USA},
-	series = {{HotPower} '13},
-	title = {Racing and {Pacing} to {Idle}: {An} {Evaluation} of {Heuristics} for {Energy}-aware {Resource} {Allocation}},
-	isbn = {978-1-4503-2458-8},
-	shorttitle = {Racing and {Pacing} to {Idle}},
-	url = {http://doi.acm.org/10.1145/2525526.2525854},
-	doi = {10.1145/2525526.2525854},
-	abstract = {We examine the problem of assigning computing resources to an application to meet a performance goal while minimizing energy consumption. We present a general formulation of this problem as a linear program, discuss several potential heuristic solutions, and evaluate these heuristics on two real systems (one purchased in 2010, the other in 2013). We find that the well-known race-to-idle heuristic is close to the optimal solution on the older machine. On the newer machine, however, the optimal solution outperforms race-to-idle by over 35\%. A generalization of race-to-idle, called pace-to-idle, is found to provide better results in a wider range of scenarios.},
-	urldate = {2019-11-29},
-	booktitle = {Proceedings of the {Workshop} on {Power}-{Aware} {Computing} and {Systems}},
-	publisher = {ACM},
-	author = {Hoffmann, Henry},
-	year = {2013},
-	note = {event-place: Farmington, Pennsylvania},
-	keywords = {energy-aware computing, optimization, power-aware computing, resource allocation},
-	pages = {13:1--13:5}
-}
-
-@inproceedings{kim_racing_2015,
-	title = {Racing and {Pacing} to {Idle}: {Theoretical} and {Empirical} {Analysis} of {Energy} {Optimization} {Heuristics}},
-	shorttitle = {Racing and {Pacing} to {Idle}},
-	doi = {10.1109/CPSNA.2015.23},
-	abstract = {The problem of minimizing energy for a performance constraint (e.g., Real-time deadline or quality-of-service requirement) has been widely studied, both in theory and in practice. Theoretical models have indicated large potential energy savings, but practical concerns have made these savings hard to realize. Instead, practitioners often rely on heuristic solutions, which achieve good results in practice but tend to be system-specific in efficacy. An example is the race-to-idle heuristic, which makes all resources available until a task completes and then idles. Theory predicts poor energy savings, but practitioners have reported good empirical results. To help bridge the gap between theory and practice, this paper presents a geometrical framework for analyzing the energy optimality of resource allocation under performance constraints. The geometry of the problem allows us to derive an optimal strategy and three commonly used heuristics: 1) race-to-idle, 2) pace-to-idle a near-optimal idling strategy, and 3) no-idle which never idles. We then implement all strategies and test them empirically for seven benchmarks on four different multicore systems, including both x86 and ARM. We find that race-to-idle is near optimal on older systems, but can consume as much as 3× more energy than the optimal strategy. In contrast, pace-to-idle is never more than 12\% worse than optimal.},
-	booktitle = {2015 {IEEE} 3rd {International} {Conference} on {Cyber}-{Physical} {Systems}, {Networks}, and {Applications}},
-	author = {Kim, David H.K. and Imes, Connor and Hoffmann, Henry},
-	month = aug,
-	year = {2015},
-	note = {ISSN: null},
-	keywords = {ARM, Energy consumption, Heuristic algorithms, Multicore processing, Optimization, Power demand, Program processors, Resource management, energy minimization, energy optimization heuristics, energy savings, geometrical framework, heuristic solutions, multicore systems, near-optimal idling strategy, no-idle heuristic, optimal strategy, pace-to-idle heuristic, performance constraints, power aware computing, race-to-idle heuristic, resource allocation, x86},
-	pages = {78--85}
-}
-
-@inproceedings{hong_integrated_2010,
-	address = {New York, NY, USA},
-	series = {{ISCA} '10},
-	title = {An {Integrated} {GPU} {Power} and {Performance} {Model}},
-	isbn = {978-1-4503-0053-7},
-	url = {http://doi.acm.org/10.1145/1815961.1815998},
-	doi = {10.1145/1815961.1815998},
-	abstract = {GPU architectures are increasingly important in the multi-core era due to their high number of parallel processors. Performance optimization for multi-core processors has been a challenge for programmers. Furthermore, optimizing for power consumption is even more difficult. Unfortunately, as a result of the high number of processors, the power consumption of many-core processors such as GPUs has increased significantly. Hence, in this paper, we propose an integrated power and performance (IPP) prediction model for a GPU architecture to predict the optimal number of active processors for a given application. The basic intuition is that when an application reaches the peak memory bandwidth, using more cores does not result in performance improvement. We develop an empirical power model for the GPU. Unlike most previous models, which require measured execution times, hardware performance counters, or architectural simulations, IPP predicts execution times to calculate dynamic power events. We then use the outcome of IPP to control the number of running cores. We also model the increases in power consumption that resulted from the increases in temperature. With the predicted optimal number of active cores, we show that we can save up to 22.09\%of runtime GPU energy consumption and on average 10.99\% of that for the five memory bandwidth-limited benchmarks.},
-	urldate = {2019-11-28},
-	booktitle = {Proceedings of the 37th {Annual} {International} {Symposium} on {Computer} {Architecture}},
-	publisher = {ACM},
-	author = {Hong, Sunpyo and Kim, Hyesoon},
-	year = {2010},
-	note = {event-place: Saint-Malo, France},
-	keywords = {CUDA, GPU architecture, analytical model, energy, performance, power estimation},
-	pages = {280--289}
-}
-
-@phdthesis{s._hong_modeling_2012,
-	type = {{PhD} thesis},
-	title = {Modeling performance and power for energy-efficient {GPGPU} computing},
-	url = {https://smartech.gatech.edu/handle/1853/45922},
-	abstract = {The objective of the proposed research is to develop an analytical model that predicts performance and power for many-core architecture and further propose a mechanism, which leverages the analytical model, to enable energy-efficient execution of an application. The key insight of the model is to investigate and quantify a complex relationship that exists between the thread-level parallelism and memory-level parallelism for an application on a given many-core architecture. Two metrics are proposed: memory warp parallelism (MWP), which refers to the number of overlapping memory accesses per core, and computation warp parallelism (CWP), which characterizes an application type. By using these metrics in addition to the architectural and application parameters, the overall application performance is produced. The model uses statically-available parameters such as instruction-mixture information and input-data size, and the prediction accuracy is 13.3\% for the GPU-computing benchmarks. Another important aspect of using many-core architecture is reducing peak power and achieving energy savings. By using the proposed integrated power and performance (IPP) framework, the results showed that different optimization points exist for GPU architecture depending on the application type. The work shows that by activating fewer cores, 10.99\% of run-time energy consumption can be saved for the bandwidth-limited benchmarks, and a projection of 25.8\% energy savings is predicted when power-gating at core level is employed. Finally, the model is shifted to throughput using OpenCL for targeting more variety of processors. First, multiple outputs relating to performance are predicted, including upper-bound and lower-bound values. Second, by using the model parameters, an application can be categorized into a different category, each with its own suggestions for improving performance and energy efficiency. Third, the bandwidth saturation point accuracy is significantly improved by considering independent memory accesses and updating the performance model. Furthermore, a trade-off analysis using architectural and application parameters is straightforward, which provides more insights to improve energy efficiency. In the future, a computer system will contain hundreds of heterogeneous cores. Hence, it is mandatory that a workload gets scheduled to an efficient core or distributed on both types of cores. A preliminary work by using the analytical model to do scheduling between CPU and GPU is demonstrated in the appendix. Since profiling phase is not required, the kernel code can be transformed to run more efficiently on the specific architecture. Another extension of the work regarding the relationship between the speed-up and energy efficiency is mathematically derived. Finally, future research ideas are presented regarding the usage of the model for programmer, compiler, and runtime for future heterogeneous systems.},
-	urldate = {2019-11-28},
-	school = {Georgia Institute of Technology},
-	author = {{S. Hong}},
-	year = {2012}
 }
 
 @article{gonzalez_supply_1997,
@@ -1533,23 +1529,6 @@ Many of the techniques presented in this dissertation can be used to improve the
 	language = {en-us},
 	urldate = {2019-11-28},
 	author = {{AMD}}
-}
-
-@inproceedings{jing_energy-efficient_2013,
-	address = {New York, NY, USA},
-	series = {{ISCA} '13},
-	title = {An {Energy}-efficient and {Scalable} {eDRAM}-based {Register} {File} {Architecture} for {GPGPU}},
-	isbn = {978-1-4503-2079-5},
-	url = {http://doi.acm.org/10.1145/2485922.2485952},
-	doi = {10.1145/2485922.2485952},
-	abstract = {The heavily-threaded data processing demands of streaming multiprocessors (SM) in a GPGPU require a large register file (RF). The fast increasing size of the RF makes the area cost and power consumption unaffordable for traditional SRAM designs in the future technologies. In this paper, we propose to use embedded-DRAM (eDRAM) as an alternative in future GPGPUs. Compared with SRAM, eDRAM provides higher density and lower leakage power. However, the limited data retention time in eDRAM poses new challenges. Periodic refresh operations are needed to maintain data integrity. This is exacerbated with the scaling of eDRAM density, process variations and temperature. Unlike conventional CPUs which make use of multi-ported RF, most of the RFs in modern GPGPU are heavily banked but not multi-ported to reduce the hardware cost. This provides a unique opportunity to hide the refresh overhead. We propose two different eDRAM implementations based on 3T1D and 1T1C memory cells. To mitigate the impact of periodic refresh, we propose two novel refresh solutions using bank bubble and bank walk-through. Plus, for the 1T1C RF, we design an interleaved bank organization together with an intelligent warp scheduling strategy to reduce the impact of the destructive reads. The analysis shows that our schemes present better energy efficiency, scalability and variation tolerance than traditional SRAM-based designs.},
-	urldate = {2019-11-28},
-	booktitle = {Proceedings of the 40th {Annual} {International} {Symposium} on {Computer} {Architecture}},
-	publisher = {ACM},
-	author = {Jing, Naifeng and Shen, Yao and Lu, Yao and Ganapathy, Shrikanth and Mao, Zhigang and Guo, Minyi and Canal, Ramon and Liang, Xiaoyao},
-	year = {2013},
-	note = {event-place: Tel-Aviv, Israel},
-	pages = {344--355}
 }
 
 @book{hwu_heterogeneous_2015,
@@ -1660,20 +1639,6 @@ Many of the techniques presented in this dissertation can be used to improve the
 	year = {2019},
 	note = {arXiv: 1909.06842},
 	keywords = {Computer Science - Distributed, Parallel, and Cluster Computing, Computer Science - Machine Learning}
-}
-
-@article{tang_impact_2019,
-	title = {The {Impact} of {GPU} {DVFS} on the {Energy} and {Performance} of {Deep} {Learning}: an {Empirical} {Study}},
-	shorttitle = {The {Impact} of {GPU} {DVFS} on the {Energy} and {Performance} of {Deep} {Learning}},
-	url = {http://arxiv.org/abs/1905.11012},
-	abstract = {Over the past years, great progress has been made in improving the computing power of general-purpose graphics processing units (GPGPUs), which facilitates the prosperity of deep neural networks (DNNs) in multiple fields like computer vision and natural language processing. A typical DNN training process repeatedly updates tens of millions of parameters, which not only requires huge computing resources but also consumes significant energy. In order to train DNNs in a more energy-efficient way, we empirically investigate the impact of GPU Dynamic Voltage and Frequency Scaling (DVFS) on the energy consumption and performance of deep learning. Our experiments cover a wide range of GPU architectures, DVFS settings, and DNN configurations. We observe that, compared to the default core frequency settings of three tested GPUs, the optimal core frequency can help conserve 8.7\%\${\textbackslash}sim\$23.1\% energy consumption for different DNN training cases. Regarding the inference, the benefits vary from 19.6\%\${\textbackslash}sim\$26.4\%. Our findings suggest that GPU DVFS has great potentials to help develop energy efficient DNN training/inference schemes.},
-	urldate = {2019-11-21},
-	journal = {arXiv:1905.11012 [cs]},
-	author = {Tang, Zhenheng and Wang, Yuxin and Wang, Qiang and Chu, Xiaowen},
-	month = may,
-	year = {2019},
-	note = {arXiv: 1905.11012},
-	keywords = {Computer Science - Performance}
 }
 
 @article{guerreiro_modeling_2019,
@@ -1902,19 +1867,6 @@ Many of the techniques presented in this dissertation can be used to improve the
 	pages = {7003--7036}
 }
 
-@article{mei_survey_2016,
-	title = {A {Survey} and {Measurement} {Study} of {GPU} {DVFS} on {Energy} {Conservation}},
-	url = {http://arxiv.org/abs/1610.01784},
-	abstract = {Energy efficiency has become one of the top design criteria for current computing systems. The dynamic voltage and frequency scaling (DVFS) has been widely adopted by laptop computers, servers, and mobile devices to conserve energy, while the GPU DVFS is still at a certain early age. This paper aims at exploring the impact of GPU DVFS on the application performance and power consumption, and furthermore, on energy conservation. We survey the state-of-the-art GPU DVFS characterizations, and then summarize recent research works on GPU power and performance models. We also conduct real GPU DVFS experiments on NVIDIA Fermi and Maxwell GPUs. According to our experimental results, GPU DVFS has significant potential for energy saving. The effect of scaling core voltage/frequency and memory voltage/frequency depends on not only the GPU architectures, but also the characteristic of GPU applications.},
-	urldate = {2019-10-23},
-	journal = {arXiv:1610.01784 [cs]},
-	author = {Mei, Xinxin and Wang, Qiang and Chu, Xiaowen},
-	month = oct,
-	year = {2016},
-	note = {arXiv: 1610.01784},
-	keywords = {Computer Science - Distributed, Parallel, and Cluster Computing, Dynamic voltage and frequency scaling, Energy efficiency, Graphics processing unit}
-}
-
 @article{vieira_transactional_nodate,
 	title = {Transactional {Memory} for {Heterogeneous} {CPU}-{GPU} {Systems}},
 	language = {en},
@@ -2115,19 +2067,6 @@ Many of the techniques presented in this dissertation can be used to improve the
 	pages = {144--157}
 }
 
-@inproceedings{guerreiro_dvfs-aware_2019,
-	title = {{DVFS}-aware application classification to improve {GPGPUs} energy efficiency {\textbar} {Elsevier} {Enhanced} {Reader}},
-	url = {https://reader.elsevier.com/reader/sd/pii/S0167819118300243?token=5530CE0F6CF56482EC5C0437FFF8C17C68BA5D90BB31B981078538CB3C2317A125D603C3E30AAB743060211C6661C65E},
-	doi = {10.1016/j.parco.2018.02.001},
-	abstract = {The increasing importance of GPUs as high-performance accelerators and the power and energy constraints of computing systems, make it fundamental to develop techniques for energy efficiency maximization of GPGPU applications. Among several potential techniques, dynamic voltage and frequency scaling (DVFS) stands out as one of the most promising approaches. Hence, novel DVFS-aware performance and power classification models are herein proposed that correlate application characteristics and GPU architecture features. In particular, by analysing the utilization of graphics and memory components at a single voltage and frequency levels, the proposed classification methodologies are able to predict the impact of DVFS on GPGPU applications execution time and power and energy consumption. The accuracy of the proposed approach is validated on two modern NVIDIA GPUs from the Maxwell and Pascal generations, by relying on 35 benchmarks from the Rodinia, Polybench, Parboil, SHOC and CUDA SDK suites. Experimental results show that the proposed approach can typically predict the optimal operating frequencies of graphics and memory subsystems, attaining up to 36\% energy savings (average of 16\%), which correspond to an average deviation of 0.74\% regarding the optimal case. Moreover, when considering a maximum performance penalty of 10\%, up to 26\% energy savings are still attained.},
-	language = {en},
-	urldate = {2019-10-23},
-	author = {Guerreiro, João},
-	month = apr,
-	year = {2019},
-	keywords = {Application Classification, DVFS, Energy savings, GPGPU, Optimal frequency}
-}
-
 @inproceedings{stavrinides_energy-aware_2018,
 	title = {Energy-{Aware} {Scheduling} of {Real}-{Time} {Workflow} {Applications} in {Clouds} {Utilizing} {DVFS} and {Approximate} {Computations}},
 	doi = {10.1109/FiCloud.2018.00013},
@@ -2151,6 +2090,7 @@ Many of the techniques presented in this dissertation can be used to improve the
 	year = {2019},
 	keywords = {Approximate Computations, Energy Efficiency, Per-Core DVFS, Quality of Service, Real-time workflows, Schedualing}
 }
+
 @inproceedings{koga_optimal_2014,
 	title = {Optimal {Reliability} {Design} for {Real}-{Time} {Systems} with {Dynamic} {Voltage} and {Frequency} {Scaling}},
 	doi = {10.1109/PRDC.2014.35},
@@ -2174,7 +2114,6 @@ Many of the techniques presented in this dissertation can be used to improve the
 	keywords = {AC cooling efficiency, AC energy consumption, CPU frequency, Computational modeling, Correlation, DVFS-enabled data centers, Heating, Optimization, Power demand, Processor scheduling, Servers, computation power consumption, convex programming, dynamic voltage and frequency scaling technology, heterogeneous thermal correlation, integer programming, mixed-integer convex optimization problem, nonlinear cube-function computation power model, nonlinear functions, optimization formulation, power aware computing, thermal-aware energy-efficient task scheduling},
 	pages = {536--540}
 }
-
 @inproceedings{huang_double-q_2017,
 	title = {Double-{Q} {Learning}-{Based} {DVFS} for {Multi}-core {Real}-{Time} {Systems}},
 	doi = {10.1109/iThings-GreenCom-CPSCom-SmartData.2017.83},
